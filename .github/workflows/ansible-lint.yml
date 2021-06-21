@@ -1,0 +1,35 @@
+name: ansible-lint
+
+on:
+  pull_request:
+  push:
+
+jobs:
+
+  ansible-lint:
+
+    name: ansible-lint
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: mamercad/cloudmason
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install ansible
+        run: pip install ansible==4.1.0
+
+      - name: Install ansible-lint
+        run: pip install ansible-lint==5.0.12
