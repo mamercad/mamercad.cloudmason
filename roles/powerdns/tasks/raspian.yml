@@ -1,0 +1,109 @@
+- name: include raspian variables
+  ansible.builtin.include_vars:
+    file: raspian.yml
+
+- name: add powerdns apt gpg key
+  ansible.builtin.apt_key:
+    state: present
+    id: "{{ powerdns_gpg_key_id }}"
+    keyserver: keys.gnupg.net
+  become: true
+
+- name: add powerdns recursor repository
+  ansible.builtin.apt_repository:
+    state: present
+    repo: "{{ powerdns_rec_repo }}"
+    filename: "{{ powerdns_rec_repo_filename }}"
+  become: true
+
+- name: add powerdns authoritative server repository
+  ansible.builtin.apt_repository:
+    state: present
+    repo: "{{ powerdns_auth_repo }}"
+    filename: "{{ powerdns_auth_repo_filename }}"
+  become: true
+
+- name: add pin-priority for powerdns packages
+  ansible.builtin.copy:
+    dest: /etc/apt/preferences.d/pdns
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      Package: pdns-*
+      Pin: origin repo.powerdns.com
+      Pin-Priority: 600
+  become: true
+
+- name: install powerdns packages
+  ansible.builtin.apt:
+    state: present
+    name:
+      - pdns-server
+      - pdns-recursor
+      - pdns-backend-bind
+      - pdns-backend-mysql
+      - pdns-backend-sqlite3
+  become: true
+
+- name: deploy /etc/powerdns/recursor.conf
+  copy:
+    dest: /etc/powerdns/recursor.conf
+    owner: pdns
+    group: root
+    mode: 0640
+    content: |
+      config-dir=/etc/powerdns
+      setuid=pdns
+      setgid=pdns
+      allow-from=127.0.0.0/8,{{ network.cidr_wide }}
+      forward-zones={{ powerdns_forward_zones }}
+      local-address=0.0.0.0:53
+      webserver=yes
+      webserver-address=0.0.0.0
+      webserver-allow-from=127.0.0.0/8,{{ network.cidr_wide }}
+      webserver-port=8082
+    backup: true
+  notify: restart-pdns-recursor
+  become: true
+
+- name: start and enable pdns-recursor
+  ansible.builtin.systemd:
+    name: pdns-recursor
+    state: started
+    enabled: true
+  become: true
+
+- name: deploy /etc/powerdns/pdns.conf
+  copy:
+    dest: /etc/powerdns/pdns.conf
+    owner: pdns
+    group: root
+    mode: 0640
+    content: |
+      config-dir=/etc/powerdns
+      setuid=pdns
+      setgid=pdns
+      api=yes
+      api-key={{ powerdns_api_key }}
+      local-address=0.0.0.0:5353
+      master=yes
+      slave=no
+      webserver=yes
+      webserver-address=0.0.0.0
+      webserver-allow-from=127.0.0.0/8,{{ network.cidr_wide }}
+      webserver-port=8081
+      launch=
+      launch+=gsqlite3
+      gsqlite3-database=/var/lib/powerdns/db.sqlite
+      gsqlite3-dnssec=no
+    backup: true
+  notify: restart-pdns-server
+  become: true
+
+- name: start and enable pdns
+  systemd:
+    name: pdns
+    state: started
+    enabled: true
+  become: true
