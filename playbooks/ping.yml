@@ -1,0 +1,11 @@
+---
+- name: ping
+  hosts: "{{ ansible_limit | default('all', True) }}"
+  connection: "{{ 'local' if ansible_limit | default('all', True) == 'localhost' else 'ssh' }}"
+  gather_facts: false
+  become: false
+
+  tasks:
+
+    - name: ping
+      action: ping
