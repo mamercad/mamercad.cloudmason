@@ -8,4 +8,4 @@
   tasks:
 
     - name: ping
-      action: ping
+      ansible.builtin.action: ping
