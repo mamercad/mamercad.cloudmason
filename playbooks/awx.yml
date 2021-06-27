@@ -1,0 +1,55 @@
+---
+- name: awx
+  hosts: "{{ ansible_limit | default('localhost', true) }}"
+  connection: "{{ 'local' if (ansible_limit | default('localhost', true) == 'localhost') else 'ssh' }}"
+  gather_facts: false
+  become: false
+
+  environment:
+
+    TOWER_HOST: https://awx-dev.cloudmason.org
+    TOWER_USERNAME: admin
+    TOWER_PASSWORD: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      64616437633033333939396365383030656563396331666231616633613532623033353633366130
+      3564663965643433336634353462386231363063623065650a336462346135373637363064393461
+      63386163383165376666656636663034323331353932333564346239383666346631643962363036
+      3833366335663237380a623331316530626433373532343961666135323262633762313931353833
+      35303234356333396461356132653365373461666631383631626537353261663163653537663333
+      3437343532663531333039323933333463346530396661316365
+
+  vars:
+    organizations:
+      - name: Cloudmason
+        description: Cloudmason
+    teams:
+      - name: Cloudmason
+        description: Cloudmason
+        organization: Cloudmason
+    projects:
+      - name: Cloudmason
+        description: Cloudmason
+        scm_type: git
+        scm_url: https://github.com/mamercad/mamercad.cloudmason.git
+    inventories:
+      - name: Cloudmason
+        description: Cloudmason
+        organization: Cloudmason
+    inventory_sources:
+      - name: Cloudmason
+        description: Cloudmason
+        organization: Cloudmason
+        inventory: Cloudmason
+        source: scm
+        source_project: Cloudmason
+        source_path: inventory/cloudmason.yml
+        overwrite: true
+        update_cache_timeout: 3600
+        update_on_project_update: true
+
+  tasks:
+
+    - name: include awx role (config tasks)
+      ansible.builtin.include_role:
+        name: awx
+        tasks_from: config.yml
