@@ -35,4 +35,4 @@ jobs:
         run: pip install ansible-lint==5.0.12
 
       - name: Run ansible-lint
-        run: ansible-lint -v
+        run: ansible-lint -x line-length -v
