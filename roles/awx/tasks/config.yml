@@ -18,6 +18,7 @@
     state: present
     name: "{{ item.name }}"
     description: "{{ item.description }}"
+    organization: "{{ item.organization }}"
     scm_type: "{{ item.scm_type }}"
     scm_url: "{{ item.scm_url }}"
   loop: "{{ config.projects | default([], true) }}"
@@ -44,3 +45,29 @@
     update_cache_timeout: "{{ item.update_cache_timeout }}"
     update_on_project_update: "{{ item.update_on_project_update }}"
   loop: "{{ config.inventory_sources | default([], true) }}"
+
+- name: create credentials
+  awx.awx.tower_credential:
+    state: present
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    organization: "{{ item.organization }}"
+    credential_type: "{{ item.credential_type }}"
+    inputs: "{{ item.inputs }}"
+  loop: "{{ config.credentials | default([], true) }}"
+  no_log: true
+
+- name: create job templates
+  awx.awx.tower_job_template:
+    state: present
+    name: "{{ item.name }}"
+    job_type: "{{ item.job_type }}"
+    organization: "{{ item.organization }}"
+    inventory: "{{ item.inventory }}"
+    ask_inventory_on_launch: "{{ item.ask_inventory_on_launch }}"
+    project: "{{ item.project }}"
+    playbook: "{{ item.playbook }}"
+    credentials: "{{ item.credentials }}"
+    ask_credential_on_launch: "{{ item.ask_credential_on_launch }}"
+    ask_limit_on_launch: "{{ item.ask_limit_on_launch }}"
+  loop: "{{ config.job_templates | default([], true) }}"
