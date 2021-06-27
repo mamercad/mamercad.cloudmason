@@ -1,7 +1,7 @@
 ---
 - name: traefik
-  hosts: "{{ ansible_limit | default('all', True) }}"
-  connection: "{{ 'local' if ansible_limit | default('all', True) == 'localhost' else 'ssh' }}"
+  hosts: "{{ ansible_limit | default('all', true) }}"
+  connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
   gather_facts: true
   become: false
 
