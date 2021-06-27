@@ -25,7 +25,7 @@
   become: true
 
 - name: deploy ~awx/.ssh/authorized_keys
-  copy:
+  ansible.builtin.copy:
     dest: "{{ user.home }}/.ssh/authorized_keys"
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
@@ -35,7 +35,7 @@
   become: true
 
 - name: deploy ~awx/.ssh/id_rsa.pub
-  copy:
+  ansible.builtin.copy:
     dest: "{{ user.home }}/.ssh/id_rsa.pub"
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
@@ -45,7 +45,7 @@
   become: true
 
 - name: deploy ~awx/.ssh/id_rsa
-  copy:
+  ansible.builtin.copy:
     dest: "{{ user.home }}/.ssh/id_rsa"
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
@@ -55,7 +55,7 @@
   become: true
 
 - name: give awx passwordless sudo
-  copy:
+  ansible.builtin.copy:
     dest: /etc/sudoers.d/awx
     owner: root
     group: root
