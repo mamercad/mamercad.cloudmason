@@ -13,6 +13,7 @@
     shell: "{{ user.shell }}"
     home: "{{ user.home }}"
     create_home: true
+    password: "{{ user.password_crypted }}"
   become: true
 
 - name: create ~awx/.ssh
