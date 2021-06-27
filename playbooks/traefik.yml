@@ -1,0 +1,14 @@
+---
+- name: traefik
+  hosts: "{{ ansible_limit | default('all', True) }}"
+  connection: "{{ 'local' if ansible_limit | default('all', True) == 'localhost' else 'ssh' }}"
+  gather_facts: true
+  become: false
+
+  tasks:
+
+    - name: include traefik role (rasbian tasks)
+      ansible.builtin.include_role:
+        name: traefik
+        tasks_from: raspian.yml
+      when: ansible_architecture == "armv7l"
