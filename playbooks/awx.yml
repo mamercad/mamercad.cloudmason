@@ -28,6 +28,19 @@
         - name: Cloudmason
           description: Cloudmason
           organization: Cloudmason
+      users:
+        - username: mark
+          first_name: Mark
+          last_name: Mercado
+          email: mamercad@gmail.com
+          is_superuser: true
+          password: !vault |
+            $ANSIBLE_VAULT;1.1;AES256
+            66633431343962396130346334363161373761633130386335366366366235363761373862333565
+            6566643330323434353165646130636337376363326162370a323362643261383166323663353762
+            33343261346538386438353838376635386538613835353432353635313835363862653163656661
+            3632393361313564370a653637366266353135313537663764316539386661333061613235653065
+            3663
       projects:
         - name: Cloudmason
           description: Cloudmason
