@@ -1,0 +1,4 @@
+traefik_user: traefik
+traefik_group: traefik
+traefik_home: /home/traefik
+traefik_shell: /bin/bash
