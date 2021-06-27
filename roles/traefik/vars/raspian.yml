@@ -1,0 +1,3 @@
+traefik_version: 2.3.5
+traefik_tarball: https://github.com/traefik/traefik/releases/download/v{{ traefik_version }}/traefik_v{{ traefik_version }}_linux_armv7.tar.gz
+traefik_sha256: 853af73c985b32bcc17f7292b111ced0e93882362f819f1e3a65ef22f4fd5f51
