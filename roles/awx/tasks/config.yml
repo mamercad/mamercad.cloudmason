@@ -3,7 +3,7 @@
     state: present
     name: "{{ item.name }}"
     description: "{{ item.description }}"
-  loop: "{{ organizations | default([], true) }}"
+  loop: "{{ config.organizations | default([], true) }}"
 
 - name: create teams
   awx.awx.tower_team:
@@ -11,7 +11,7 @@
     name: "{{ item.name }}"
     description: "{{ item.description }}"
     organization: "{{ item.organization }}"
-  loop: "{{ teams | default([], true) }}"
+  loop: "{{ config.teams | default([], true) }}"
 
 - name: create projects
   awx.awx.tower_project:
@@ -20,7 +20,7 @@
     description: "{{ item.description }}"
     scm_type: "{{ item.scm_type }}"
     scm_url: "{{ item.scm_url }}"
-  loop: "{{ projects | default([], true) }}"
+  loop: "{{ config.projects | default([], true) }}"
 
 - name: create inventories
   awx.awx.tower_inventory:
@@ -28,7 +28,7 @@
     name: "{{ item.name }}"
     description: "{{ item.description }}"
     organization: "{{ item.organization }}"
-  loop: "{{ inventories | default([], true) }}"
+  loop: "{{ config.inventories | default([], true) }}"
 
 - name: create inventory sources
   awx.awx.tower_inventory_source:
@@ -43,4 +43,4 @@
     overwrite: "{{ item.overwrite }}"
     update_cache_timeout: "{{ item.update_cache_timeout }}"
     update_on_project_update: "{{ item.update_on_project_update }}"
-  loop: "{{ inventory_sources | default([], true) }}"
+  loop: "{{ config.inventory_sources | default([], true) }}"

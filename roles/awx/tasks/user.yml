@@ -1,0 +1,66 @@
+- name: create awx group
+  ansible.builtin.group:
+    state: present
+    name: "{{ user.group }}"
+  become: true
+
+- name: create awx user
+  ansible.builtin.user:
+    state: present
+    name: "{{ user.name }}"
+    groups: "{{ user.group }}"
+    comment: "{{ user.comment }}"
+    shell: "{{ user.shell }}"
+    home: "{{ user.home }}"
+    create_home: true
+  become: true
+
+- name: create ~awx/.ssh
+  ansible.builtin.file:
+    state: directory
+    path: "{{ user.home }}/.ssh"
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    mode: 0700
+  become: true
+
+- name: deploy ~awx/.ssh/authorized_keys
+  copy:
+    dest: "{{ user.home }}/.ssh/authorized_keys"
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    content: "{{ user.ssh.authorized_keys }}"
+    mode: 0600
+    backup: true
+  become: true
+
+- name: deploy ~awx/.ssh/id_rsa.pub
+  copy:
+    dest: "{{ user.home }}/.ssh/id_rsa.pub"
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    content: "{{ user.ssh.public_key }}"
+    mode: 0600
+    backup: true
+  become: true
+
+- name: deploy ~awx/.ssh/id_rsa
+  copy:
+    dest: "{{ user.home }}/.ssh/id_rsa"
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    content: "{{ user.ssh.private_key }}"
+    mode: 0600
+    backup: true
+  become: true
+
+- name: give awx passwordless sudo
+  copy:
+    dest: /etc/sudoers.d/awx
+    owner: root
+    group: root
+    mode: 0440
+    content: |
+      awx ALL=(ALL) NOPASSWD: ALL
+    backup: true
+  become: true
