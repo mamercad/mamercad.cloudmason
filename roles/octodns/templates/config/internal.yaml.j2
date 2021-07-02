@@ -1,0 +1,60 @@
+---
+manager:
+  max_workers: 4
+
+providers:
+  internal:
+    class: octodns.provider.yaml.YamlProvider
+    directory: ./config/internal
+    default_ttl: 3600
+    enforce_order: False # I'd rather order by IP
+  net1:
+    class: octodns.provider.powerdns.PowerDnsProvider
+    host: 192.168.1.10
+    api_key: "{{ powerdns_api_key }}"
+    port: 8081
+    nameserver_values:
+      - net1.cloudmason.org.
+      - net2.cloudmason.org.
+    nameserver_ttl: 3600
+  net2:
+    class: octodns.provider.powerdns.PowerDnsProvider
+    host: 192.168.1.11
+    api_key: "{{ powerdns_api_key }}"
+    port: 8081
+    nameserver_values:
+      - net1.cloudmason.org.
+      - net2.cloudmason.org.
+    nameserver_ttl: 3600
+  thinkpad:
+    class: octodns.provider.powerdns.PowerDnsProvider
+    host: 192.168.1.67
+    api_key: "{{ powerdns_api_key }}"
+    port: 8081
+    nameserver_values:
+      - net1.cloudmason.org.
+      - net2.cloudmason.org.
+    nameserver_ttl: 3600
+
+zones:
+  cloudmason.org.:
+    sources:
+      - internal
+    targets:
+      - net1
+      - net2
+      - thinkpad
+  1.168.192.in-addr.arpa.:
+    sources:
+      - internal
+    targets:
+      - net1
+      - net2
+      - thinkpad
+  letsbuildthe.cloud.:
+    sources:
+      - internal
+    targets:
+      - net1
+      - net2
+      - thinkpad

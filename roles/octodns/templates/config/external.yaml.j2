@@ -1,0 +1,25 @@
+---
+manager:
+  max_workers: 2
+
+providers:
+  external:
+    class: octodns.provider.yaml.YamlProvider
+    directory: ./config/external
+    default_ttl: 3600
+    enforce_order: False # I'd rather order by IP
+  cloudflare:
+    class: octodns.provider.cloudflare.CloudflareProvider
+    token: "{{ cloudflare_api_key }}"
+
+zones:
+  letsbuildthe.cloud.:
+    sources:
+      - external
+    targets:
+      - cloudflare
+  cloudmason.org.:
+    sources:
+      - external
+    targets:
+      - cloudflare
