@@ -1,0 +1,31 @@
+- name: set a fact for outdir
+  ansible.builtin.set_fact:
+    outdir: "{{ outdir | default('/tmp', true) }}"
+
+- name: do octodns sync (dry run)
+  ansible.builtin.shell:
+    cmd: |
+      octodns-sync --config-file config/{{ item.0.key }}.yaml
+  args:
+    chdir: "{{ outdir.path }}"
+  register: dry_run
+  changed_when: dry_run.stderr is not search("No changes were planned")
+  with_subelements:
+    - "{{ lookup('ansible.builtin.dict', templates) }}"
+    - value
+
+- name: figure out cmds needed
+  ansible.builtin.set_fact:
+    cmds: "{{ cmds|default([], true) + [item.cmd] }}"
+  loop: "{{ dry_run.results | selectattr('changed', 'equalto', true) | list }}"
+
+- name: do octodns sync (when needed)
+  ansible.builtin.shell:
+    cmd: |
+      {{ item }} --doit
+  args:
+    chdir: "{{ outdir.path }}"
+  loop: "{{ cmds | unique }}"
+  when:
+    - cmds is defined
+    - cmds | length > 0

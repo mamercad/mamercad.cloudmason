@@ -18,6 +18,12 @@
   vars:
     outdir: "{{ tmpdir }}"
 
+- name: sync tasks
+  ansible.builtin.include_tasks:
+    file: sync.yml
+  vars:
+    outdir: "{{ tmpdir }}"
+
 - name: remove tmp dir
   ansible.builtin.file:
     path: "{{ tmpdir.path }}"
