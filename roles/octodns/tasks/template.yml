@@ -17,3 +17,12 @@
   with_subelements:
     - "{{ lookup('ansible.builtin.dict', templates) }}"
     - value
+
+- name: create the octodns config templates
+  ansible.builtin.template:
+    src: config/{{ item.0.key }}.yaml.j2
+    dest: "{{ outdir.path }}/config/{{ item.0.key }}.yaml"
+  with_subelements:
+    - "{{ lookup('ansible.builtin.dict', templates) }}"
+    - value
+  no_log: true  # there are secrets in here
