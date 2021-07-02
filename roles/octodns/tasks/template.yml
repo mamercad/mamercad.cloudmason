@@ -1,0 +1,19 @@
+- name: set a fact for outdir
+  ansible.builtin.set_fact:
+    outdir: "{{ outdir | default('/tmp', true) }}"
+
+- name: create the octodns directory skeleton
+  ansible.builtin.file:
+    state: directory
+    path: "{{ outdir.path }}/config/{{ item.0.key }}"
+  with_subelements:
+    - "{{ lookup('ansible.builtin.dict', templates) }}"
+    - value
+
+- name: create the octodns domain templates
+  ansible.builtin.template:
+    src: config/{{ item.0.key }}/{{ item.1 }}.yaml.j2
+    dest: "{{ outdir.path }}/config/{{ item.0.key }}/{{ item.1 }}.yaml"
+  with_subelements:
+    - "{{ lookup('ansible.builtin.dict', templates) }}"
+    - value

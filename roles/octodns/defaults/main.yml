@@ -1,0 +1,16 @@
+gateway:
+  user: mamercad
+  address: 192.168.1.1
+  interfaces:
+    - eth0
+    - eth1
+    - eth2
+
+templates:
+  external:
+    - cloudmason.org
+    - letsbuildthe.cloud
+  internal:
+    - 1.168.192.in-addr.arpa
+    - cloudmason.org
+    - letsbuildthe.cloud

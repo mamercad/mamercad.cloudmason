@@ -1,0 +1,25 @@
+- name: install octodns
+  ansible.builtin.pip:
+    name: octodns
+
+- name: wan tasks
+  ansible.builtin.include_tasks:
+    file: wan.yml
+
+- name: create tmp dir
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: octodns
+  register: tmpdir
+
+- name: template tasks
+  ansible.builtin.include_tasks:
+    file: template.yml
+  vars:
+    outdir: "{{ tmpdir }}"
+
+- name: remove tmp dir
+  ansible.builtin.file:
+    path: "{{ tmpdir.path }}"
+    state: absent
+  when: tmpdir.path is defined

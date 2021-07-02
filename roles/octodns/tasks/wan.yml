@@ -1,0 +1,20 @@
+- name: figure out wan addresses (eth0)
+  ansible.builtin.shell:
+    cmd: |
+      ssh -q {{ gateway.user }}@{{ gateway.address }} /opt/vyatta/bin/vyatta-show-interfaces | grep 'inet ' | grep {{ interface }} | awk '{print $2}' | sed 's/\/.*$//'
+  loop: "{{ gateway.interfaces }}"
+  loop_control:
+    loop_var: interface
+  register: addresses
+
+- name: set facts
+  ansible.builtin.set_fact:
+    "{{ item.interface }}": "{{ item.stdout | trim }}"
+  loop: "{{ addresses.results }}"
+
+- name: debug
+  ansible.builtin.debug:
+    msg: |
+      eth0: {{ eth0 }}
+      eth1: {{ eth1 }}
+      eth2: {{ eth2 }}
