@@ -3,6 +3,8 @@ all:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: "{{ lookup('ansible.builtin.pipe', 'which python3') }}"
+    cloudkey:
+      ansible_host: 192.168.1.3
     gala:
       ansible_host: 192.168.1.73
       ansible_python_interpreter: /usr/bin/python3
@@ -86,6 +88,9 @@ all:
         net2:
         thinkpad:
   vars:
+    me:
+      email:
+        personal: mamercad@gmail.com
     network:
       domain: cloudmason.org
       gateway: 192.168.1.1
