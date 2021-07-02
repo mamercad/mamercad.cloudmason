@@ -12,6 +12,16 @@
     "{{ item.interface }}": "{{ item.stdout | trim }}"
   loop: "{{ addresses.results }}"
 
+- name: ensure
+  ansible.builtin.assert:
+    that:
+      - eth0 is defined
+      - eth0 | length > 0
+      - eth1 is defined
+      - eth1 | length > 0
+      - eth2 is defined
+      - eth2 | length > 0
+
 - name: debug
   ansible.builtin.debug:
     msg: |
