@@ -445,8 +445,6 @@
           ask_credential_on_launch: true
           ask_limit_on_launch: true
 
-
-
   tasks:
 
     - name: include awx role (config tasks)
