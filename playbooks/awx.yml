@@ -432,6 +432,12 @@
               61643138373235616433353834623965383662383831336432383530396238393439336163623365
               61376636613763643762656363656362326432653738363739373535613432636135636663353366
               65633765313165643563396563346562643537353662613263346466613233366538
+      schedules:
+        - name: Cloudmason / schedule / metronome
+          description: Hourly AWX Metronome
+          rrule: "DTSTART:20210323T000000Z RRULE:FREQ=HOURLY;INTERVAL=1"
+          unified_job_template: Cloudmason / metronome
+          enabled: true
       job_templates:
         - name: Cloudmason / ping
           job_type: run
@@ -444,6 +450,26 @@
             - Cloudmason Machine
           ask_credential_on_launch: true
           ask_limit_on_launch: true
+        - name: Cloudmason / metronome
+          job_type: run
+          organization: Cloudmason
+          inventory: Cloudmason
+          ask_inventory_on_launch: false
+          project: Cloudmason
+          playbook: playbooks/metronome.yml
+          ask_credential_on_launch: false
+          ask_limit_on_launch: false
+          limit: localhost
+          extra_vars:
+            healthchecks_url: !vault |
+              $ANSIBLE_VAULT;1.1;AES256
+              62343265636566353731363333353837343438623063613433346633643738386435343637386536
+              3536356535616432363261653530623638343461356562630a626461313365373361656433366235
+              36343663663835626665386632373837366464616461333433656630623638653230396334633231
+              3533386635626236350a313865303737333636303439623661313735663766313736366238313834
+              32376335633263663435313763633062636236666535306536356634363039636431363438313434
+              38356362353865343636306436336338306232363930663761376136393262323030363337633137
+              663961613061393434313230633731353035
 
   tasks:
 
