@@ -1,8 +1,7 @@
-- name: figure out wan addresses (eth0)
+- name: figure out wan addresses
   ansible.builtin.shell:
-    cmd: |
-      ssh -q {{ gateway.user }}@{{ gateway.address }} /opt/vyatta/bin/vyatta-show-interfaces | grep 'inet ' | grep {{ interface }} | awk '{print $2}' | sed 's/\/.*$//'
-  loop: "{{ gateway.interfaces }}"
+    cmd: /opt/vyatta/bin/vyatta-show-interfaces | grep 'inet ' | grep {{ interface }} | awk '{print $2}' | sed 's/\/.*$//'
+  loop: "{{ interfaces }}"
   loop_control:
     loop_var: interface
   register: addresses
@@ -15,12 +14,11 @@
 - name: ensure
   ansible.builtin.assert:
     that:
-      - eth0 is defined
-      - eth0 | length > 0
-      - eth1 is defined
-      - eth1 | length > 0
-      - eth2 is defined
-      - eth2 | length > 0
+      - interface is defined
+      - interface | length > 0
+  loop: "{{ interfaces }}"
+  loop_control:
+    loop_var: interface
 
 - name: debug
   ansible.builtin.debug:
@@ -28,3 +26,6 @@
       eth0: {{ eth0 }}
       eth1: {{ eth1 }}
       eth2: {{ eth2 }}
+  loop: "{{ interfaces }}"
+  loop_control:
+    loop_var: interface
