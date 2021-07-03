@@ -1,13 +1,13 @@
 ---
-- name: awx
-  hosts: "{{ ansible_limit | default('localhost', true) }}"
-  connection: "{{ 'local' if (ansible_limit | default('localhost', true) == 'localhost') else 'ssh' }}"
+- name: awx (config)
+  hosts: localhost
+  connection: local
   gather_facts: false
   become: false
 
   environment:
 
-    TOWER_HOST: https://awx-dev.cloudmason.org
+    TOWER_HOST: https://awx.cloudmason.org
     TOWER_USERNAME: admin
     TOWER_PASSWORD: !vault |
       $ANSIBLE_VAULT;1.1;AES256
@@ -445,6 +445,26 @@
           ask_credential_on_launch: true
           ask_limit_on_launch: true
 
+
+
+  tasks:
+
+    - name: include awx role (config tasks)
+      ansible.builtin.include_role:
+        name: awx
+        tasks_from: config.yml
+        apply:
+          tags: config
+      tags: config
+
+- name: awx (user)
+  hosts: linux
+  connection: ssh
+  gather_facts: false
+  become: false
+
+  vars:
+
     user:
       group: awx
       name: awx
@@ -652,14 +672,6 @@
           65633765313165643563396563346562643537353662613263346466613233366538
 
   tasks:
-
-    - name: include awx role (config tasks)
-      ansible.builtin.include_role:
-        name: awx
-        tasks_from: config.yml
-        apply:
-          tags: config
-      tags: config
 
     - name: include awx role (user tasks)
       ansible.builtin.include_role:
