@@ -1,0 +1,11 @@
+---
+- name: metronome
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  tasks:
+    - name: post to healthchecks.io
+      uri:
+        url: "{{ healthchecks_url }}"
+        method: POST
