@@ -76,10 +76,22 @@
     job_type: "{{ item.job_type }}"
     organization: "{{ item.organization }}"
     inventory: "{{ item.inventory }}"
-    ask_inventory_on_launch: "{{ item.ask_inventory_on_launch }}"
+    ask_inventory_on_launch: "{{ item.ask_inventory_on_launch | default(false, true) }}"
     project: "{{ item.project }}"
     playbook: "{{ item.playbook }}"
-    credentials: "{{ item.credentials }}"
-    ask_credential_on_launch: "{{ item.ask_credential_on_launch }}"
-    ask_limit_on_launch: "{{ item.ask_limit_on_launch }}"
+    credentials: "{{ item.credentials | default(omit) }}"
+    ask_credential_on_launch: "{{ item.ask_credential_on_launch | default(false, true) }}"
+    ask_limit_on_launch: "{{ item.ask_limit_on_launch | default(false, true) }}"
+    limit: "{{ item.limit | default(omit) }}"
+    extra_vars: "{{ item.extra_vars | default(omit) }}"
   loop: "{{ config.job_templates | default([], true) }}"
+
+- name: create schedules
+  awx.awx.tower_schedule:
+    state: present
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    rrule: "{{ item.rrule }}"
+    unified_job_template: "{{ item.unified_job_template }}"
+    enabled: "{{ item.enabled | default(true, false) }}"
+  loop: "{{ config.schedules | default([], true) }}"
