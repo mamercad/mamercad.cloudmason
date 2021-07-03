@@ -1,13 +1,27 @@
 ---
+
+- name: wan
+  hosts: gateway
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: include octodns role (wan tasks)
+      ansible.builtin.include_role:
+        name: octodns
+        tasks_from: wan.yml
+        apply:
+          tags: wan
+      tags: always
+
 - name: octodns
   hosts: "{{ ansible_limit | default('localhost', true) }}"
   connection: "{{ 'local' if ansible_limit | default('localhost', true) == 'localhost' else 'ssh' }}"
   gather_facts: false
   become: false
-
   tasks:
-
     - name: include octodns role (main tasks)
       ansible.builtin.include_role:
         name: octodns
         tasks_from: main.yml
+      tags: always
