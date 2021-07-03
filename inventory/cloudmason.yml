@@ -79,6 +79,7 @@ all:
         net2:
     traefik:
       hosts:
+        net1:
         net2:
     unifi:
       hosts:
