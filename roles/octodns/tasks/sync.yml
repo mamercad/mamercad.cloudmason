@@ -16,16 +16,18 @@
 
 - name: figure out cmds needed
   ansible.builtin.set_fact:
-    cmds: "{{ cmds|default([], true) + [item.cmd] }}"
+    cmds: "{{ cmds|default([], true) + [item.cmd|trim] }}"
   loop: "{{ dry_run.results | selectattr('changed', 'equalto', true) | list }}"
 
 - name: do octodns sync (when needed)
   ansible.builtin.shell:
     cmd: |
-      {{ item }} --doit
+      {{ cmd }} --doit
   args:
     chdir: "{{ outdir.path }}"
   loop: "{{ cmds | unique }}"
+  loop_control:
+    loop_var: cmd
   when:
     - cmds is defined
     - cmds | length > 0
