@@ -24,4 +24,6 @@
       ansible.builtin.include_role:
         name: octodns
         tasks_from: main.yml
+      vars:
+        doit: true
       tags: always
