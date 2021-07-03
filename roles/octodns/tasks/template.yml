@@ -6,7 +6,7 @@
   ansible.builtin.file:
     state: directory
     path: "{{ outdir.path }}/config/{{ item.0.key }}"
-    mode: 0644
+    mode: 0755
   with_subelements:
     - "{{ lookup('ansible.builtin.dict', templates) }}"
     - value
