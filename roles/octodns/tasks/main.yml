@@ -2,10 +2,6 @@
   ansible.builtin.pip:
     name: octodns
 
-- name: wan tasks
-  ansible.builtin.include_tasks:
-    file: wan.yml
-
 - name: create tmp dir
   ansible.builtin.tempfile:
     state: directory
