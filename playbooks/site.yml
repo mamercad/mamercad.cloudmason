@@ -1,7 +1,8 @@
 ---
-- name: site
-  hosts: "{{ ansible_limit | default('all', true) }}"
-  connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
+
+- name: ping
+  hosts: all
+  connection: ssh
   gather_facts: false
   become: false
   tasks:
@@ -10,12 +11,52 @@
 
 - name: powerdns
   hosts: powerdns
-  connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
+  connection: ssh
   gather_facts: true
   become: false
   tasks:
     - name: include powerdns role (rasbian tasks)
       ansible.builtin.include_role:
         name: powerdns
+        tasks_from: raspian.yml
+      when: ansible_architecture == "armv7l"
+
+- name: wan
+  hosts: gateway
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: include octodns role (wan tasks)
+      ansible.builtin.include_role:
+        name: octodns
+        tasks_from: wan.yml
+        apply:
+          tags: wan
+      tags: always
+
+- name: octodns
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  tasks:
+    - name: include octodns role (main tasks)
+      ansible.builtin.include_role:
+        name: octodns
+        tasks_from: main.yml
+      vars:
+        doit: true
+      tags: always
+
+- name: traefik
+  hosts: traefik
+  connection: ssh
+  gather_facts: true
+  become: false
+  tasks:
+    - name: include traefik role (rasbian tasks)
+      ansible.builtin.include_role:
+        name: traefik
         tasks_from: raspian.yml
       when: ansible_architecture == "armv7l"
