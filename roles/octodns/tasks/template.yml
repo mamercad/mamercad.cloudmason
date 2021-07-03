@@ -6,7 +6,7 @@
   ansible.builtin.file:
     state: directory
     path: "{{ outdir.path }}/config/{{ item.0.key }}"
-		mode: 0644
+    mode: 0644
   with_subelements:
     - "{{ lookup('ansible.builtin.dict', templates) }}"
     - value
@@ -15,7 +15,7 @@
   ansible.builtin.template:
     src: config/{{ item.0.key }}/{{ item.1 }}.yaml.j2
     dest: "{{ outdir.path }}/config/{{ item.0.key }}/{{ item.1 }}.yaml"
-		mode: 0644
+    mode: 0644
   with_subelements:
     - "{{ lookup('ansible.builtin.dict', templates) }}"
     - value
@@ -24,7 +24,7 @@
   ansible.builtin.template:
     src: config/{{ item.0.key }}.yaml.j2
     dest: "{{ outdir.path }}/config/{{ item.0.key }}.yaml"
-		mode: 0644
+    mode: 0644
   with_subelements:
     - "{{ lookup('ansible.builtin.dict', templates) }}"
     - value
