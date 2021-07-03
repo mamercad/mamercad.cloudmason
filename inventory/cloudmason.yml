@@ -91,6 +91,9 @@ all:
         net1:
         net2:
         thinkpad:
+    linux:
+      children:
+        ubuntu:
   vars:
     me:
       email:
