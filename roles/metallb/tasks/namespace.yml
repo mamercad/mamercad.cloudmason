@@ -1,0 +1,10 @@
+- name: create metallb-system namespace
+  community.kubernetes.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: metallb-system
+        labels:
+          app: metallb
