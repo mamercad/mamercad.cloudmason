@@ -1,0 +1,23 @@
+- name: create metallb serviceaccount
+  community.kubernetes.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        labels:
+          app: metallb
+        name: controller
+        namespace: metallb-system
+
+- name: create metallb serviceaccount
+  community.kubernetes.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        labels:
+          app: metallb
+        name: speaker
+        namespace: metallb-system
