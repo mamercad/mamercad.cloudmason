@@ -665,6 +665,19 @@
               66336435626566363139613330343533333164653738323739326661356636326462376665643435
               31396430306565323065646166303235616139323332383432386233323561346431393061313436
               3734333166646336313031373334623961373335333439386138
+        - name: Cloudmason Vault
+          description: Cloudmason Vault
+          organization: Cloudmason
+          credential_type: Vault
+          inputs:
+            vault_id: Cloudmason
+            vault_password: !vault |
+              $ANSIBLE_VAULT;1.1;AES256
+              64383535393831613632353664323562653964663864383430616333376462333938626266356334
+              3332343636306466623035396462633432333735653766300a663466393461633561363363326666
+              34653065636366616231356661636465393661303438383730393534646131623738393332316632
+              3339666535643762300a363163633138626565373565326464393835373636663733383935636133
+              3764
       schedules:
         - name: Cloudmason / schedule / metronome
           description: Hourly AWX Metronome
@@ -703,6 +716,19 @@
               32376335633263663435313763633062636236666535306536356634363039636431363438313434
               38356362353865343636306436336338306232363930663761376136393262323030363337633137
               663961613061393434313230633731353035
+        - name: Cloudmason / powerdns
+          job_type: run
+          organization: Cloudmason
+          inventory: Cloudmason
+          ask_inventory_on_launch: false
+          project: Cloudmason
+          playbook: playbooks/powerdns.yml
+          credentials:
+            - Cloudmason Machine (awx)
+            - Cloudmason Vault
+          ask_credential_on_launch: false
+          ask_limit_on_launch: false
+          limit: powerdns
 
   tasks:
 
