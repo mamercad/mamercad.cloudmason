@@ -1,0 +1,16 @@
+# https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+- name: include tasks
+  ansible.builtin.include_tasks:
+    file: "{{ item }}.yml"
+  loop:
+    - namespace
+    - podsecuritypolicy
+    - serviceaccount
+    - clusterrole
+    - role
+    - clusterrolebinding
+    - rolebinding
+    - daemonset
+    - deployment
+    - configmap
+    - secret
