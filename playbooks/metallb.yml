@@ -1,0 +1,14 @@
+---
+- name: metallb
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  tasks:
+    - name: include metallb role (main tasks)
+      include_role:
+        name: metallb
+        tasks_from: main.yml
+      vars:
+        context: thinkpad
+        range: 192.168.1.200-192.168.1.219
