@@ -69,6 +69,16 @@
   loop: "{{ config.credentials | default([], true) }}"
   no_log: true
 
+- name: Slack Notification Template
+  awx.awx.tower_notification_template:
+    state: present
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    notification_type: "{{ item.notification_type }}"
+    notification_configuration: "{{ item.notification_configuration }}"
+  loop: "{{ config.notification_templates | default([], true) }}"
+  no_log: true
+
 - name: create job templates
   awx.awx.tower_job_template:
     state: present
