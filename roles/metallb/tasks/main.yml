@@ -1,16 +1,3 @@
-- name: create metallb secret
-  community.kubernetes.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      data:
-        secretkey: "{{ secretkey }}"
-      kind: Secret
-      metadata:
-        name: memberlist
-        namespace: metallb-system
-      type: Opaque
-
 - name: create metallb configmap
   community.kubernetes.k8s:
     state: present
