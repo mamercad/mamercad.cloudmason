@@ -6,7 +6,7 @@
   become: false
   tasks:
     - name: include metallb role (main tasks)
-      include_role:
+      ansible.builtin.include_role:
         name: metallb
         tasks_from: main.yml
       vars:
