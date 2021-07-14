@@ -86,7 +86,7 @@ all:
         gateway:
     ubuntu:
       hosts:
-        gala:
+        # gala:
         lenovo:
         net1:
         net2:
