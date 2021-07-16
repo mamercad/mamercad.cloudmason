@@ -12,3 +12,8 @@
           Uptime: {{ ansible_uptime_seconds }}
           Distribution: {{ ansible_distribution }}
           Release: {{ ansible_distribution_release }}
+          Version: {{ ansible_distribution_version }}
+          DNS0 Nameserver: {{ ansible_dns.nameservers.0 }}
+          DNS0 Search: {{ ansible_dns.search.0 }}
+          Domain: {{ ansible_domain }}
+          FQDN: {{ ansible_fqdn }}
