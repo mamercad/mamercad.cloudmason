@@ -10,3 +10,5 @@
         msg: |
           Vendor: {{ ansible_chassis_vendor }}
           Uptime: {{ ansible_uptime_seconds }}
+          Distribution: {{ ansible_distribution }}
+          Release: {{ ansible_distribution_release }}
