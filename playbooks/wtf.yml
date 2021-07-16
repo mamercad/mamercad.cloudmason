@@ -9,6 +9,8 @@
       ansible.builtin.debug:
         msg: |
           Vendor: {{ ansible_chassis_vendor }}
+          Product Name: {{ ansible_product_name }}
+          Product Version: {{ ansible_product_version }}
           Uptime: {{ ansible_uptime_seconds }}
           Distribution: {{ ansible_distribution }}
           Release: {{ ansible_distribution_release }}
@@ -17,3 +19,8 @@
           DNS0 Search: {{ ansible_dns.search.0 }}
           Domain: {{ ansible_domain }}
           FQDN: {{ ansible_fqdn }}
+          Hostname: {{ ansible_hostname }}
+          Kernel: {{ ansible_kernel_version }}
+          Machine: {{ ansible_machine }}
+          Processors: {{ ansible_processor_nproc }}
+          Memory: {{ ansible_memtotal_mb }}
