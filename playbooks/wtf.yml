@@ -17,7 +17,7 @@
           Version: {{ ansible_distribution_version }}
           DNS0 Nameserver: {{ ansible_dns.nameservers.0 | default('Undefined', true) }}
           DNS0 Search: {{ ansible_dns.search.0 | default('Undefined', true) }}
-          Domain: {{ ansible_domain }}
+          Domain: {{ ansible_domain | default('Undefined', true) }}
           FQDN: {{ ansible_fqdn }}
           Hostname: {{ ansible_hostname }}
           Kernel: {{ ansible_kernel_version }}
