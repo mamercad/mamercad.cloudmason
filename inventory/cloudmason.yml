@@ -60,6 +60,9 @@ all:
         37336230646466653337376337333637663734343431616639653464646337363363653337376337
         64643030616134353336323761306663633564376262396361306166346630346339353063346533
         656561616436616637316138326232653835
+    sunfire:
+      ansible_host: 192.168.1.50
+      ansible_python_interpreter: /usr/bin/python3
     thinkpad:
       ansible_host: 192.168.1.67
       ansible_python_interpreter: /usr/bin/python3
@@ -90,6 +93,7 @@ all:
         lenovo:
         net1:
         net2:
+        sunfire:
         thinkpad:
     linux:
       children:
