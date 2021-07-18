@@ -107,6 +107,17 @@ all:
     linux:
       children:
         ubuntu:
+    opennebula_frontend:
+      hosts:
+        thinkpad:
+    opennebula_backend:
+      hosts:
+        lenovo:
+          type: kvm
+        sunfire:
+          type: kvm
+        thinkpad:
+          type: kvm
   vars:
     me:
       email:
