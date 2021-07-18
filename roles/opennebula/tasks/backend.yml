@@ -1,0 +1,82 @@
+- name: deploy opennebula apt key
+  ansible.builtin.apt_key:
+    state: present
+    url: https://downloads.opennebula.io/repo/repo.key
+  become: true
+
+- name: deploy opennebula repository
+  ansible.builtin.apt_repository:
+    state: present
+    repo: deb https://downloads.opennebula.io/repo/6.0/Ubuntu/{{ ansible_distribution_version }} stable opennebula
+    update_cache: true
+  become: true
+
+- name: install opennebula packages
+  ansible.builtin.apt:
+    state: present
+    name:
+      - opennebula-node-kvm
+    update_cache: true
+  notify: restart-libvirtd
+  become: true
+  when:
+    - type == "kvm"
+
+- name: install opennebula packages
+  ansible.builtin.apt:
+    state: present
+    name:
+      - opennebula-node-lxd
+    update_cache: true
+  become: true
+  when:
+    - type == "lxd"
+
+- name: deploy oneadmin ssh pubkey
+  ansible.builtin.copy:
+    dest: /var/lib/one/.ssh/id_rsa.pub
+    owner: oneadmin
+    group: oneadmin
+    mode: 0644
+    content: "{{ oneadmin_pubkey }}"
+    backup: true
+  become: true
+
+- name: deploy oneadmin ssh privkey
+  ansible.builtin.copy:
+    dest: /var/lib/one/.ssh/id_rsa
+    owner: oneadmin
+    group: oneadmin
+    mode: 0600
+    content: "{{ oneadmin_privkey }}\n"
+    backup: true
+  become: true
+
+- name: deploy oneadmin ssh known_hosts
+  ansible.builtin.copy:
+    dest: /var/lib/one/.ssh/known_hosts
+    owner: oneadmin
+    group: oneadmin
+    mode: 0644
+    content: "{{ oneadmin_known_hosts }}"
+    backup: true
+  become: true
+
+- name: deploy oneadmin ssh authorized_keys
+  ansible.builtin.copy:
+    dest: /var/lib/one/.ssh/authorized_keys
+    owner: oneadmin
+    group: oneadmin
+    mode: 0644
+    content: "{{ oneadmin_authorized_keys }}"
+    backup: true
+  become: true
+
+- name: add oneadmin to docker
+  ansible.builtin.user:
+    name: oneadmin
+    groups: docker
+    append: true
+  become: true
+  when:
+    - type == "kvm"

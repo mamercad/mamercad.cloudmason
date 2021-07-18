@@ -1,0 +1,29 @@
+- name: restart-opennebula-sunstone
+  ansible.builtin.systemd:
+    name: opennebula-sunstone
+    state: restarted
+  become: true
+
+- name: restart-opennebula-flow
+  ansible.builtin.systemd:
+    name: opennebula-flow
+    state: restarted
+  become: true
+
+- name: restart-opennebula-gate
+  ansible.builtin.systemd:
+    name: opennebula-gate
+    state: restarted
+  become: true
+
+- name: restart-opennebula
+  ansible.builtin.systemd:
+    name: opennebula
+    state: restarted
+  become: true
+
+- name: restart-libvirtd
+  ansible.builtin.systemd:
+    name: libvirtd
+    state: restarted
+  become: true

@@ -1,0 +1,131 @@
+- name: deploy opennebula apt key
+  ansible.builtin.apt_key:
+    state: present
+    url: https://downloads.opennebula.io/repo/repo.key
+  become: true
+
+- name: deploy opennebula repository
+  ansible.builtin.apt_repository:
+    state: present
+    repo: deb https://downloads.opennebula.io/repo/6.0/Ubuntu/{{ ansible_distribution_version }} stable opennebula
+    update_cache: true
+  become: true
+
+- name: create opennebula database
+  community.mysql.mysql_db:
+    state: present
+    name: opennebula
+    encoding: utf8
+    collation: utf8_bin
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  register: create_database
+  become: true
+  no_log: true
+
+- name: create oneadmin database user
+  community.mysql.mysql_user:
+    state: present
+    name: oneadmin
+    password: "{{ opennebula_db_password }}"
+    priv: 'opennebula.*:ALL'
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  become: true
+
+- name: configure the transaction isolation level
+  community.mysql.mysql_variables:
+    variable: transaction_isolation
+    value: READ-COMMITTED
+    mode: global
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  become: true
+
+- name: create /etc/one
+  ansible.builtin.file:
+    state: directory
+    path: /etc/one
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+
+- name: deploy /etc/one/oned.conf
+  ansible.builtin.template:
+    src: oned.conf.j2
+    dest: /etc/one/oned.conf
+    owner: root
+    group: oneadmin
+    mode: 0640
+  become: true
+
+- name: install opennebula dependencies
+  ansible.builtin.apt:
+    state: present
+    name:
+      - libmysqlclient21
+      - nodejs
+    update_cache: true
+  become: true
+
+- name: install opennebula packages
+  ansible.builtin.apt:
+    state: present
+    name:
+      - opennebula
+      - opennebula-fireedge
+      - opennebula-flow
+      - opennebula-gate
+      - opennebula-guacd
+      - opennebula-libs
+      - opennebula-rubygems
+      - opennebula-sunstone
+      - opennebula-provision
+      - opennebula-tools
+    update_cache: true
+  become: true
+
+- name: add oneadmin to docker
+  ansible.builtin.user:
+    name: oneadmin
+    groups: docker
+    append: true
+  become: true
+
+- name: configure opennebula-fireedge
+  ansible.builtin.replace:
+    path: /etc/one/sunstone-server.conf
+    regexp: ":public_fireedge_endpoint: .*$"
+    replace: ":public_fireedge_endpoint: {{ public_fireedge_endpoint }}"
+    backup: true
+  notify: restart-opennebula-sunstone
+  become: true
+
+- name: configure opennebula-oneflow
+  ansible.builtin.replace:
+    path: /etc/one/oneflow-server.conf
+    regexp: ":host: 127.0.0.1"
+    replace: ":host: 0.0.0.0"
+    backup: true
+  notify: restart-opennebula-flow
+  become: true
+
+- name: configure opennebula-onegate
+  ansible.builtin.replace:
+    path: /etc/one/onegate-server.conf
+    regexp: ":host: 127.0.0.1"
+    replace: ":host: 0.0.0.0"
+    backup: true
+  notify: restart-opennebula-gate
+  become: true
+
+- name: start and enable opennebula services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - opennebula
+    - opennebula-sunstone
+    - opennebula-fireedge
+    - opennebula-gate
+    - opennebula-flow
+  become: true
