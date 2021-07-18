@@ -1,0 +1,21 @@
+---
+
+- name: opennebula / frontend
+  hosts: opennebula_frontend
+  gather_facts: true
+  become: false
+  tasks:
+    - name: include opennebula role (frontend tasks)
+      ansible.builtin.include_role:
+        name: opennebula
+        tasks_from: frontend.yml
+
+- name: opennebula / backend
+  hosts: opennebula_backend
+  gather_facts: true
+  become: false
+  tasks:
+    - name: include opennebula role (backend tasks)
+      ansible.builtin.include_role:
+        name: opennebula
+        tasks_from: backend.yml
