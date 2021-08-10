@@ -50,6 +50,7 @@ all:
         656561616436616637316138326232653835
     sunfire:
       ansible_host: 192.168.1.50
+      ansible_user: root
       ansible_python_interpreter: /usr/bin/python3
       healthchecks_io: !vault |
         $ANSIBLE_VAULT;1.1;AES256
