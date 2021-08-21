@@ -756,7 +756,7 @@
             - Cloudmason Vault
           ask_credential_on_launch: false
           ask_limit_on_launch: false
-          limit: wan,localhost
+          limit: gateway,localhost
 
   tasks:
 
