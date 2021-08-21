@@ -744,6 +744,19 @@
           ask_credential_on_launch: false
           ask_limit_on_launch: false
           limit: powerdns
+        - name: Cloudmason / octodns
+          job_type: run
+          organization: Cloudmason
+          inventory: Cloudmason
+          ask_inventory_on_launch: false
+          project: Cloudmason
+          playbook: playbooks/octodns.yml
+          credentials:
+            - Cloudmason Machine (awx)
+            - Cloudmason Vault
+          ask_credential_on_launch: false
+          ask_limit_on_launch: false
+          limit: wan,localhost
 
   tasks:
 
