@@ -59,6 +59,14 @@ thelounge:
   type: A
   value: {{ hostvars.gateway.eth0 }}
   ttl: 3600
+grafana:
+  type: A
+  value: {{ hostvars.gateway.eth0 }}
+  ttl: 3600
+prometheus:
+  type: A
+  value: {{ hostvars.gateway.eth0 }}
+  ttl: 3600
 cloudkey:
   type: A
   value: {{ hostvars.cloudkey.ansible_host }}
