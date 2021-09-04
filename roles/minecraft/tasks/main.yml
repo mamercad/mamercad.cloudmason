@@ -1,0 +1,147 @@
+- name: create minecraft group
+  ansible.builtin.group:
+    state: present
+    name: "{{ group }}"
+  become: true
+
+- name: create minecraft user
+  ansible.builtin.user:
+    state: present
+    name: "{{ user }}"
+    group: "{{ group }}"
+    home: "{{ home }}"
+    shell: /bin/bash
+  become: true
+
+- name: install openjdk-X-jre-headless
+  ansible.builtin.apt:
+    state: present
+    name: openjdk-{{ item }}-jre-headless
+  loop: "{{ openjdk_versions }}"
+  become: true
+
+- name: add an apt key by id from a keyserver
+  ansible.builtin.apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: EB9B1D8886F44E2A
+  become: true
+
+- name: install ubuntu openjdk ppa
+  ansible.builtin.apt_repository:
+    state: present
+    repo: deb http://ppa.launchpad.net/openjdk-r/ppa/ubuntu {{ ansible_distribution_release }} main
+  become: true
+
+# - name: install openjdk-17-jre-headless
+#   ansible.builtin.apt:
+#     state: present
+#     name: openjdk-17-jre-headless
+#     update_cache: true
+#   become: true
+
+- name: minecraft server jar
+  ansible.builtin.get_url:
+    url: "{{ server_jar }}"
+    dest: "{{ home }}/minecraft_server.jar"
+  become: true
+  become_user: "{{ user }}"
+
+- name: deploy eula.txt
+  ansible.builtin.copy:
+    dest: "{{ home }}/eula.txt"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+    content: |
+      eula=true
+  become: true
+  become_user: "{{ user }}"
+
+- name: deploy server.properties
+  ansible.builtin.copy:
+    dest: "{{ home }}/server.properties"
+    owner: "{{ user }}"
+    group: "{{ group }}"
+    mode: 0644
+    content: |
+      #Minecraft server properties
+      #Thu May 20 08:48:42 EDT 2021
+      enable-jmx-monitoring=false
+      rcon.port=25575
+      level-seed=
+      gamemode=survival
+      enable-command-block=false
+      enable-query=false
+      generator-settings=
+      level-name=world
+      motd={{ gamename }}
+      query.port=25565
+      pvp=true
+      generate-structures=true
+      difficulty=easy
+      network-compression-threshold=256
+      max-tick-time=60000
+      max-players=20
+      use-native-transport=true
+      online-mode=true
+      enable-status=true
+      allow-flight=false
+      broadcast-rcon-to-ops=true
+      view-distance=10
+      max-build-height=256
+      server-ip=
+      allow-nether=true
+      server-port=25565
+      enable-rcon=true
+      sync-chunk-writes=true
+      op-permission-level=4
+      prevent-proxy-connections=false
+      resource-pack=
+      entity-broadcast-range-percentage=100
+      rcon.password=hunter2
+      player-idle-timeout=0
+      force-gamemode=false
+      rate-limit=0
+      hardcore=false
+      white-list=false
+      broadcast-console-to-ops=true
+      spawn-npcs=true
+      spawn-animals=true
+      snooper-enabled=true
+      function-permission-level=2
+      level-type=default
+      text-filtering-config=
+      spawn-monsters=true
+      enforce-whitelist=false
+      resource-pack-sha1=
+      spawn-protection=16
+      max-world-size=29999984
+  become: true
+  become_user: "{{ user }}"
+
+- name: deploy minecraft systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/minecraft.service
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      [Unit]
+      Description={{ gamename }}
+      After=network.target
+      [Service]
+      WorkingDirectory={{ home }}
+      User={{ user }}
+      Group={{ group }}
+      Restart=always
+      ExecStart=/usr/bin/screen -DmS {{ user }} /usr/bin/java -Xmx2G -jar minecraft_server.jar nogui
+      [Install]
+      WantedBy=multi-user.target
+  become: true
+
+- name: start and enable mincraft
+  ansible.builtin.systemd:
+    name: minecraft
+    state: started
+    enabled: true
+  become: true
