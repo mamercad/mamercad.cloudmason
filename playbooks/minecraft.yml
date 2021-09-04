@@ -1,0 +1,16 @@
+---
+- name: minecraft
+  hosts: minecraft1
+  connection: ssh
+  gather_facts: true
+  become: false
+  tasks:
+    - name: include minecraft role (main tasks)
+      ansible.builtin.include_role:
+        name: minecraft
+        tasks_from: main.yml
+      vars:
+        port: 25565
+        version: 1.17.1
+        server_jar: https://launcher.mojang.com/v1/objects/a16d67e5807f57fc4e550299cf20226194497dc2/server.jar
+        openjdk_versions: ["16"]
