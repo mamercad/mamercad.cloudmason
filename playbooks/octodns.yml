@@ -27,3 +27,17 @@
       vars:
         doit: true
       tags: always
+
+- name: pdns
+  hosts: pdns
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: include octodns role (pdns tasks)
+      ansible.builtin.include_role:
+        name: octodns
+        tasks_from: pdns.yml
+        apply:
+          tags: pdns
+      tags: always
