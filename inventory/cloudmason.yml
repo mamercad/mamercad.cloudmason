@@ -110,6 +110,10 @@ all:
           type: kvm
         thinkpad:
           type: kvm
+    pdns:
+      hosts:
+        net1:
+        net2:
   vars:
     me:
       email:
