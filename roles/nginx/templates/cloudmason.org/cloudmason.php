@@ -137,7 +137,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!--
 <b>$ git log -1</b><br/><pre><?= shell_exec('git log -1'); ?></pre>
 -->
+
+<a href="https://www.digitalocean.com/?refcode=86a7236d915c&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://web-platforms.sfo2.digitaloceanspaces.com/WWW/Badge%203.svg" alt="DigitalOcean Referral Badge" /></a>
+
   </div>
+
 
 </main><!-- /.container -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
