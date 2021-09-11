@@ -1,0 +1,12 @@
+---
+- name: nginx
+  hosts: net
+  connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
+  gather_facts: true
+  become: false
+  tasks:
+    - name: include nginx role (main tasks)
+      ansible.builtin.include_role:
+        name: nginx
+        tasks_from: main.yml
+      when: ansible_architecture == "armv7l"
