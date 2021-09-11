@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/mamercad
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://cloudmason.org
+  * I am mamercad (https://keybase.io/mamercad) on keybase.
+  * I have a public key ASC-TwYKwIAcSUqjd9QzqKH3onua8Klbd7-3CX58cJuYGgo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120be4f060ac0801c494aa377d433a8a1f7a27b9af0a95b77bfb7097e7c709b981a0a",
+      "host": "keybase.io",
+      "kid": "0120be4f060ac0801c494aa377d433a8a1f7a27b9af0a95b77bfb7097e7c709b981a0a",
+      "uid": "929e8748b2c80b7c394da896d8d5f819",
+      "username": "mamercad"
+    },
+    "merkle_root": {
+      "ctime": 1565663428,
+      "hash": "d38f1d7a31eac3fd6d0f83a9fa395b3833f2dc4ee38efa6d9ea5bc88cafa166587f40c83e9d279429c17738e18c8d6e907f1b3a7ad87c0d2256a0c304e6b0598",
+      "hash_meta": "e03215ea3adbfc7feab9d2eaf1655b4c905a3e26aff2f5e1e3499d1ecbe54c45",
+      "seqno": 6000322
+    },
+    "service": {
+      "entropy": "MQXbDxZNY0KzLfzIRI5Sszsv",
+      "hostname": "cloudmason.org",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "4.3.0"
+  },
+  "ctime": 1565663474,
+  "expire_in": 504576000,
+  "prev": "8350771f115b24853810bb137892a16679a1601517c64a3f98dea797a5c40b6e",
+  "seqno": 14,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgvk8GCsCAHElKo3fUM6ih96J7mvCpW3e/twl+fHCbmBoKp3BheWxvYWTESpcCDsQgg1B3HxFbJIU4ELsTeJKhZnmhYBUXxko/mN6nl6XEC27EIN9q8wLkKnd2pZVZAhvLxH1NwnTyf8/EyZ6m28Q9fq75AgHCo3NpZ8RA42TDRCCK5BgC9N6e19AhtfaGVIbE3Vpm8dCC28yltHAryFRT4D8kyNxbjBrTOfB0cTiBSiI6A85H9qG382nSDKhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIPMf13l2Lx0kEgPsgrWerEoPpN7M/nVKAjyNPY9psafbo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/mamercad
+
+==================================================================
