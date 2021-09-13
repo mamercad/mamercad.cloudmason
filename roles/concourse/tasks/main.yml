@@ -25,4 +25,9 @@
     name: concourse
     chart_ref: concourse/concourse
     release_namespace: concourse-main
+    force: true
+    wait: true
+    replace: true
+    update_repo_cache: true
+    disable_hook: true
     values: "{{ helm_values }}"
