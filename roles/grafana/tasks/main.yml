@@ -1,0 +1,36 @@
+- name: Add grafana apt key
+  ansible.builtin.apt_key:
+    state: present
+    url: https://packages.grafana.com/gpg.key
+  become: true
+
+- name: Add grafana deb repository
+  ansible.builtin.apt_repository:
+    state: present
+    repo: deb https://packages.grafana.com/oss/deb stable main
+  become: true
+
+- name: Install grafana
+  ansible.builtin.apt:
+    state: present
+    name: grafana
+    update_cache: true
+  become: true
+
+- name: Start and enable grafana
+  ansible.builtin.systemd:
+    name: grafana-server
+    state: started
+    enabled: true
+  become: true
+
+- name: Install grafana plugins
+  ansible.builtin.shell:
+    cmd: |
+      grafana-cli plugins install grafana-clock-panel
+      grafana-cli plugins install natel-discrete-panel
+      grafana-cli plugins install grafana-piechart-panel
+  args:
+    creates: /var/lib/grafana/plugins/grafana-clock-panel
+  notify: restart-grafana-server
+  become: true
