@@ -183,7 +183,7 @@
               url = "http://thinkpad.cloudmason.org:8080/"
           [http.services.concourse.loadBalancer]
             [[http.services.concourse.loadBalancer.servers]]
-              url = "http://concourse.lenovo.cloudmason.org:8080/"
+              url = "http://concourse-web.concourse-main.thinkpad.cloudmason.org:8080/"
           [http.services.grafana.loadBalancer]
             [[http.services.grafana.loadBalancer.servers]]
               url = "http://thinkpad.cloudmason.org:3000/"
