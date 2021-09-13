@@ -1,0 +1,11 @@
+---
+- name: grafana
+  hosts: thinkpad
+  connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
+  gather_facts: true
+  become: false
+  tasks:
+    - name: include grafana role (main tasks)
+      ansible.builtin.include_role:
+        name: grafana
+        tasks_from: main.yml
