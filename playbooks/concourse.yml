@@ -13,6 +13,12 @@
         context: thinkpad
         helm_values:
           replicas: 1
-          web.service.api.type: LoadBalancer
-          web.service.workerGateway.type: LoadBalancer
-          concourse.web.externalUrl: https://concourse.cloudmason.org
+          web:
+            service:
+              api:
+                type: LoadBalancer
+              workerGateway:
+                type: LoadBalancer
+          concourse:
+            web:
+              externalUrl: https://concourse.cloudmason.org
