@@ -11,3 +11,8 @@
         tasks_from: main.yml
       vars:
         context: thinkpad
+        helm_values:
+          replicas: 1
+          web.service.api.type: LoadBalancer
+          web.service.workerGateway.type: LoadBalancer
+          concourse.web.externalUrl: https://concourse.cloudmason.org
