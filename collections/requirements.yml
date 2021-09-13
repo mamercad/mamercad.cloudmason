@@ -2,4 +2,6 @@ collections:
   - name: awx.awx
     version: 19.1.0
   - name: community.digitalocean
-    version: 1.8.0
+    version: 1.9.0
+  - name: kubernetes.core
+    version: 2.1.1
