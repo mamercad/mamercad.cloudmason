@@ -1,0 +1,31 @@
+- name: add Concourse chart repo
+  kubernetes.core.helm_repository:
+    state: present
+    name: concourse-charts
+    repo_url: https://concourse-charts.storage.googleapis.com/
+
+- name: create concourse-main namespace
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: concourse-main
+        labels:
+          app.kubernetes.io/managed-by: Helm
+        annotations:
+          meta.helm.sh/release-name: concourse
+          meta.helm.sh/release-namespace: concourse-main
+
+- name: deploy latest version of Concourse
+  kubernetes.core.helm:
+    state: present
+    name: concourse
+    chart_ref: concourse/concourse
+    release_namespace: concourse-main
+    values:
+      replicas: 1
+      web.service.api.type: LoadBalancer
+      web.service.workerGateway.type: LoadBalancer
