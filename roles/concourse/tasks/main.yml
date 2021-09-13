@@ -25,7 +25,4 @@
     name: concourse
     chart_ref: concourse/concourse
     release_namespace: concourse-main
-    values:
-      replicas: 1
-      web.service.api.type: LoadBalancer
-      web.service.workerGateway.type: LoadBalancer
+    values: "{{ helm_values }}"
