@@ -118,6 +118,31 @@ all:
       hosts:
         net1:
         net2:
+    powerdns_servers:
+      hosts:
+        net1:
+        net2:
+    prometheus_servers:
+      hosts:
+        thinkpad:
+    grafana_servers:
+      hosts:
+        grafana:
+    prometheus_clients:
+      hosts:
+        net1:
+        net2:
+        thinkpad:
+    snmp_targets:
+      hosts:
+        gateway:
+        basement:
+        bedroom:
+        diningroom:
+        familyroom:
+    unifi_pollers:
+      hosts:
+        thinkpad:
   vars:
     me:
       email:
