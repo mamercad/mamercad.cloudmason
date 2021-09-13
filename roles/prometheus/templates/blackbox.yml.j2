@@ -1,0 +1,12 @@
+modules:
+  dns_cloudmason_org_a:
+    prober: dns
+    dns:
+      preferred_ip_protocol: ip4
+      query_name: "cloudmason.org"
+      query_type: "A"
+      valid_rcodes:
+        - NOERROR
+      validate_answer_rrs:
+        fail_if_not_matches_regexp:
+          - "cloudmason.org.\t.*\tIN\tA\t.*"

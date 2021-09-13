@@ -1,0 +1,67 @@
+- name: fetch snmp_exporter
+  ansible.builtin.get_url:
+    url: "{{ snmp_exporter.url }}"
+    checksum: "{{ snmp_exporter.checksum }}"
+    dest: /tmp/snmp_exporter-{{ snmp_exporter.version }}.linux-amd64.tar.gz
+  become: true
+
+- name: unarchive snmp_exporter tarball
+  ansible.builtin.unarchive:
+    src: /tmp/snmp_exporter-{{ snmp_exporter.version }}.linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: yes
+  become: true
+
+- name: create /opt/prometheus/snmp_exporter
+  ansible.builtin.file:
+    state: directory
+    path: /opt/prometheus/snmp_exporter
+    owner: prometheus
+    group: prometheus
+  become: true
+
+- name: deploy snmp_exporter binary to /opt/prometheus/snmp_exporter
+  ansible.builtin.copy:
+    src: /tmp/snmp_exporter-{{ snmp_exporter.version }}.linux-amd64/snmp_exporter
+    dest: /opt/prometheus/snmp_exporter/snmp_exporter
+    remote_src: true
+    owner: prometheus
+    group: prometheus
+    mode: 0755
+  become: true
+
+- name: deploy snmp_exporter config to /opt/prometheus/snmp_exporter
+  ansible.builtin.copy:
+    src: /tmp/snmp_exporter-{{ snmp_exporter.version }}.linux-amd64/snmp.yml
+    dest: /opt/prometheus/snmp_exporter/snmp.yml
+    remote_src: true
+    owner: prometheus
+    group: prometheus
+    mode: 0644
+  become: true
+
+- name: deploy snmp_exporter systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/snmp_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      [Unit]
+      Description=SNMP Exporter
+      After=network-online.target
+      [Service]
+      User=prometheus
+      Restart=on-failure
+      ExecStart=/opt/prometheus/snmp_exporter/snmp_exporter --config.file='/opt/prometheus/snmp_exporter/snmp.yml'
+      [Install]
+      WantedBy=multi-user.target
+  become: true
+  notify: reload-systemd
+
+- name: start and enable
+  ansible.builtin.systemd:
+    name: snmp_exporter
+    state: started
+    enabled: true
+  become: true

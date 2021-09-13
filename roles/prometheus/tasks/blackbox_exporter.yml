@@ -1,0 +1,66 @@
+- name: fetch blackbox_exporter
+  ansible.builtin.get_url:
+    url: "{{ blackbox_exporter.url }}"
+    checksum: "{{ blackbox_exporter.checksum }}"
+    dest: /tmp/blackbox_exporter-{{ blackbox_exporter.version }}.linux-amd64.tar.gz
+  become: true
+
+- name: unarchive blackbox_exporter tarball
+  ansible.builtin.unarchive:
+    src: /tmp/blackbox_exporter-{{ blackbox_exporter.version }}.linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: yes
+  become: true
+
+- name: create /opt/prometheus/blackbox_exporter
+  ansible.builtin.file:
+    state: directory
+    path: /opt/prometheus/blackbox_exporter
+    owner: prometheus
+    group: prometheus
+  become: true
+
+- name: deploy blackbox_exporter binary to /opt/prometheus/blackbox_exporter
+  ansible.builtin.copy:
+    src: /tmp/blackbox_exporter-{{ blackbox_exporter.version }}.linux-amd64/blackbox_exporter
+    dest: /opt/prometheus/blackbox_exporter/blackbox_exporter
+    remote_src: true
+    owner: prometheus
+    group: prometheus
+    mode: 0755
+  become: true
+
+- name: deploy blackbox_exporter config to /opt/prometheus/blackbox_exporter
+  ansible.builtin.template:
+    src: blackbox.yml.j2
+    dest: /opt/prometheus/blackbox_exporter/blackbox.yml
+    owner: prometheus
+    group: prometheus
+    mode: 0644
+  become: true
+
+- name: deploy blackbox_exporter systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/blackbox_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      [Unit]
+      Description=Blackbox Exporter
+      After=network-online.target
+      [Service]
+      User=prometheus
+      Restart=on-failure
+      ExecStart=/opt/prometheus/blackbox_exporter/blackbox_exporter --config.file='/opt/prometheus/blackbox_exporter/blackbox.yml'
+      [Install]
+      WantedBy=multi-user.target
+  become: true
+  notify: reload-systemd
+
+- name: start and enable
+  ansible.builtin.systemd:
+    name: blackbox_exporter
+    state: started
+    enabled: true
+  become: true

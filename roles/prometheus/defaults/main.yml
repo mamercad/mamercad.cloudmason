@@ -1,0 +1,14 @@
+# https://prometheus.io/download/
+version: 2.27.1
+release_tarball: https://github.com/prometheus/prometheus/releases/download/v{{ version }}/prometheus-{{ version }}.linux-amd64.tar.gz
+release_sha256: ce637d0167d5e6d2561f3bd37e1c58fe8601e13e4e1ea745653c068f6e1317ae
+
+snmp_exporter:
+  url: https://github.com/prometheus/snmp_exporter/releases/download/v0.20.0/snmp_exporter-0.20.0.linux-amd64.tar.gz
+  checksum: sha256:004a0c26e649db29288e36962e03bb659d70e56dcd46aa96782a77cb303a8488
+  version: 0.20.0
+
+blackbox_exporter:
+  url: https://github.com/prometheus/blackbox_exporter/releases/download/v0.19.0/blackbox_exporter-0.19.0.linux-amd64.tar.gz
+  checksum: sha256:af2ae1394c4f9b46962ac1510e1dacac78115c11e625991fb6c54825d2240896
+  version: 0.19.0
