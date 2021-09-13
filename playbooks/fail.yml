@@ -12,6 +12,22 @@
 
   post_tasks:
 
+    - name: show all hosts
+      run_once: true
+      ansible.builtin.debug:
+        msg: |
+          all hosts:
+          {{ ansible_play_hosts_all
+          | join(', ') }}
+
+    - name: show passed hosts
+      run_once: true
+      ansible.builtin.debug:
+        msg: |
+          passed hosts:
+          {{ ansible_play_batch
+          | join(', ') }}
+
     - name: show failed hosts
       run_once: true
       ansible.builtin.debug:
