@@ -1,0 +1,31 @@
+name: testing
+
+on:  # noqa truthy
+  pull_request_target:
+    types: [labeled]
+
+jobs:
+
+  testing:
+
+    name: testing
+
+    environment: production
+
+    runs-on: ubuntu-latest
+
+    if: contains(github.event.pull_request.labels.*.name, 'safe to test')
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: mamercad/cloudmason
+
+      - name: Testing
+        run: echo "${SECRET}"
