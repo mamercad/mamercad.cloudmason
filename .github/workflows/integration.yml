@@ -1,0 +1,28 @@
+name: integration
+
+on:
+  pull_request_target:
+
+jobs:
+
+  ansible-lint:
+
+    name: integration
+
+    environment: integration
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mamercad/cloudmason/ansible
+
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: mamercad/cloudmason
+
+      - name: Ping Healthchecks.io
+        run: curl ${HEALTHCHECKS_IO}
