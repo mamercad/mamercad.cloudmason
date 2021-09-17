@@ -36,6 +36,3 @@ jobs:
 
       - name: Run ansible-lint
         run: ansible-lint -x line-length -v
-
-      - name: Testing
-        run: echo "${SECRET}"
