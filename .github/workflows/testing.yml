@@ -10,7 +10,7 @@ jobs:
 
     name: testing
 
-    environment: production
+    # environment: production
 
     runs-on: ubuntu-latest
 
