@@ -27,4 +27,7 @@ jobs:
           path: mamercad/cloudmason
 
       - name: Ping Healthchecks.io
-        run: curl ${HEALTHCHECKS_IO}
+        run: |
+          which curl
+          curl -v
+          curl ${HEALTHCHECKS_IO}
