@@ -2,17 +2,21 @@ name: integration
 
 on:
   pull_request_target:
-    types: [labeled]
+    branches: [ main ]
 
 jobs:
 
-  ansible-lint:
+  approve:
+    name: approve
+    runs-on: ubuntu-latest
+    steps:
+      - name: approve
+        run: echo All pull requests need to be approved before running the integration tests.
 
+  integrations:
     name: integration
-
+    needs: [ approve ]
     environment: integration
-    if: contains(github.event.pull_request.labels.*.name, 'safe to test')
-
     runs-on: ubuntu-latest
 
     defaults:
@@ -25,6 +29,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: mamercad/cloudmason
+          ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
 
       - name: Ping Healthchecks.io
         run: |
