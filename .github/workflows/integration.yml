@@ -14,34 +14,38 @@ jobs:
       - name: approve
         run: echo All pull requests need to be approved before running the integration tests.
 
-  one-passing-test:
-    name: one-passing-test
+  store-secret:
+    name: store-secret
     needs: [ approve ]
     environment: integration
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: store-secret
+        shell: bash
+        run: |
+          run: echo "${{ secrets.HEALTHCHECKS_IO }}" >secret
+      - name: upload-secret
+        uses: actions/upload-artifact@v2
         with:
-          path: mamercad/cloudmason
-          ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
-      - name: Ping Healthchecks.io
-        uses: wei/curl@master
-        with:
-          args: ${{ secrets.HEALTHCHECKS_IO }}
+          name: secret
+          path: secret
+          retention-days: 0
 
   integration:
     name: integration
-    needs: [ one-passing-test ]
-    environment: integration
+    needs: [ store-secret ]
     runs-on: ubuntu-latest
     steps:
+      - name: download-secret
+        uses: actions/download-artifact@v2
+        with:
+          name: secret
       - name: Check out code
         uses: actions/checkout@v2
         with:
           path: mamercad/cloudmason
           ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
       - name: Ping Healthchecks.io
-        uses: wei/curl@master
-        with:
-          args: ${{ secrets.HEALTHCHECKS_IO }}
+        run: |
+          source secret
+          curl -vvv ${HEALTHCHECKS_IO}
