@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: store-secret
         shell: bash
-        run: echo "${{ secrets.HEALTHCHECKS_IO }}" >secret
+        run: echo "HEALTHCHECKS_IO='${{ secrets.HEALTHCHECKS_IO }}'" >secret
       - name: upload-secret
         uses: actions/upload-artifact@v2
         with:
