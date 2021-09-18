@@ -21,5 +21,4 @@ jobs:
 
       - name: Ping Healthchecks.io
         run: |
-          source secret
           curl --silent --head ${{ secrets.HEALTHCHECKS_IO }}
