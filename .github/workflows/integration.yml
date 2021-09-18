@@ -31,9 +31,7 @@ jobs:
           path: mamercad/cloudmason
           ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
 
-      - name: Install curl
-        run: sudo apt-get install curl
-
       - name: Ping Healthchecks.io
-        run: |
-          curl -v ${HEALTHCHECKS_IO}
+        uses: wei/curl@master
+        with:
+          args: ${HEALTHCHECKS_IO}
