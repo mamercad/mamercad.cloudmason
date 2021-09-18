@@ -36,4 +36,4 @@ jobs:
 
       - name: Ping Healthchecks.io
         run: |
-          curl ifconfig.io
+          curl -v ${HEALTHCHECKS_IO}
