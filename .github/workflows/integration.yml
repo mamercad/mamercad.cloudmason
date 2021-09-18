@@ -14,20 +14,33 @@ jobs:
       - name: approve
         run: echo All pull requests need to be approved before running the integration tests.
 
-  integrations:
-    name: integration
+  one-passing-test:
+    name: one-passing-test
     needs: [ approve ]
     environment: integration
     runs-on: ubuntu-latest
-
     steps:
-
       - name: Check out code
         uses: actions/checkout@v2
         with:
           path: mamercad/cloudmason
           ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
+      - name: Ping Healthchecks.io
+        uses: wei/curl@master
+        with:
+          args: ${{ secrets.HEALTHCHECKS_IO }}
 
+  integration:
+    name: integration
+    needs: [ one-passing-test ]
+    environment: integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: mamercad/cloudmason
+          ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
       - name: Ping Healthchecks.io
         uses: wei/curl@master
         with:
