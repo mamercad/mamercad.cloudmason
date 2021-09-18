@@ -1,4 +1,3 @@
-# https://dev.to/petrsvihlik/using-environment-protection-rules-to-secure-secrets-when-building-external-forks-with-pullrequesttarget-hci
 name: integration
 
 on:
@@ -7,44 +6,20 @@ on:
 
 jobs:
 
-  approve:
-    name: approve
-    runs-on: ubuntu-latest
-    steps:
-      - name: approve
-        run: echo All pull requests need to be approved before running the integration tests.
-
-  store-secret:
-    name: store-secret
-    needs: [ approve ]
-    environment: integration
-    runs-on: ubuntu-latest
-    steps:
-      - name: store-secret
-        shell: bash
-        run: echo "HEALTHCHECKS_IO='${{ secrets.HEALTHCHECKS_IO }}'" >secret
-      - name: upload-secret
-        uses: actions/upload-artifact@v2
-        with:
-          name: secret
-          path: secret
-          retention-days: 0
-
   integration:
     name: integration
-    needs: [ store-secret ]
+    environment: integration
     runs-on: ubuntu-latest
+
     steps:
-      - name: download-secret
-        uses: actions/download-artifact@v2
-        with:
-          name: secret
+
       - name: Check out code
         uses: actions/checkout@v2
         with:
           path: mamercad/cloudmason
           ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
+
       - name: Ping Healthchecks.io
         run: |
           source secret
-          curl --silent --head ${HEALTHCHECKS_IO}
+          curl --silent --head ${{ secrets.HEALTHCHECKS_IO }}
