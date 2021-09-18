@@ -47,4 +47,4 @@ jobs:
       - name: Ping Healthchecks.io
         run: |
           source secret
-          curl -vvv ${HEALTHCHECKS_IO}
+          curl --silent --head ${HEALTHCHECKS_IO}
