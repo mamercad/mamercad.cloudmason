@@ -34,4 +34,4 @@ jobs:
       - name: Ping Healthchecks.io
         uses: wei/curl@master
         with:
-          args: ${HEALTHCHECKS_IO}
+          args: ${{ secrets.HEALTHCHECKS_IO }}
