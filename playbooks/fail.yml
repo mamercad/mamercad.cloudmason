@@ -47,8 +47,8 @@
     #   skipped:{{ ansible_callback_diy.stats.skipped | flatten | join(',') }}
     ansible_callback_diy_playbook_on_stats_msg: |+2
       summary
-        ok      {{ (ansible_callback_diy.stats.ok | flatten) | difference(ansible_callback_diy.stats.failures | flatten) | flatten | sort | join(',') }}
-        failed  {{ (ansible_callback_diy.stats.failures | flatten) | union(ansible_callback_diy.stats.dark | flatten) | flatten | sort | join(',') }}
+        ok     {{ (ansible_callback_diy.stats.ok | flatten) | difference(ansible_callback_diy.stats.failures | flatten) | flatten | sort | join(',') }}
+        failed {{ (ansible_callback_diy.stats.failures | flatten) | union(ansible_callback_diy.stats.dark | flatten) | flatten | sort | join(',') }}
 
   tasks:
 
