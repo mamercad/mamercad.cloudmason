@@ -52,110 +52,23 @@
 
   tasks:
 
-    - name: task1
+    - name: task1 (ping)
       ansible.builtin.ping:
 
-    - name: task2
+    - name: task2 (debug)
+      ansible.builtin.debug:
+        msg: hello
+
+    - name: task3 (debug no log)
+      ansible.builtin.debug:
+        msg: hello
+      no_log: true
+
+    - name: task 4 (skip)
+      ansible.builtin.debug:
+        msg: hello
+      when: false
+
+    - name: task5 (fail 50%)
       ansible.builtin.fail:
       when: 2 | random == 1
-
-
-# {
-#     "changed": {}
-# }
-# {
-#     "custom": {}
-# }
-# {
-#     "dark": {
-#         "lenovo": 1,
-#         "sunfire": 1
-#     }
-# }
-# {
-#     "failures": {
-#         "net2": 1,
-#         "thinkpad5": 1
-#     }
-# }
-# {
-#     "ignored": {}
-# }
-# {
-#     "ok": {
-#         "net1": 1,
-#         "net2": 1,
-#         "thinkpad": 1,
-#         "thinkpad2": 1,
-#         "thinkpad3": 1,
-#         "thinkpad4": 1,
-#         "thinkpad5": 1
-#     }
-# }
-# {
-#     "processed": {
-#         "lenovo": 1,
-#         "net1": 1,
-#         "net2": 1,
-#         "sunfire": 1,
-#         "thinkpad": 1,
-#         "thinkpad2": 1,
-#         "thinkpad3": 1,
-#         "thinkpad4": 1,
-#         "thinkpad5": 1
-#     }
-# }
-# {
-#     "rescued": {}
-# }
-# {
-#     "skipped": {
-#         "net1": 1,
-#         "thinkpad": 1,
-#         "thinkpad2": 1,
-#         "thinkpad3": 1,
-#         "thinkpad4": 1
-#     }
-# }
-
-
-# play:
-#   {'any_errors_fatal': False, 'become': False, 'become_flags': None, 'become_method': 'sudo', 'become_user': None, 'check_mode': False, 'collections': ['mamercad.cloudmason', 'ansible.legacy'], 'connection': 'ssh', 'debugger': None, 'diff': True, 'environment': None, 'fact_path': None, 'finalized': True, 'force_handlers': False, 'gather_facts': False, 'gather_subset': ['all'], 'gather_timeout': 10, 'handlers': [], 'hosts': ['thinkpad'], 'ignore_errors': None, 'ignore_unreachable': None, 'included_conditional': None, 'included_path': None, 'max_fail_percentage': None, 'module_defaults': None, 'name': 'fail', 'no_log': None, 'only_tags': {'all'}, 'order': None, 'port': None, 'post_tasks': [], 'pre_tasks': [], 'remote_user': None, 'removed_hosts': [], 'roles': [], 'run_once': None, 'serial': [], 'skip_tags': set(), 'squashed': False, 'strategy': 'linear', 'tags': [], 'tasks': [BLOCK(uuid=4c32758e-fbd3-8626-1a9f-000000000018)(id=4558180464)(parent=None)], 'uuid': '4c32758e-fbd3-8626-1a9f-000000000017', 'validated': True, 'vars_files': [], 'vars_prompt': []}
-# playbook:
-#   {'entries': [fail], 'file_name': 'playbooks/fail.yml', 'basedir': '/Users/mark/.ansible/collections/ansible_collections/mamercad/cloudmason/playbooks'}
-# result:
-#   {'host': thinkpad, 'task': TASK: ping, 'task_name': 'ping', 'is_changed': False, 'is_failed': False, 'is_skipped': False, 'is_unreachable': False, 'output': {'ping': 'pong', 'invocation': {'module_args': {'data': 'pong'}}, '_ansible_no_log': False, 'changed': False}}
-# task:
-#   {'action': 'ansible.builtin.ping', 'any_errors_fatal': False, 'args': {}, 'async': 0, 'async_val': 0, 'become': False, 'become_flags': None, 'become_method': 'sudo', 'become_user': None, 'changed_when': [], 'check_mode': False, 'collections': ['mamercad.cloudmason', 'ansible.legacy'], 'connection': 'ssh', 'debugger': None, 'delay': 5, 'delegate_facts': None, 'delegate_to': None, 'diff': True, 'environment': [], 'failed_when': [], 'finalized': False, 'ignore_errors': None, 'ignore_unreachable': None, 'loop': None, 'loop_control': None, 'loop_with': None, 'module_defaults': [], 'name': 'ping', 'no_log': None, 'notify': None, 'parent': BLOCK(uuid=4c32758e-fbd3-8626-1a9f-000000000018)(id=4558180464)(parent=None), 'poll': 15, 'port': None, 'register': None, 'remote_user': None, 'retries': 3, 'role': None, 'run_once': None, 'squashed': False, 'tags': [], 'untagged': frozenset({'untagged'}), 'until': [], 'uuid': '4c32758e-fbd3-8626-1a9f-000000000019', 'validated': True, 'when': []}
-# top_level_var_names:
-#   ['me', 'network', 'dns', 'cloudflare_api_key', 'powerdns_api_key', 'powerdns_forward_zones', 'traefik_admin_username', 'traefik_admin_password', 'traefik_cloudflare_api_email', 'traefik_cloudflare_api_key', 'inventory_file', 'inventory_dir', 'ansible_host', 'ansible_python_interpreter', 'healthchecks_io', 'type', 'inventory_hostname', 'inventory_hostname_short', 'group_names', 'ansible_facts', 'ansible_callback_diy_playbook_on_stats_msg', 'ansible_callback_diy_playbook_on_task_start_msg', 'ansible_callback_diy_runner_on_ok_msg', 'playbook_dir', 'ansible_playbook_python', 'ansible_config_file', 'ansible_role_names', 'ansible_play_role_names', 'ansible_dependent_role_names', 'role_names', 'ansible_play_name', 'groups', 'ansible_play_hosts_all', 'ansible_play_hosts', 'ansible_play_batch', 'play_hosts', 'omit', 'ansible_version', 'ansible_check_mode', 'ansible_diff_mode', 'ansible_forks', 'ansible_inventory_sources', 'ansible_skip_tags', 'ansible_limit', 'ansible_run_tags', 'ansible_verbosity', 'hostvars', 'environment', 'vars', 'ansible_callback_diy', 'ping', 'invocation', '_ansible_no_log', 'changed']
-
-
-# cat ansible.log | jq -r '.stats | to_entries[] | select(.value.skipped==1) | .key'
-
-  # post_tasks:
-
-  #   - name: show all hosts
-  #     run_once: true
-  #     ansible.builtin.debug:
-  #       msg: |
-  #         all hosts:
-  #         {{ ansible_play_hosts_all
-  #         | join(', ') }}
-
-  #   - name: show passed hosts
-  #     run_once: true
-  #     ansible.builtin.debug:
-  #       msg: |
-  #         passed hosts:
-  #         {{ ansible_play_batch
-  #         | join(', ') }}
-
-  #   - name: show failed hosts
-  #     run_once: true
-  #     ansible.builtin.debug:
-  #       msg: |
-  #         failed hosts:
-  #         {{ ansible_play_hosts_all
-  #         | difference(ansible_play_batch)
-  #         | join(', ') }}
