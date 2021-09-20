@@ -152,6 +152,21 @@ class CallbackModule(CallbackBase):
         ]
         self.post_message(text="runner skipped", blocks=blocks)
 
+    def v2_runner_on_unreachable(self, result, **kwargs):
+        _result = json.loads(self._dump_results(result._result))
+        _changed = str(_result.get("changed", False)).lower()
+        del _result["changed"]
+        _result = yaml.dump(_result, indent=2)
+        _host = result._host
+        _text = f"fatal: [{_host}]: UNREACHABLE! => changed={_changed}"
+        blocks = [
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": f"```{_text}\n  {_result}```"},
+            }
+        ]
+        self.post_message(text="runner failed", blocks=blocks)
+
     def v2_runner_on_failed(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
         _changed = str(_result.get("changed", False)).lower()
@@ -166,6 +181,8 @@ class CallbackModule(CallbackBase):
             }
         ]
         self.post_message(text="runner failed", blocks=blocks)
+
+
 
     def v2_playbook_on_stats(self, stats):
         _hosts = sorted(stats.processed.keys())
