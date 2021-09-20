@@ -12,7 +12,6 @@ DOCUMENTATION = """
   type: notification
   requirements:
     - Allow in configuration C(callbacks_enabled = slack) in C([default]).
-    - Specify the path in configuration C(callback_plugins = ./plugins/callback:/usr/share/ansible/plugins/callback).
     - The C(slack_sdk) Python library.
   short_description: Sends play events to a Slack channel.
   description:
@@ -39,7 +38,6 @@ DOCUMENTATION = """
 
 import json
 import yaml
-import os
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
