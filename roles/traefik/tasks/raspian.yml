@@ -172,6 +172,9 @@
           [http.services.awx.loadBalancer]
             [[http.services.awx.loadBalancer.servers]]
               url = "http://awx-service.awx.thinkpad.cloudmason.org:80/"
+          [http.services.awx-dev.loadBalancer]
+            [[http.services.awx-dev.loadBalancer.servers]]
+              url = "http://awx-dev-service.default.lenovo.cloudmason.org:80/"
           [http.services.opennebula.loadBalancer]
             [[http.services.opennebula.loadBalancer.servers]]
               url = "http://thinkpad.cloudmason.org:9869/"
