@@ -42,7 +42,7 @@
               delegate_facts: true
               ansible.builtin.set_fact:
                 passes: "{{ hostvars['localhost']['passes'] | combine(
-                          {inventory_hostname: 'ping'}
+                          {inventory_hostname: 'ping'}, recursive=True
                           ) }}"
 
           rescue:
@@ -52,7 +52,7 @@
               delegate_facts: true
               ansible.builtin.set_fact:
                 failures: "{{ hostvars['localhost']['failures'] | combine(
-                          {inventory_hostname: 'ping'}
+                          {inventory_hostname: 'ping'}, recursive=True
                           ) }}"
 
         - name: task 2
@@ -67,21 +67,21 @@
               delegate_facts: true
               ansible.builtin.set_fact:
                 passes: "{{ hostvars['localhost']['passes'] | combine(
-                          {inventory_hostname: 'fail'}
+                          {inventory_hostname: 'fail'}, recursive=True
                           ) }}"
 
           rescue:
 
-            - name: debug
-              ansible.builtin.debug:
-                var: ansible_failed_task
+            # - name: debug
+            #   ansible.builtin.debug:
+            #     var: ansible_failed_task
 
             - name: fact
               delegate_to: localhost
               delegate_facts: true
               ansible.builtin.set_fact:
                 failures: "{{ hostvars['localhost']['failures'] | combine(
-                          {inventory_hostname: 'fail'}
+                          {inventory_hostname: 'fail'}, recursive=True
                           ) }}"
 
       always:
@@ -93,42 +93,43 @@
             msg: |
               failures:
               {{ hostvars['localhost']['failures'] | to_nice_yaml(indent=2) }}
+          when: inventory_hostname == 'thinkpad5'
 
         - name: debug
           delegate_to: localhost
-          run_once: true
           ansible.builtin.debug:
             msg: |
               passes:
               {{ hostvars['localhost']['passes'] | to_nice_yaml(indent=2) }}
+          when: inventory_hostname == 'thinkpad5'
 
-        - name: Send notification message via Slack
-          delegate_to: localhost
-          run_once: true
-          community.general.slack:
-            token: "{{ slack_token }}"
-            channel: "#bots"
-            icon_url: https://img.stackshare.io/service/7728/DJLpA-IWAAAqXsE.jpg
-            username: "{{ inventory_hostname }}"
-            blocks:
-              - type: header
-                text:
-                  type: plain_text
-                  text: hello world
-                  emoji: true
-              - type: section
-                text:
-                  text: play results
-                  type: mrkdwn
-              - type: section
-                fields:
-                  - type: mrkdwn
-                    text: "```all hosts:\n{{ ansible_play_hosts_all | join(', ') }}```"
-                  - type: mrkdwn
-                    text: "```failed hosts:\n{{ ansible_play_hosts_all | difference(ansible_play_batch) | join(', ') }}```"
-                  - type: mrkdwn
-                    text: "```passed hosts:\n{{ ansible_play_batch | join(', ') }}```"
-                  - type: mrkdwn
-                    text: "```failures:\n{{ hostvars['localhost']['failures'] | to_nice_yaml(indent=2) }}```"
-                  - type: mrkdwn
-                    text: "```passes:\n{{ hostvars['localhost']['passes'] | to_nice_yaml(indent=2) }}```"
+        # - name: Send notification message via Slack
+        #   delegate_to: localhost
+        #   run_once: true
+        #   community.general.slack:
+        #     token: "{{ slack_token }}"
+        #     channel: "#bots"
+        #     icon_url: https://img.stackshare.io/service/7728/DJLpA-IWAAAqXsE.jpg
+        #     username: "{{ inventory_hostname }}"
+        #     blocks:
+        #       - type: header
+        #         text:
+        #           type: plain_text
+        #           text: hello world
+        #           emoji: true
+        #       - type: section
+        #         text:
+        #           text: play results
+        #           type: mrkdwn
+        #       - type: section
+        #         fields:
+        #           - type: mrkdwn
+        #             text: "```all hosts:\n{{ ansible_play_hosts_all | join(', ') }}```"
+        #           - type: mrkdwn
+        #             text: "```failed hosts:\n{{ ansible_play_hosts_all | difference(ansible_play_batch) | join(', ') }}```"
+        #           - type: mrkdwn
+        #             text: "```passed hosts:\n{{ ansible_play_batch | join(', ') }}```"
+        #           - type: mrkdwn
+        #             text: "```failures:\n{{ hostvars['localhost']['failures'] | to_nice_yaml(indent=2) }}```"
+        #           - type: mrkdwn
+        #             text: "```passes:\n{{ hostvars['localhost']['passes'] | to_nice_yaml(indent=2) }}```"
