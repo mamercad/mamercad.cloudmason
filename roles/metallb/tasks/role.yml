@@ -1,5 +1,5 @@
 - name: create metallb role
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
@@ -20,7 +20,7 @@
         - watch
 
 - name: create metallb role
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
@@ -39,7 +39,7 @@
         - list
 
 - name: create metallb role
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
