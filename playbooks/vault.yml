@@ -1,0 +1,13 @@
+---
+- name: vault
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  tasks:
+    - name: include vault role (main tasks)
+      ansible.builtin.include_role:
+        name: vault
+        tasks_from: main.yml
+      vars:
+        context: lenovo
