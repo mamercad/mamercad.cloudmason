@@ -3,6 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from re import I
 
 __metaclass__ = type
 
@@ -12,39 +13,49 @@ DOCUMENTATION = """
   type: notification
   requirements:
     - Allow in configuration C(callbacks_enabled = slack) in C([default]).
-    - The C(slack_sdk) Python library.
+    - The C(requests) Python library.
   short_description: Sends play events to a Slack channel.
   description:
     - This is an ansible callback plugin that sends status updates to a Slack channel during playbook execution.
   options:
     slack_bot_token:
       required: true
-      desciption: Slack bot token; has the form C(xoxb-37809492...).
+      description: Slack token; has the form C(xoxb-37809492...).
       env:
         - name: SLACK_BOT_TOKEN
       ini:
-        - section: callback_slack
-          key: bot_token
+        - section: callback_summary
+          key: slack_bot_token
     slack_channel:
       required: true
-      desciption: Slack channel; has the form C(#bots).
+      description: Slack channel; has the form C(#bots).
       env:
         - name: SLACK_CHANNEL
       ini:
-        - section: callback_slack
-          key: channel
+        - section: callback_summary
+          key: slack_channel
+    ansible_events:
+      required: false
+      description: Ansible events for which to notify on.
+      default: v2_playbook_on_start,v2_playbook_on_task_start,v2_runner_on_ok,v2_runner_on_skipped,v2_runner_on_unreachable,v2_runner_on_failed,v2_playbook_on_stats
+      env:
+        - name: ANSIBLE_EVENTS
+      ini:
+        - section: callback_summary
+          key: ansible_events
+    slack_threading:
+      required: false
+      description: Use Slack threads (or not).
+      default: false
+      ini:
+        - section: callback_summary
+          key: slack_threading
 """
-
 
 import json
 import yaml
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
+import requests
 
-
-# from ansible import context
-# from ansible.module_utils.common.text.converters import to_text
-# from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
 
@@ -57,6 +68,35 @@ class CallbackModule(CallbackBase):
     def __init__(self, display=None):
         super(CallbackModule, self).__init__(display=display)
 
+        self.slack_ts = None
+
+        self.overall_summary = {}
+        self.current_plays = None
+        self.current_task = None
+
+        #  overall_summary = {
+        #    'host1' = [
+        #       { 'task1' = 'ok' },
+        #       { 'task2' = 'failed' },
+        #    ],
+        #    'host2' = [
+        #       { 'task1' = 'ok' },
+        #       { 'task2' = 'ok' },
+        #       { 'task3' = 'failed' },
+        #    ],
+        #    'host3' = [
+        #       { 'task1' = 'skipped' },
+        #       { 'task2' = 'skipped' },
+        #       { 'task3' = 'failed' },
+        #    ],
+        #    'host4' = [
+        #       { 'task1' = 'skipped' },
+        #       { 'task2' = 'ok' },
+        #       { 'task3' = 'ok' },
+        #    ],
+        #    ...
+        #  }
+
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(
             task_keys=task_keys, var_options=var_options, direct=direct
@@ -64,6 +104,8 @@ class CallbackModule(CallbackBase):
 
         self.slack_bot_token = self.get_option("slack_bot_token")
         self.slack_channel = self.get_option("slack_channel")
+        self.ansible_events = self.get_option("ansible_events").split(",")
+        self.slack_threading = self.get_option("slack_threading")
 
         if self.slack_bot_token is None:
             self.disabled = True
@@ -81,16 +123,38 @@ class CallbackModule(CallbackBase):
                 "environment variable."
             )
 
-        self.client = WebClient(token=self.slack_bot_token)
-        self.channel = self.slack_channel
-
     def post_message(self, **kwargs):
         try:
-            self.client.chat_postMessage(channel=self.channel, **kwargs)
-        except SlackApiError as e:
-            assert e.response.get("ok", True) is False
-            assert e.response.get("error", False)
-            raise Exception(f"{e.response['error']}")
+            headers = {
+                "Authorization": f"Bearer {self.slack_bot_token}",
+                "Content-type": "application/json; charset=utf-8",
+            }
+
+            payload = {
+                "channel": self.slack_channel,
+                **kwargs,
+            }
+
+            if self.slack_threading:
+                if self.slack_ts is not None:
+                    payload.update({"thread_ts": self.slack_ts})
+
+            slack = requests.post(
+                "https://slack.com/api/chat.postMessage", headers=headers, json=payload
+            )
+
+            if slack.status_code != requests.codes.ok:
+                self._display.error(slack.text)
+            else:
+                resp = slack.json()
+                if resp.get("ok", False) is not True:
+                    self._display.error(slack.text)
+                else:
+                    if self.slack_ts is None:
+                        self.slack_ts = resp.get("ts", None)
+
+        except Exception as e:
+            self._display.error(str(e))
 
     def v2_playbook_on_start(self, playbook, **kwargs):
         _plays = playbook.get_plays()
@@ -105,7 +169,10 @@ class CallbackModule(CallbackBase):
                 },
             }
         ]
-        self.post_message(text="playbook start", blocks=blocks)
+        if "v2_playbook_on_start" in self.ansible_events:
+            self.post_message(text="playbook start", blocks=blocks)
+
+        self.current_plays = str(_plays)
 
     def v2_playbook_on_task_start(self, task, **kwargs):
         _task_name = task.name
@@ -120,14 +187,17 @@ class CallbackModule(CallbackBase):
                 },
             }
         ]
-        self.post_message(text="task start", blocks=blocks)
+        if "v2_playbook_on_task_start" in self.ansible_events:
+            self.post_message(text="task start", blocks=blocks)
+
+        self.current_task = _task_name
 
     def v2_runner_on_ok(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
         _changed = str(_result.get("changed", False)).lower()
         del _result["changed"]
         _result = yaml.dump(_result, indent=2)
-        _host = result._host
+        _host = str(result._host)
         _text = f"ok: [{_host}] => changed={_changed}"
         blocks = [
             {
@@ -135,14 +205,19 @@ class CallbackModule(CallbackBase):
                 "text": {"type": "mrkdwn", "text": f"```{_text}\n  {_result}```"},
             }
         ]
-        self.post_message(text="runner ok", blocks=blocks)
+        if "v2_runner_on_ok" in self.ansible_events:
+            self.post_message(text="runner ok", blocks=blocks)
+
+        if _host not in self.overall_summary:
+            self.overall_summary[_host] = []
+        self.overall_summary[_host].append({self.current_task: "ok"})
 
     def v2_runner_on_skipped(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
         _changed = str(_result.get("changed", False)).lower()
         del _result["changed"]
         _result = yaml.dump(_result, indent=2)
-        _host = result._host
+        _host = str(result._host)
         _text = f"skipping: [{_host}] => changed={_changed}"
         blocks = [
             {
@@ -150,14 +225,19 @@ class CallbackModule(CallbackBase):
                 "text": {"type": "mrkdwn", "text": f"```{_text}\n  {_result}```"},
             }
         ]
-        self.post_message(text="runner skipped", blocks=blocks)
+        if "v2_runner_on_skipped" in self.ansible_events:
+            self.post_message(text="runner skipped", blocks=blocks)
+
+        if _host not in self.overall_summary:
+            self.overall_summary[_host] = []
+        self.overall_summary[_host].append({self.current_task: "skipped"})
 
     def v2_runner_on_unreachable(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
         _changed = str(_result.get("changed", False)).lower()
         del _result["changed"]
         _result = yaml.dump(_result, indent=2)
-        _host = result._host
+        _host = str(result._host)
         _text = f"fatal: [{_host}]: UNREACHABLE! => changed={_changed}"
         blocks = [
             {
@@ -165,14 +245,19 @@ class CallbackModule(CallbackBase):
                 "text": {"type": "mrkdwn", "text": f"```{_text}\n  {_result}```"},
             }
         ]
-        self.post_message(text="runner failed", blocks=blocks)
+        if "v2_runner_on_unreachable" in self.ansible_events:
+            self.post_message(text="runner unreachable", blocks=blocks)
+
+        if _host not in self.overall_summary:
+            self.overall_summary[_host] = []
+        self.overall_summary[_host].append({self.current_task: "unreachable"})
 
     def v2_runner_on_failed(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
         _changed = str(_result.get("changed", False)).lower()
         del _result["changed"]
         _result = yaml.dump(_result, indent=2)
-        _host = result._host
+        _host = str(result._host)
         _text = f"fatal: [{_host}] => changed={_changed}"
         blocks = [
             {
@@ -180,9 +265,12 @@ class CallbackModule(CallbackBase):
                 "text": {"type": "mrkdwn", "text": f"```{_text}\n  {_result}```"},
             }
         ]
-        self.post_message(text="runner failed", blocks=blocks)
+        if "v2_runner_on_failed" in self.ansible_events:
+            self.post_message(text="runner failed", blocks=blocks)
 
-
+        if _host not in self.overall_summary:
+            self.overall_summary[_host] = []
+        self.overall_summary[_host].append({self.current_task: "failed"})
 
     def v2_playbook_on_stats(self, stats):
         _hosts = sorted(stats.processed.keys())
@@ -205,4 +293,33 @@ class CallbackModule(CallbackBase):
                 },
             }
         ]
-        self.post_message(text="playbook start", blocks=blocks)
+        if "v2_playbook_on_stats" in self.ansible_events:
+            self.post_message(text="stats", blocks=blocks)
+
+        self.display_overall_summary()
+
+    def display_overall_summary(self):
+        max_hostname_length = 0
+        for host in sorted(self.overall_summary.keys()):
+            if len(host) > max_hostname_length:
+                max_hostname_length = len(host)
+
+        _msg = self.current_plays + "\n"
+        for host in sorted(self.overall_summary.keys()):
+            last_task = self.overall_summary[host][-1]
+            for k, v in last_task.items():
+                if last_task[k] in ["failed", "unreachable"]:
+                    _msg += f"{host.ljust(max_hostname_length, ' ')} | failed | {k.ljust(44, ' ')}\n"
+                else:
+                    _msg += f"{host.ljust(max_hostname_length, ' ')} | passed\n"
+
+        blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"```{_msg}```",
+                },
+            }
+        ]
+        self.post_message(text="overall summary", blocks=blocks)
