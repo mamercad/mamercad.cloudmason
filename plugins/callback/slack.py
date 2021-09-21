@@ -91,7 +91,7 @@ class CallbackModule(CallbackBase):
         #    ],
         #    'host4' = [
         #       { 'task1' = 'skipped' },
-        #       { 'task2' = 'ok' },
+        #       { 'task2' = ['ok', '...'] },
         #       { 'task3' = 'ok' },
         #    ],
         #    ...
@@ -210,7 +210,7 @@ class CallbackModule(CallbackBase):
 
         if _host not in self.overall_summary:
             self.overall_summary[_host] = []
-        self.overall_summary[_host].append({self.current_task: "ok"})
+        self.overall_summary[_host].append({self.current_task: ["ok", _result]})
 
     def v2_runner_on_skipped(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
@@ -230,7 +230,7 @@ class CallbackModule(CallbackBase):
 
         if _host not in self.overall_summary:
             self.overall_summary[_host] = []
-        self.overall_summary[_host].append({self.current_task: "skipped"})
+        self.overall_summary[_host].append({self.current_task: ["skipped", _result]})
 
     def v2_runner_on_unreachable(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
@@ -250,7 +250,7 @@ class CallbackModule(CallbackBase):
 
         if _host not in self.overall_summary:
             self.overall_summary[_host] = []
-        self.overall_summary[_host].append({self.current_task: "unreachable"})
+        self.overall_summary[_host].append({self.current_task: ["unreachable", _result]})
 
     def v2_runner_on_failed(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
@@ -270,7 +270,7 @@ class CallbackModule(CallbackBase):
 
         if _host not in self.overall_summary:
             self.overall_summary[_host] = []
-        self.overall_summary[_host].append({self.current_task: "failed"})
+        self.overall_summary[_host].append({self.current_task: ["failed", _result]})
 
     def v2_playbook_on_stats(self, stats):
         _hosts = sorted(stats.processed.keys())
@@ -304,15 +304,33 @@ class CallbackModule(CallbackBase):
             if len(host) > max_hostname_length:
                 max_hostname_length = len(host)
 
-        _msg = self.current_plays + "\n"
+        max_taskname_length = 0
+        for host in sorted(self.overall_summary.keys()):
+            for task in self.overall_summary[host]:
+                for k, v in task.items():
+                    if len(k) > max_taskname_length:
+                        max_taskname_length = len(k)
+
+        max_failmsg_length = 0
         for host in sorted(self.overall_summary.keys()):
             last_task = self.overall_summary[host][-1]
             for k, v in last_task.items():
-                if last_task[k] in ["failed", "unreachable"]:
-                    _msg += f"{host.ljust(max_hostname_length, ' ')} | failed | {k.ljust(44, ' ')}\n"
-                else:
-                    _msg += f"{host.ljust(max_hostname_length, ' ')} | passed\n"
+                if len(last_task[k][1]) > max_failmsg_length:
+                    max_failmsg_length = len(last_task[k][1])
 
+        _msgs = []
+        _msgs.append(self.current_plays)
+        for host in sorted(self.overall_summary.keys()):
+            last_task = self.overall_summary[host][-1]
+            for k, v in last_task.items():
+                if last_task[k][0] in ["failed", "unreachable"]:
+                    _msgs.append(f"{host.ljust(max_hostname_length, ' ')} | "
+                                 f"failed | {k.ljust(max_taskname_length, ' ')} | "
+                                 f"{last_task[k][1][:20]}")
+                else:
+                    _msgs.append(f"{host.ljust(max_hostname_length, ' ')} | passed")
+
+        _msg = "\n".join(_msgs)
         blocks = [
             {
                 "type": "section",
