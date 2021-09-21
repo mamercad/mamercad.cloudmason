@@ -30,3 +30,4 @@
     replace: true
     update_repo_cache: true
     disable_hook: true
+    values: "{{ vault_values }}"
