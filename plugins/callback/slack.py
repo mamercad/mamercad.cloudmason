@@ -24,7 +24,7 @@ DOCUMENTATION = """
       env:
         - name: SLACK_BOT_TOKEN
       ini:
-        - section: callback_summary
+        - section: callback_slack
           key: slack_bot_token
     slack_channel:
       required: true
@@ -32,7 +32,7 @@ DOCUMENTATION = """
       env:
         - name: SLACK_CHANNEL
       ini:
-        - section: callback_summary
+        - section: callback_slack
           key: slack_channel
     ansible_events:
       required: false
@@ -41,14 +41,14 @@ DOCUMENTATION = """
       env:
         - name: ANSIBLE_EVENTS
       ini:
-        - section: callback_summary
+        - section: callback_slack
           key: ansible_events
     slack_threading:
       required: false
       description: Use Slack threads (or not).
       default: false
       ini:
-        - section: callback_summary
+        - section: callback_slack
           key: slack_threading
 """
 
