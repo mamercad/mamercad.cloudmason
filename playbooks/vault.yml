@@ -11,3 +11,7 @@
         tasks_from: main.yml
       vars:
         context: lenovo
+        vault_values:
+          server:
+            dev:
+              enabled: true
