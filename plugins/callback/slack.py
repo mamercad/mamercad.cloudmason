@@ -12,7 +12,7 @@ DOCUMENTATION = """
   name: slack
   type: notification
   requirements:
-    - Allow in configuration C(callbacks_enabled = slack) in C([default]).
+    - Allow in configuration C(callbacks_enabled = mamercad.cloudmason.slack) in C([default]).
     - The C(requests) Python library.
   short_description: Sends play events to a Slack channel.
   description:
