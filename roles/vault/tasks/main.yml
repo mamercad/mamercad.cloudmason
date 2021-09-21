@@ -1,0 +1,32 @@
+- name: add Hashicorp chart repo
+  kubernetes.core.helm_repository:
+    state: present
+    name: hashicorp
+    repo_url: https://helm.releases.hashicorp.com
+
+- name: create vault-main namespace
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: vault-main
+        labels:
+          app.kubernetes.io/managed-by: Helm
+        annotations:
+          meta.helm.sh/release-name: vault
+          meta.helm.sh/release-namespace: vault-main
+
+- name: deploy latest version of Vault
+  kubernetes.core.helm:
+    state: present
+    name: vault
+    chart_ref: hashicorp/vault
+    release_namespace: vault-main
+    force: true
+    wait: true
+    replace: true
+    update_repo_cache: true
+    disable_hook: true
