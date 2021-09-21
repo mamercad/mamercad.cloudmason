@@ -25,7 +25,7 @@
     name: vault
     chart_ref: hashicorp/vault
     release_namespace: vault-main
-    force: true
+    force: false
     wait: true
     replace: true
     update_repo_cache: true
