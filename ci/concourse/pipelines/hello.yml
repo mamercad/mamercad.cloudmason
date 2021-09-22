@@ -45,6 +45,7 @@ jobs:
             args:
               - -exc
               - |
-                stty cols 80
+                stty cols 120
                 source /venv/bin/activate
-                ansible-playbook -i source/inventory/cloudmason.yml source/playbooks/ping.yml -l localhost -v
+                cd source
+                ansible-playbook -i inventory/cloudmason.yml playbooks/ping.yml -l localhost -v

@@ -20,7 +20,9 @@ fly-pipelines:
 
 fly-set-pipelines:
 	fly -t cloudmason set-pipeline \
-		--pipeline hello --config pipelines/hello.yml --non-interactive
+		--pipeline hello --config pipelines/pr.yml \
+		--var github-access-token="$(shell cat ~/.github-concourse-access-token)" \
+		--non-interactive
 
 fly-unpause-pipelines:
 	fly -t cloudmason unpause-pipeline \
