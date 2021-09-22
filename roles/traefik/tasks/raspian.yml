@@ -115,6 +115,10 @@
             rule = "Host(`concourse.cloudmason.org`)"
             service = "concourse"
             [http.routers.concourse.tls]
+          [http.routers.vault]
+            rule = "Host(`vault.cloudmason.org`)"
+            service = "vault"
+            [http.routers.vault.tls]
           [http.routers.grafana]
             rule = "Host(`grafana.cloudmason.org`)"
             service = "grafana"
@@ -187,6 +191,9 @@
           [http.services.concourse.loadBalancer]
             [[http.services.concourse.loadBalancer.servers]]
               url = "http://concourse-web.concourse-main.thinkpad.cloudmason.org:8080/"
+          [http.services.vault.loadBalancer]
+            [[http.services.vault.loadBalancer.servers]]
+              url = "http://vault-ui.vault-main.thinkpad.cloudmason.org:8200/"
           [http.services.grafana.loadBalancer]
             [[http.services.grafana.loadBalancer.servers]]
               url = "http://thinkpad.cloudmason.org:3000/"
