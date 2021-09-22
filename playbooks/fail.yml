@@ -4,35 +4,71 @@
   connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
   gather_facts: false
   become: false
+  vars:
+    ansible_callback_diy_on_any_msg: ""
+    # ansible_callback_diy_runner_on_ok_msg: |+2
+    #     ok          {{ ansible_callback_diy.play.name }},{{ ansible_callback_diy.task.name }},{{ ansible_callback_diy.result.host.name }}
+    # ansible_callback_diy_runner_on_failed_msg: |+2
+    #     failed      {{ ansible_callback_diy.play.name }},{{ ansible_callback_diy.task.name }},{{ ansible_callback_diy.result.host.name }}
+    # ansible_callback_diy_runner_on_skipped_msg: |+2
+    #     skipped     {{ ansible_callback_diy.play.name }},{{ ansible_callback_diy.task.name }},{{ ansible_callback_diy.result.host.name }}
+    # ansible_callback_diy_runner_on_unreachable_msg: |+2
+    #     unreachable {{ ansible_callback_diy.play.name }},{{ ansible_callback_diy.task.name }},{{ ansible_callback_diy.result.host.name }}
+    ansible_callback_diy_runner_on_ok_msg: |+2
+          ok          {{ ansible_callback_diy.result.host.name }}
+    ansible_callback_diy_runner_on_failed_msg: |+2
+          failed      {{ ansible_callback_diy.result.host.name }}
+    ansible_callback_diy_runner_on_skipped_msg: |+2
+          skipped     {{ ansible_callback_diy.result.host.name }}
+    ansible_callback_diy_runner_on_unreachable_msg: |+2
+          unreachable {{ ansible_callback_diy.result.host.name }}
+    ansible_callback_diy_playbook_on_start_msg: ""
+    ansible_callback_diy_playbook_on_notify_msg: ""
+    ansible_callback_diy_playbook_on_no_hosts_matched_msg: ""
+    ansible_callback_diy_playbook_on_no_hosts_remaining_msg: ""
+    # ansible_callback_diy_playbook_on_task_start_msg: "[task]"
+    ansible_callback_diy_playbook_on_task_start_msg: |+2
+        {{ ansible_callback_diy.task.name }}
+    ansible_callback_diy_playbook_on_handler_task_start_msg: ""
+    ansible_callback_diy_playbook_on_vars_prompt_msg: ""
+    # ansible_callback_diy_playbook_on_play_start_msg: "[play]"
+    ansible_callback_diy_playbook_on_play_start_msg: |+2
+      {{ ansible_callback_diy.play.name }}
+    # ansible_callback_diy_playbook_on_stats_msg: |
+    #   [stats]
+    #   changed:{{ ansible_callback_diy.stats.changed | flatten | join(',') }}
+    #   custom:{{ ansible_callback_diy.stats.custom | flatten | join(',') }}
+    #   unreachable:{{ ansible_callback_diy.stats.dark | flatten | join(',') }}
+    #   failures:{{ ansible_callback_diy.stats.failures | flatten | join(',') }}
+    #   ignored:{{ ansible_callback_diy.stats.ignored | flatten | join(',') }}
+    #   ok:{{ ansible_callback_diy.stats.ok | flatten | join(',') }}
+    #   processed:{{ ansible_callback_diy.stats.processed | flatten | join(',') }}
+    #   rescued:{{ ansible_callback_diy.stats.rescued | flatten | join(',') }}
+    #   skipped:{{ ansible_callback_diy.stats.skipped | flatten | join(',') }}
+    ansible_callback_diy_playbook_on_stats_msg: |+2
+      summary
+        ok     {{ (ansible_callback_diy.stats.ok | flatten) | difference(ansible_callback_diy.stats.failures | flatten) | flatten | sort | join(',') }}
+        failed {{ (ansible_callback_diy.stats.failures | flatten) | union(ansible_callback_diy.stats.dark | flatten) | flatten | sort | join(',') }}
+
   tasks:
 
-    - name: fail randomly
+    - name: task1 (ping)
+      ansible.builtin.ping:
+
+    - name: task2 (debug)
+      ansible.builtin.debug:
+        msg: hello
+
+    - name: task3 (debug no log)
+      ansible.builtin.debug:
+        msg: hello
+      no_log: true
+
+    - name: task 4 (skip)
+      ansible.builtin.debug:
+        msg: hello
+      when: false
+
+    - name: task5 (fail 50%)
       ansible.builtin.fail:
-      when: 3 | random == 1
-
-  post_tasks:
-
-    - name: show all hosts
-      run_once: true
-      ansible.builtin.debug:
-        msg: |
-          all hosts:
-          {{ ansible_play_hosts_all
-          | join(', ') }}
-
-    - name: show passed hosts
-      run_once: true
-      ansible.builtin.debug:
-        msg: |
-          passed hosts:
-          {{ ansible_play_batch
-          | join(', ') }}
-
-    - name: show failed hosts
-      run_once: true
-      ansible.builtin.debug:
-        msg: |
-          failed hosts:
-          {{ ansible_play_hosts_all
-          | difference(ansible_play_batch)
-          | join(', ') }}
+      when: 2 | random == 1

@@ -1,5 +1,5 @@
 - name: create metallb clusterrole
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
@@ -40,7 +40,7 @@
         - use
 
 - name: create metallb clusterrole
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: rbac.authorization.k8s.io/v1

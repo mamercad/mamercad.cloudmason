@@ -1,5 +1,5 @@
 - name: create metallb deployment
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: apps/v1

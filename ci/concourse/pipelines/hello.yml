@@ -1,0 +1,51 @@
+---
+
+resources:
+
+  - name: source
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/mamercad/mamercad.cloudmason.git
+
+jobs:
+
+  - name: job
+    public: true
+    plan:
+
+      - get: source
+        trigger: true
+
+      - task: list-files
+        config:
+          inputs:
+            - name: source
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: busybox
+          run:
+            path: ls
+            args: ["-la", "./"]
+
+      - task: ansible
+        config:
+          inputs:
+            - name: source
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: mamercad/alpine-ansible
+              tag: latest
+          run:
+            path: /bin/ash
+            args:
+              - -exc
+              - |
+                stty cols 120
+                source /venv/bin/activate
+                cd source
+                ansible-playbook -i inventory/cloudmason.yml playbooks/ping.yml -l localhost -v

@@ -22,10 +22,11 @@
 - name: deploy latest version of Concourse
   kubernetes.core.helm:
     state: present
+    context: "{{ context }}"
     name: concourse
     chart_ref: concourse/concourse
     release_namespace: concourse-main
-    force: true
+    # force: true
     wait: true
     replace: true
     update_repo_cache: true

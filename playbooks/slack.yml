@@ -1,0 +1,135 @@
+---
+- name: slack
+  hosts: "{{ ansible_limit | default('localhost', true) }}"
+  connection: "{{ 'local' if ansible_limit | default('localhost', true) == 'localhost' else 'ssh' }}"
+  gather_facts: false
+  become: false
+
+  vars:
+
+    slack_token: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      63353665383135316432623763363232623030356531383632353939316337386161613132643462
+      3330346139373333383562636237393934376563323165350a356465393032373931373532353738
+      37373062393338336530313161333661333336626131353732656664396438643538646438303764
+      3864356136366137360a366265666430366437393264373561323036666439356432313662666262
+      35376433663038343735616133633961353166363931623836643832373433623064656235396132
+      31383638333064623930323338396233393832356335613630303362343337343337336331346439
+      333865383533396232393431636366666635
+
+  pre_tasks:
+
+    - name: init
+      delegate_to: localhost
+      delegate_facts: true
+      ansible.builtin.set_fact:
+        passes: {}
+        failures: {}
+
+  tasks:
+
+    - name: block 1
+      block:
+
+        - name: task 1
+          block:
+
+            - name: ping
+              ansible.builtin.ping:
+
+            - name: fact
+              delegate_to: localhost
+              delegate_facts: true
+              ansible.builtin.set_fact:
+                passes: "{{ hostvars['localhost']['passes'] | combine(
+                          {inventory_hostname: 'ping'}, recursive=True
+                          ) }}"
+
+          rescue:
+
+            - name: fact
+              delegate_to: localhost
+              delegate_facts: true
+              ansible.builtin.set_fact:
+                failures: "{{ hostvars['localhost']['failures'] | combine(
+                          {inventory_hostname: 'ping'}, recursive=True
+                          ) }}"
+
+        - name: task 2
+          block:
+
+            - name: fail
+              ansible.builtin.fail:
+              when: 2 | random == 1
+
+            - name: fact
+              delegate_to: localhost
+              delegate_facts: true
+              ansible.builtin.set_fact:
+                passes: "{{ hostvars['localhost']['passes'] | combine(
+                          {inventory_hostname: 'fail'}, recursive=True
+                          ) }}"
+
+          rescue:
+
+            # - name: debug
+            #   ansible.builtin.debug:
+            #     var: ansible_failed_task
+
+            - name: fact
+              delegate_to: localhost
+              delegate_facts: true
+              ansible.builtin.set_fact:
+                failures: "{{ hostvars['localhost']['failures'] | combine(
+                          {inventory_hostname: 'fail'}, recursive=True
+                          ) }}"
+
+      always:
+
+        - name: debug
+          delegate_to: localhost
+          run_once: true
+          ansible.builtin.debug:
+            msg: |
+              failures:
+              {{ hostvars['localhost']['failures'] | to_nice_yaml(indent=2) }}
+          when: inventory_hostname == 'thinkpad5'
+
+        - name: debug
+          delegate_to: localhost
+          ansible.builtin.debug:
+            msg: |
+              passes:
+              {{ hostvars['localhost']['passes'] | to_nice_yaml(indent=2) }}
+          when: inventory_hostname == 'thinkpad5'
+
+        # - name: Send notification message via Slack
+        #   delegate_to: localhost
+        #   run_once: true
+        #   community.general.slack:
+        #     token: "{{ slack_token }}"
+        #     channel: "#bots"
+        #     icon_url: https://img.stackshare.io/service/7728/DJLpA-IWAAAqXsE.jpg
+        #     username: "{{ inventory_hostname }}"
+        #     blocks:
+        #       - type: header
+        #         text:
+        #           type: plain_text
+        #           text: hello world
+        #           emoji: true
+        #       - type: section
+        #         text:
+        #           text: play results
+        #           type: mrkdwn
+        #       - type: section
+        #         fields:
+        #           - type: mrkdwn
+        #             text: "```all hosts:\n{{ ansible_play_hosts_all | join(', ') }}```"
+        #           - type: mrkdwn
+        #             text: "```failed hosts:\n{{ ansible_play_hosts_all | difference(ansible_play_batch) | join(', ') }}```"
+        #           - type: mrkdwn
+        #             text: "```passed hosts:\n{{ ansible_play_batch | join(', ') }}```"
+        #           - type: mrkdwn
+        #             text: "```failures:\n{{ hostvars['localhost']['failures'] | to_nice_yaml(indent=2) }}```"
+        #           - type: mrkdwn
+        #             text: "```passes:\n{{ hostvars['localhost']['passes'] | to_nice_yaml(indent=2) }}```"
