@@ -22,10 +22,10 @@
 - name: deploy latest version of Vault
   kubernetes.core.helm:
     state: present
+    context: "{{ context }}"
     name: vault
     chart_ref: hashicorp/vault
     release_namespace: vault-main
-    force: false
     wait: true
     replace: true
     update_repo_cache: true
