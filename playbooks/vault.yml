@@ -10,8 +10,11 @@
         name: vault
         tasks_from: main.yml
       vars:
-        context: lenovo
+        context: thinkpad
         vault_values:
           server:
             dev:
               enabled: true
+          ui:
+            enabled: true
+            serviceType: LoadBalancer
