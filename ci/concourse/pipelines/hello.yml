@@ -1,5 +1,13 @@
 ---
 
+resource_types:
+
+  - name: slack-alert
+    type: docker-image
+    source:
+      repository: arbourd/concourse-slack-alert-resource
+
+
 resources:
 
   - name: source
@@ -7,17 +15,23 @@ resources:
     icon: github
     source:
       uri: https://github.com/mamercad/mamercad.cloudmason.git
+      branch: main
+
+  - name: notify
+    type: slack-alert
+    source:
+      url: ((slack-webhook))
 
 jobs:
 
-  - name: job
+  - name: test
     public: true
     plan:
 
       - get: source
         trigger: true
 
-      - task: list-files
+      - task: ansible
         config:
           inputs:
             - name: source
@@ -25,10 +39,41 @@ jobs:
           image_resource:
             type: registry-image
             source:
-              repository: busybox
+              repository: mamercad/alpine-ansible
+              tag: latest
           run:
-            path: ls
-            args: ["-la", "./"]
+            path: /bin/ash
+            args:
+              - -exc
+              - |
+                stty cols 120
+                source /venv/bin/activate
+                cd source
+                ansible-lint -vv
+        on_success:
+          put: notify
+          params:
+            alert_type: success
+        on_failure:
+          put: notify
+          params:
+            alert_type: failed
+        on_abort:
+          put: notify
+          params:
+            alert_type: aborted
+        on_error:
+          put: notify
+          params:
+            alert_type: errored
+
+  - name: deploy
+    public: true
+    plan:
+
+      - get: source
+        passed: ['test']
+        trigger: true
 
       - task: ansible
         config:
@@ -49,3 +94,20 @@ jobs:
                 source /venv/bin/activate
                 cd source
                 ansible-playbook -i inventory/cloudmason.yml playbooks/ping.yml -l localhost -v
+
+        on_success:
+          put: notify
+          params:
+            alert_type: success
+        on_failure:
+          put: notify
+          params:
+            alert_type: failed
+        on_abort:
+          put: notify
+          params:
+            alert_type: aborted
+        on_error:
+          put: notify
+          params:
+            alert_type: errored

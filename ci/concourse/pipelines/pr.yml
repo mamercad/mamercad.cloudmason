@@ -18,7 +18,6 @@ resources:
   - name: pull-request
     type: pull-request
     check_every: 24h
-    # webhook_token: ((webhook-token))
     source:
       repository: mamercad/mamercad.cloudmason
       access_token: ((github-access-token))
@@ -51,8 +50,10 @@ jobs:
               - -xce
               - |
                 cd pull-request
-                git log --graph --all --color --pretty=format:"%x1b[31m%h%x09%x1b[32m%d%x1b[0m%x20%s" > log.txt
-                cat log.txt
+                git log --graph --all --color --pretty=format:"%x1b[31m%h%x09%x1b[32m%d%x1b[0m%x20%s" | head > ../files/log.txt
+                cat ../files/log.txt
+          outputs:
+            - name: files
         on_failure:
           put: pull-request
           params:
@@ -63,3 +64,5 @@ jobs:
         params:
           path: pull-request
           status: success
+          comment: "Concourse tests passed :tada:"
+          comment_file: ./files/log.txt
