@@ -351,4 +351,64 @@ class CallbackModule(CallbackBase):
                 },
             }
         ]
-        self.post_message(text="overall summary", blocks=blocks)
+        # self.post_message(text="overall summary", blocks=blocks)
+
+        summary = {
+           "play": "",        # the play name
+           "passed": [],      # [ "hostname" ]
+           "failed": [],      # [ "hostname", "failed task", "failed message" ]
+           "unreachable": [], # [ "unreachable" ]
+        }
+
+        summary["play"] = self.current_plays[1:-1]
+        for host in sorted(self.overall_summary.keys()):
+            last_task = self.overall_summary[host][-1]
+            for k, v in last_task.items():
+                t_name = k
+                t_reason = last_task[k][1].replace("\n", " ")
+                if last_task[k][0] in ["failed"]:
+                    summary["failed"].append([":large_red_square:", f"*{host}*", f"{t_name}", f"{t_reason}"])
+                    # failing_hosts += 1
+                elif last_task[k][0] in ["unreachable"]:
+                    summary["unreachable"].append([":black_large_square:", f"*{host}*", f"{t_name}", f"{t_reason}"])
+                    # failing_hosts += 1
+                else:
+                    summary["passed"].append([":large_green_square:", f"*{host}*", "", ""])
+                    # passing_hosts += 1
+
+        blocks = [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": summary["play"],
+                    "emoji": True
+                }
+            }
+        ]
+        self.post_message(text="header", blocks=blocks)
+
+        for status in ["passed", "failed", "unreachable"]:
+            for x in summary[status]:
+                blocks = [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "   ".join(x),
+                        },
+                    }
+                ]
+                self.post_message(text="result", blocks=blocks)
+
+        overall = f"{str(total_hosts)} hosts \n> {str(passing_hosts)} passing \n> {str(failing_hosts)} failing/unreachable \n> {str('{:.2f}'.format(100.0*passing_hosts/total_hosts))}% success"
+        blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"> {overall}",
+                },
+            }
+        ]
+        self.post_message(text="overall", blocks=blocks)
