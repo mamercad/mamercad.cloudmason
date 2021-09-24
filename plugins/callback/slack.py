@@ -70,33 +70,6 @@ class CallbackModule(CallbackBase):
 
         self.slack_ts = None
 
-        self.overall_summary = {}
-        self.current_plays = None
-        self.current_task = None
-
-        #  overall_summary = {
-        #    'host1' = [
-        #       { 'task1' = 'ok' },
-        #       { 'task2' = 'failed' },
-        #    ],
-        #    'host2' = [
-        #       { 'task1' = 'ok' },
-        #       { 'task2' = 'ok' },
-        #       { 'task3' = 'failed' },
-        #    ],
-        #    'host3' = [
-        #       { 'task1' = 'skipped' },
-        #       { 'task2' = 'skipped' },
-        #       { 'task3' = 'failed' },
-        #    ],
-        #    'host4' = [
-        #       { 'task1' = 'skipped' },
-        #       { 'task2' = ['ok', '...'] },
-        #       { 'task3' = 'ok' },
-        #    ],
-        #    ...
-        #  }
-
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(
             task_keys=task_keys, var_options=var_options, direct=direct
@@ -172,8 +145,6 @@ class CallbackModule(CallbackBase):
         if "v2_playbook_on_start" in self.ansible_events:
             self.post_message(text="playbook start", blocks=blocks)
 
-        self.current_plays = str(_plays)
-
     def v2_playbook_on_task_start(self, task, **kwargs):
         _task_name = task.name
         _msg = f"TASK [{_task_name}]"
@@ -189,8 +160,6 @@ class CallbackModule(CallbackBase):
         ]
         if "v2_playbook_on_task_start" in self.ansible_events:
             self.post_message(text="task start", blocks=blocks)
-
-        self.current_task = _task_name
 
     def v2_runner_on_ok(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
@@ -208,10 +177,6 @@ class CallbackModule(CallbackBase):
         if "v2_runner_on_ok" in self.ansible_events:
             self.post_message(text="runner ok", blocks=blocks)
 
-        if _host not in self.overall_summary:
-            self.overall_summary[_host] = []
-        self.overall_summary[_host].append({self.current_task: ["ok", _result]})
-
     def v2_runner_on_skipped(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
         _changed = str(_result.get("changed", False)).lower()
@@ -227,10 +192,6 @@ class CallbackModule(CallbackBase):
         ]
         if "v2_runner_on_skipped" in self.ansible_events:
             self.post_message(text="runner skipped", blocks=blocks)
-
-        if _host not in self.overall_summary:
-            self.overall_summary[_host] = []
-        self.overall_summary[_host].append({self.current_task: ["skipped", _result]})
 
     def v2_runner_on_unreachable(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
@@ -248,10 +209,6 @@ class CallbackModule(CallbackBase):
         if "v2_runner_on_unreachable" in self.ansible_events:
             self.post_message(text="runner unreachable", blocks=blocks)
 
-        if _host not in self.overall_summary:
-            self.overall_summary[_host] = []
-        self.overall_summary[_host].append({self.current_task: ["unreachable", _result]})
-
     def v2_runner_on_failed(self, result, **kwargs):
         _result = json.loads(self._dump_results(result._result))
         _changed = str(_result.get("changed", False)).lower()
@@ -267,10 +224,6 @@ class CallbackModule(CallbackBase):
         ]
         if "v2_runner_on_failed" in self.ansible_events:
             self.post_message(text="runner failed", blocks=blocks)
-
-        if _host not in self.overall_summary:
-            self.overall_summary[_host] = []
-        self.overall_summary[_host].append({self.current_task: ["failed", _result]})
 
     def v2_playbook_on_stats(self, stats):
         _hosts = sorted(stats.processed.keys())
@@ -295,49 +248,3 @@ class CallbackModule(CallbackBase):
         ]
         if "v2_playbook_on_stats" in self.ansible_events:
             self.post_message(text="stats", blocks=blocks)
-
-        self.display_overall_summary()
-
-    def display_overall_summary(self):
-        max_hostname_length = 0
-        for host in sorted(self.overall_summary.keys()):
-            if len(host) > max_hostname_length:
-                max_hostname_length = len(host)
-
-        max_taskname_length = 0
-        for host in sorted(self.overall_summary.keys()):
-            for task in self.overall_summary[host]:
-                for k, v in task.items():
-                    if len(k) > max_taskname_length:
-                        max_taskname_length = len(k)
-
-        max_failmsg_length = 0
-        for host in sorted(self.overall_summary.keys()):
-            last_task = self.overall_summary[host][-1]
-            for k, v in last_task.items():
-                if len(last_task[k][1]) > max_failmsg_length:
-                    max_failmsg_length = len(last_task[k][1])
-
-        _msgs = []
-        _msgs.append(self.current_plays)
-        for host in sorted(self.overall_summary.keys()):
-            last_task = self.overall_summary[host][-1]
-            for k, v in last_task.items():
-                if last_task[k][0] in ["failed", "unreachable"]:
-                    _msgs.append(f"{host.ljust(max_hostname_length, ' ')} | "
-                                 f"failed | {k.ljust(max_taskname_length, ' ')} | "
-                                 f"{last_task[k][1][:20]}")
-                else:
-                    _msgs.append(f"{host.ljust(max_hostname_length, ' ')} | passed")
-
-        _msg = "\n".join(_msgs)
-        blocks = [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"```{_msg}```",
-                },
-            }
-        ]
-        self.post_message(text="overall summary", blocks=blocks)
