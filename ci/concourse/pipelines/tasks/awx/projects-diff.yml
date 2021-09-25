@@ -31,11 +31,11 @@ run:
         2>&1 | tee -a ../files/before
       rc=$?
 
-      CURRENT_PROJECT_NAME="$(cat ../files/output | jq -r .name)"
-      CURRENT_PROJECT_DESCRIPTION="$(cat ../files/output | jq -r .description)"
-      CURRENT_PROJECT_SCM_TYPE="$(cat ../files/output | jq -r .scm_type)"
-      CURRENT_PROJECT_SCM_URL="$(cat ../files/output | jq -r .scm_url)"
-      CURRENT_PROJECT_SCM_BRANCH="$(cat ../files/output | jq -r .scm_branch)"
+      CURRENT_PROJECT_NAME="$(cat ../files/before | jq -r .name)"
+      CURRENT_PROJECT_DESCRIPTION="$(cat ../files/before | jq -r .description)"
+      CURRENT_PROJECT_SCM_TYPE="$(cat ../files/before | jq -r .scm_type)"
+      CURRENT_PROJECT_SCM_URL="$(cat ../files/before | jq -r .scm_url)"
+      CURRENT_PROJECT_SCM_BRANCH="$(cat ../files/before | jq -r .scm_branch)"
 
       if [[ "$CURRENT_PROJECT_NAME" != "$PROJECT_NAME" ]]; then
         echo "Name: $CURRENT_PROJECT_NAME => $PROJECT_NAME" | tee -a ../files/diffs
