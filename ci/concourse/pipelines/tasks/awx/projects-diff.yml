@@ -22,8 +22,6 @@ run:
     - |
       stty cols 120
       source /venv/bin/activate
-      # awx ping 2>&1 | tee -a ../files/output
-      # rc=$?
 
       awx projects get \
         --conf.color false \
@@ -59,7 +57,7 @@ run:
         sed -i '1s/^/Desired changes to AWX Project ${CURRENT_PROJECT_NAME}:\n/' ../files/diffs
         cp ../files/diffs ../files/slack
         cp ../files/diffs ../files/output
-      else:
+      else
         echo "No changes to AWX Project ${CURRENT_PROJECT_NAME}" | tee -a ../files/output
         echo "No changes to AWX Project ${CURRENT_PROJECT_NAME}" | tee -a ../files/slack
       fi
