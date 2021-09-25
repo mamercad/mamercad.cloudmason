@@ -15,6 +15,7 @@ run:
   dir: pull-request
   path: /bin/ash
   args:
+    - -e
     - -o
     - pipefail
     - -c
