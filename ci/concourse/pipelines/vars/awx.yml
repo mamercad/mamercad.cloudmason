@@ -1,2 +1,4 @@
 projects:
   - name: Cloudmason
+    description: Cloudmason
+    scm_revision: 8df5dc89f85d137b3e23f03197e58dd3e3152c05
