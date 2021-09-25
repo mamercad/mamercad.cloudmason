@@ -1,4 +1,7 @@
-projects:
-  - name: Cloudmason
-    description: Cloudmason
-    scm_revision: 8df5dc89f85d137b3e23f03197e58dd3e3152c05
+project:
+  name: Cloudmason
+  description: Cloudmason
+  organization: Cloudmason
+  scm_type: git
+  scm_url: https://github.com/mamercad/mamercad.cloudmason.git
+  scm_branch: test
