@@ -56,9 +56,12 @@ run:
 
       # there are diffs
       if [[ -s ../files/diffs ]]; then
-        sed -i '1s/^/Desired Changes to AWX Project ${CURRENT_PROJECT_NAME}:\n/' ../files/diffs
+        sed -i '1s/^/Desired changes to AWX Project ${CURRENT_PROJECT_NAME}:\n/' ../files/diffs
         cp ../files/diffs ../files/slack
         cp ../files/diffs ../files/output
+      else:
+        echo "No changes to AWX Project ${CURRENT_PROJECT_NAME}" | tee -a ../files/output
+        echo "No changes to AWX Project ${CURRENT_PROJECT_NAME}" | tee -a ../files/slack
       fi
 
       # add backticks to output
