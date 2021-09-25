@@ -1,10 +1,17 @@
-.PHONY: build
+DOCKER_HUB_USERNAME := mamercad
+DOCKER_HUB_PASSWORD := "$(shell cat ~/.docker-hub-password)"
 
-build:
-	docker build -t mamercad/alpine-ansible:latest .
+IMAGE_NAME := $(DOCKER_HUB_USERNAME)/alpine-ansible
+IMAGE_TAG := latest
 
-login:
-	docker login --username mamercad --password "$(cat ~/.vault-pass)"
+.PHONY: docker-login docker-build docker-push
+.DEFAULT_GOAL := docker-push
 
-push:
-	docker push mamercad/alpine-ansible:latest
+docker-login:
+	@echo $(DOCKER_HUB_PASSWORD) | docker login --username $(DOCKER_HUB_USERNAME) --password-stdin
+
+docker-build: docker-login
+	@docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
+
+docker-push: docker-build
+	@docker push $(IMAGE_NAME):$(IMAGE_TAG)
