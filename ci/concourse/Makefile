@@ -3,7 +3,7 @@ C := https://concourse.cloudmason.org
 
 .PHONY: fly-login fly-sync fly-targets fly-status fly-userinfo fly-pipelines \
         fly-nuke-pipelines fly-test-pipelines fly-set-pipelines \
-				fly-pause-pipeline fly-unpause-pipelines
+				fly-pause-pipeline fly-unpause-pipelines fly-trigger-job
 
 fly-login:
 	@fly login -t $(T) -c $(C)
@@ -43,3 +43,6 @@ fly-pause-pipelines:
 fly-unpause-pipelines:
 	fly -t $(T) unpause-pipeline \
 		--pipeline cloudmason
+
+fly-trigger-job:
+	fly -t $(T) trigger-job -j cloudmason/test
