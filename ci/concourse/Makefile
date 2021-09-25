@@ -18,6 +18,9 @@ fly-userinfo:
 fly-pipelines:
 	fly -t cloudmason pipelines
 
+fly-test-pipelines:
+	fly -t cloudmason validate-pipeline -c pipelines/hello.yml
+
 fly-set-pipelines:
 	fly -t cloudmason set-pipeline \
 		--pipeline hello --config pipelines/pr.yml \

@@ -1,5 +1,39 @@
 ---
 
+handlers: &handlers
+  on_success:
+    in_parallel:
+      - put: slack-alert
+        params:
+          alert_type: success
+  on_failure:
+    in_parallel:
+      - put: slack-alert
+        params:
+          alert_type: failed
+  on_abort:
+    in_parallel:
+      - put: slack-alert
+        params:
+          alert_type: aborted
+  on_error:
+    in_parallel:
+      - put: slack-alert
+        params:
+          alert_type: errored
+
+resource_types:
+
+  - name: slack-alert
+    type: docker-image
+    source:
+      repository: arbourd/concourse-slack-alert-resource
+
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
 resources:
 
   - name: source
@@ -7,12 +41,34 @@ resources:
     icon: github
     source:
       uri: https://github.com/mamercad/mamercad.cloudmason.git
+      branch: main
+
+  - name: slack-alert
+    type: slack-alert
+    source:
+      url: ((slack-webhook))
+
+  - name: pull-request
+    type: pull-request
+    check_every: 24h
+    source:
+      repository: mamercad/mamercad.cloudmason
+      access_token: ((github-access-token))
 
 jobs:
 
   - name: job
     public: true
     plan:
+
+      - get: pull-request
+        trigger: true
+        version: every
+
+      - put: pull-request
+        params:
+          path: pull-request
+          status: pending
 
       - get: source
         trigger: true
@@ -27,8 +83,24 @@ jobs:
             source:
               repository: busybox
           run:
-            path: ls
-            args: ["-la", "./"]
+            path: /bin/ash
+            args:
+              - -exc
+              - |
+                stty cols 120
+                source /venv/bin/activate
+                cd source
+                ansible-lint -vv
+
+    <<: *handlers
+
+  - name: deploy
+    public: true
+    plan:
+
+      - get: source
+        passed: ['test']
+        trigger: true
 
       - task: ansible
         config:
@@ -49,3 +121,5 @@ jobs:
                 source /venv/bin/activate
                 cd source
                 ansible-playbook -i inventory/cloudmason.yml playbooks/ping.yml -l localhost -v
+
+    <<: *handlers
