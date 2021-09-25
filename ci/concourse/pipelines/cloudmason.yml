@@ -1,0 +1,191 @@
+---
+
+handlers: &handlers
+  on_success:
+    in_parallel:
+      - put: slack-alert
+        params:
+          channel: "#concourse"
+          text: |
+            <$ATC_EXTERNAL_URL/builds/$BUILD_ID|$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME/$BUILD_NAME> passed :+1:
+            $TEXT_FILE_CONTENT
+          text_file: files/slack
+      - put: pull-request
+        params:
+          path: pull-request
+          context: "$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME"
+          status: success
+          comment: |
+            [$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME/$BUILD_NAME]($ATC_EXTERNAL_URL/builds/$BUILD_ID) passed :+1:
+          comment_file: files/output
+          delete_previous_comments: true
+  on_failure:
+    in_parallel:
+      - put: slack-alert
+        params:
+          channel: "#concourse"
+          text: |
+            <$ATC_EXTERNAL_URL/builds/$BUILD_ID|$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME/$BUILD_NAME> failed :-1:
+            $TEXT_FILE_CONTENT
+          text_file: files/slack
+          # attachments:
+          #   - title: "$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME build #$BUILD_NAME failed"
+          #     title_link: "$ATC_EXTERNAL_URL/builds/$BUILD_ID"
+          #     text: this is the attachments text
+          #     footer: this is the attachments footer
+          #     color: danger
+      - put: pull-request
+        params:
+          path: pull-request
+          context: "$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME"
+          status: failure
+          comment: |
+            [$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME/$BUILD_NAME]($ATC_EXTERNAL_URL/builds/$BUILD_ID) failed :-1:
+          comment_file: files/output
+          delete_previous_comments: true
+  on_abort:
+    in_parallel:
+      - put: slack-alert
+        params:
+          alert_type: aborted
+      - put: pull-request
+        params:
+          path: pull-request
+          context: "$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME"
+          status: failure
+  on_error:
+    in_parallel:
+      - put: slack-alert
+        params:
+          alert_type: errored
+      - put: pull-request
+        params:
+          path: pull-request
+          context: "$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME"
+          status: failure
+          delete_previous_comments: true
+
+resource_types:
+
+  # - name: slack-alert
+  #   type: docker-image
+  #   source:
+  #     repository: arbourd/concourse-slack-alert-resource
+
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: latest
+
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
+resources:
+
+  # - name: source
+  #   type: git
+  #   icon: github
+  #   source:
+  #     uri: https://github.com/mamercad/mamercad.cloudmason.git
+  #     branch: main
+
+  - name: slack-alert
+    type: slack-notification
+    source:
+      url: ((slack-webhook))
+
+  - name: pull-request
+    type: pull-request
+    check_every: 24h
+    source:
+      repository: mamercad/mamercad.cloudmason
+      access_token: ((github-access-token))
+
+jobs:
+
+  - name: test
+    public: true
+    plan:
+
+      - get: pull-request
+        trigger: true
+        version: every
+
+      - put: pull-request
+        params:
+          path: pull-request
+          context: "$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME"
+          status: pending
+
+      - task: ansible-lint
+        config:
+          inputs:
+            - name: pull-request
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: mamercad/alpine-ansible
+              tag: latest
+          run:
+            dir: pull-request
+            path: /bin/ash
+            args:
+              - -o
+              - pipefail
+              - -c
+              - |
+                stty cols 120
+                source /venv/bin/activate
+                ansible-lint 2>&1 | tee -a ../files/output
+                rc=$?
+
+                # last 10 lines for slack
+                tail -10 ../files/output | tee -a ../files/slack
+
+                # add backticks to output
+                sed -i '1s/^/```\n/' ../files/output
+                sed -i '$s/$/\n```/' ../files/output
+
+                # add backticks to slack
+                sed -i '1s/^/```(last 10 lines)\n/' ../files/slack
+                sed -i '$s/$/\n```/'                ../files/slack
+
+                exit $rc
+          outputs:
+            - name: files
+
+    <<: *handlers
+
+  # - name: deploy
+  #   public: true
+  #   plan:
+
+  #     - get: source
+  #       passed: ['test']
+  #       trigger: true
+
+  #     - task: ansible
+  #       config:
+  #         inputs:
+  #           - name: source
+  #         platform: linux
+  #         image_resource:
+  #           type: registry-image
+  #           source:
+  #             repository: mamercad/alpine-ansible
+  #             tag: latest
+  #         run:
+  #           path: /bin/ash
+  #           args:
+  #             - -exc
+  #             - |
+  #               stty cols 120
+  #               source /venv/bin/activate
+  #               cd source
+  #               ansible-playbook -i inventory/cloudmason.yml playbooks/ping.yml -l localhost -v
+
+  #   <<: *handlers
