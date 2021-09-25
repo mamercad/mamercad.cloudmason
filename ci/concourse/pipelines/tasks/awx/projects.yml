@@ -11,17 +11,6 @@ image_resource:
     repository: mamercad/alpine-ansible
     tag: latest
 
-params:
-  TOWER_HOST: ((awx-host))
-  TOWER_USERNAME: ((awx-username))
-  TOWER_PASSWORD: ((awx-password))
-  PROJECT_NAME: ((.:awx.project.name))
-  PROJECT_DESCRIPTION: ((.:awx.project.description))
-  PROJECT_ORGANIZATION: ((.:awx.project.organization))
-  PROJECT_SCM_TYPE: ((.:awx.project.scm_type))
-  PROJECT_SCM_URL: ((.:awx.project.scm_url))
-  PROJECT_SCM_BRANCH: ((.:awx.project.scm_branch))
-
 run:
   dir: source
   path: /bin/ash

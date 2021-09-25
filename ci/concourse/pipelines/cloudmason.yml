@@ -220,8 +220,19 @@ jobs:
         file: source/ci/concourse/pipelines/vars/awx.yml
         reveal: true
 
-      - name: awx-projects
-        file: source/ci/concourse/pipelines/tasks/projects.yml
+      - task: awx-projects
+        file: source/ci/concourse/pipelines/tasks/awx/projects.yml
+        params:
+          TOWER_HOST: ((awx-host))
+          TOWER_USERNAME: ((awx-username))
+          TOWER_PASSWORD: ((awx-password))
+          PROJECT_NAME: ((.:awx.project.name))
+          PROJECT_DESCRIPTION: ((.:awx.project.description))
+          PROJECT_ORGANIZATION: ((.:awx.project.organization))
+          PROJECT_SCM_TYPE: ((.:awx.project.scm_type))
+          PROJECT_SCM_URL: ((.:awx.project.scm_url))
+          PROJECT_SCM_BRANCH: ((.:awx.project.scm_branch))
+
 
       # - task: awx
       #   config:
