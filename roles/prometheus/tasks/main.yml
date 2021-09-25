@@ -26,6 +26,7 @@
     state: directory
     owner: prometheus
     group: prometheus
+    mode: 0755
   become: true
 
 - name: unarchive prometheus tarball
@@ -180,6 +181,9 @@
           --storage.tsdb.path /opt/prometheus/storage --storage.tsdb.retention.time=45d
       [Install]
       WantedBy=multi-user.target
+    owner: root
+    group: root
+    mode: 0644
   become: true
   notify: restart-prometheus
 

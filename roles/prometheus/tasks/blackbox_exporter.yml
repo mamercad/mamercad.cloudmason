@@ -18,6 +18,7 @@
     path: /opt/prometheus/blackbox_exporter
     owner: prometheus
     group: prometheus
+    mode: 0755
   become: true
 
 - name: deploy blackbox_exporter binary to /opt/prometheus/blackbox_exporter
