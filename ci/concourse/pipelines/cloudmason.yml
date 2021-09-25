@@ -156,7 +156,6 @@ jobs:
     public: true
     serial: false
     plan:
-
       - get: pull-request
         trigger: true
         version: every
@@ -204,24 +203,47 @@ jobs:
                 exit $rc
           outputs:
             - name: files
-
     <<: *pr_handlers
 
 
 
-  - name: deploy
+  - name: awx-diff
     public: true
     serial: true
     plan:
+      - get: pull-request
 
+      - load_var: awx
+        file: source/ci/concourse/pipelines/vars/awx.yml
+        reveal: true
+
+      - task: projects
+        file: source/ci/concourse/pipelines/tasks/awx/projects-diff.yml
+        params:
+          TOWER_HOST: ((awx-host))
+          TOWER_USERNAME: ((awx-username))
+          TOWER_PASSWORD: ((awx-password))
+          PROJECT_NAME: ((.:awx.project.name))
+          PROJECT_DESCRIPTION: ((.:awx.project.description))
+          PROJECT_ORGANIZATION: ((.:awx.project.organization))
+          PROJECT_SCM_TYPE: ((.:awx.project.scm_type))
+          PROJECT_SCM_URL: ((.:awx.project.scm_url))
+          PROJECT_SCM_BRANCH: ((.:awx.project.scm_branch))
+    <<: *pr_handlers
+
+
+  - name: awx-deploy
+    public: true
+    serial: true
+    plan:
       - get: source
 
       - load_var: awx
         file: source/ci/concourse/pipelines/vars/awx.yml
         reveal: true
 
-      - task: awx-projects
-        file: source/ci/concourse/pipelines/tasks/awx/projects.yml
+      - task: projects
+        file: source/ci/concourse/pipelines/tasks/awx/projects-deploy.yml
         params:
           TOWER_HOST: ((awx-host))
           TOWER_USERNAME: ((awx-username))
