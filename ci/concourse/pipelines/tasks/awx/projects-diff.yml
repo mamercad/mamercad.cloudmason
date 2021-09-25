@@ -46,15 +46,15 @@ run:
         echo "SCM type: $CURRENT_PROJECT_SCM_TYPE => $PROJECT_SCM_TYPE" | tee -a ../files/diffs
       fi
       if [[ "$CURRENT_PROJECT_SCM_URL" != "$PROJECT_SCM_URL" ]]; then
-        echo "SCM type: $CURRENT_PROJECT_SCM_URL => $PROJECT_SCM_URL" | tee -a ../files/diffs
+        echo "SCM URL: $CURRENT_PROJECT_SCM_URL => $PROJECT_SCM_URL" | tee -a ../files/diffs
       fi
       if [[ "$CURRENT_PROJECT_SCM_BRANCH" != "$PROJECT_SCM_BRANCH" ]]; then
-        echo "SCM type: $CURRENT_PROJECT_SCM_BRANCH => $PROJECT_SCM_BRANCH" | tee -a ../files/diffs
+        echo "SCM branch: $CURRENT_PROJECT_SCM_BRANCH => $PROJECT_SCM_BRANCH" | tee -a ../files/diffs
       fi
 
       # there are diffs
       if [[ -s ../files/diffs ]]; then
-        sed -i '1s/^/Desired changes to AWX Project ${CURRENT_PROJECT_NAME}:\n/' ../files/diffs
+        sed -i "1s/^/Desired changes to AWX Project ${CURRENT_PROJECT_NAME}:\n/" ../files/diffs
         cp ../files/diffs ../files/slack
         cp ../files/diffs ../files/output
       else
