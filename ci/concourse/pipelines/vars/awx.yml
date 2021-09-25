@@ -1,6 +1,2 @@
-env:
-  TOWER_HOST: ((awx-host))
-  TOWER_USERNAME: ((awx.awx-username))
-  TOWER_PASSWORD: ((awx.awx-password))
 projects:
   - name: Cloudmason
