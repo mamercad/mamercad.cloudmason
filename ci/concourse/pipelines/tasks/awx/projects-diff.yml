@@ -1,0 +1,74 @@
+---
+
+inputs:
+  - name: source
+
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: mamercad/alpine-ansible
+    tag: latest
+
+run:
+  dir: pull-request
+  path: /bin/ash
+  args:
+    - -o
+    - pipefail
+    - -c
+    - |
+      stty cols 120
+      source /venv/bin/activate
+      # awx ping 2>&1 | tee -a ../files/output
+      # rc=$?
+
+      awx projects get \
+        --conf.color false \
+        --conf.format json \
+        $PROJECT_NAME \
+        2>&1 | tee -a ../files/before
+      rc=$?
+
+      CURRENT_PROJECT_NAME="$(cat ../files/output | jq -r .name)"
+      CURRENT_PROJECT_DESCRIPTION="$(cat ../files/output | jq -r .description)"
+      CURRENT_PROJECT_SCM_TYPE="$(cat ../files/output | jq -r .scm_type)"
+      CURRENT_PROJECT_SCM_URL="$(cat ../files/output | jq -r .scm_url)"
+      CURRENT_PROJECT_SCM_BRANCH="$(cat ../files/output | jq -r .scm_branch)"
+
+      if [[ "$CURRENT_PROJECT_NAME" != "$PROJECT_NAME" ]]; then
+        echo "Name: $CURRENT_PROJECT_NAME => $PROJECT_NAME" | tee -a ../files/diffs
+      fi
+      if [[ "$CURRENT_PROJECT_DESCRIPTION" != "$PROJECT_DESCRIPTION" ]]; then
+        echo "Description: $CURRENT_PROJECT_DESCRIPTION => $PROJECT_DESCRIPTION" | tee -a ../files/diffs
+      fi
+      if [[ "$CURRENT_PROJECT_SCM_TYPE" != "$PROJECT_SCM_TYPE" ]]; then
+        echo "SCM type: $CURRENT_PROJECT_SCM_TYPE => $PROJECT_SCM_TYPE" | tee -a ../files/diffs
+      fi
+      if [[ "$CURRENT_PROJECT_SCM_URL" != "$PROJECT_SCM_URL" ]]; then
+        echo "SCM type: $CURRENT_PROJECT_SCM_URL => $PROJECT_SCM_URL" | tee -a ../files/diffs
+      fi
+      if [[ "$CURRENT_PROJECT_SCM_BRANCH" != "$PROJECT_SCM_BRANCH" ]]; then
+        echo "SCM type: $CURRENT_PROJECT_SCM_BRANCH => $PROJECT_SCM_BRANCH" | tee -a ../files/diffs
+      fi
+
+      # there are diffs
+      if [[ -s ../files/diffs ]]; then
+        sed -i '1s/^/Desired Changes to AWX Project ${CURRENT_PROJECT_NAME}:\n/' ../files/diffs
+        cp ../files/diffs ../files/slack
+        cp ../files/diffs ../files/output
+      fi
+
+      # add backticks to output
+      sed -i '1s/^/```\n/' ../files/output
+      sed -i '$s/$/\n```/' ../files/output
+
+      # add backticks to slack
+      sed -i '1s/^/```\n/' ../files/slack
+      sed -i '$s/$/\n```/' ../files/slack
+
+      exit $rc
+
+outputs:
+  - name: files
