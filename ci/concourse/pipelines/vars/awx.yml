@@ -4,4 +4,4 @@ project:
   organization: Cloudmason
   scm_type: git
   scm_url: https://github.com/mamercad/mamercad.cloudmason.git
-  scm_branch: test
+  scm_branch: main
