@@ -103,6 +103,7 @@ import base64
 
 from ansible.plugins.callback import CallbackBase
 from ansible import constants as C
+
 # from __main__ import cli
 
 
@@ -274,7 +275,9 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_task_start(self, task, **kwargs):
         if self._display.verbosity:
-            self._display.display("*** v2_playbook_on_task_start ***", color=C.COLOR_DEBUG)
+            self._display.display(
+                "*** v2_playbook_on_task_start ***", color=C.COLOR_DEBUG
+            )
             self._display.display(str(task.__dict__), color=C.COLOR_DEBUG)
         self.statsd.v2_playbook_on_task_start(self, task.__dict__, task.name)
 
