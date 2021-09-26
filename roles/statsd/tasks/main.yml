@@ -76,9 +76,8 @@
                 event: "v2_playbook_on_stats"
                 playdir: "$1"
                 playbook: "$2"
-                host: "$3"
-                task: "$4"
-                changed: "$5"
+                result: "$3"
+                host: "$4"
             - match: "awx_workflow.*.*.*.*.*"
               match_metric_type: counter
               name: "awx_workflow_counter_${5}"
