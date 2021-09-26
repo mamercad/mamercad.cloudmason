@@ -152,58 +152,58 @@ resources:
 
 jobs:
 
-  - name: test
-    public: true
-    serial: false
-    plan:
-      - get: pull-request
-        trigger: true
-        version: every
+  # - name: test
+  #   public: true
+  #   serial: false
+  #   plan:
+  #     - get: pull-request
+  #       trigger: true
+  #       version: every
 
-      - put: pull-request
-        params:
-          path: pull-request
-          context: "$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME"
-          status: pending
+  #     - put: pull-request
+  #       params:
+  #         path: pull-request
+  #         context: "$BUILD_TEAM_NAME/$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME"
+  #         status: pending
 
-      - task: ansible-lint
-        config:
-          inputs:
-            - name: pull-request
-          platform: linux
-          image_resource:
-            type: registry-image
-            source:
-              repository: mamercad/alpine-ansible
-              tag: latest
-          run:
-            dir: pull-request
-            path: /bin/ash
-            args:
-              - -o
-              - pipefail
-              - -c
-              - |
-                stty cols 120
-                source /venv/bin/activate
-                ansible-lint 2>&1 | tee -a ../files/output
-                rc=$?
+  #     - task: ansible-lint
+  #       config:
+  #         inputs:
+  #           - name: pull-request
+  #         platform: linux
+  #         image_resource:
+  #           type: registry-image
+  #           source:
+  #             repository: mamercad/alpine-ansible
+  #             tag: latest
+  #         run:
+  #           dir: pull-request
+  #           path: /bin/ash
+  #           args:
+  #             - -o
+  #             - pipefail
+  #             - -c
+  #             - |
+  #               stty cols 120
+  #               source /venv/bin/activate
+  #               ansible-lint 2>&1 | tee -a ../files/output
+  #               rc=$?
 
-                # last 10 lines for slack
-                tail -10 ../files/output | tee -a ../files/slack
+  #               # last 10 lines for slack
+  #               tail -10 ../files/output | tee -a ../files/slack
 
-                # add backticks to output
-                sed -i '1s/^/```\n/' ../files/output
-                sed -i '$s/$/\n```/' ../files/output
+  #               # add backticks to output
+  #               sed -i '1s/^/```\n/' ../files/output
+  #               sed -i '$s/$/\n```/' ../files/output
 
-                # add backticks to slack
-                sed -i '1s/^/```(last 10 lines)\n/' ../files/slack
-                sed -i '$s/$/\n```/'                ../files/slack
+  #               # add backticks to slack
+  #               sed -i '1s/^/```(last 10 lines)\n/' ../files/slack
+  #               sed -i '$s/$/\n```/'                ../files/slack
 
-                exit $rc
-          outputs:
-            - name: files
-    <<: *pr_handlers
+  #               exit $rc
+  #         outputs:
+  #           - name: files
+  #   <<: *pr_handlers
 
 
 
@@ -212,13 +212,15 @@ jobs:
     serial: true
     plan:
       - get: pull-request
+        trigger: true
+        version: every
 
       - load_var: awx
-        file: source/ci/concourse/pipelines/vars/awx.yml
+        file: pull-request/ci/concourse/pipelines/vars/awx.yml
         reveal: true
 
       - task: projects
-        file: source/ci/concourse/pipelines/tasks/awx/projects-diff.yml
+        file: pull-request/ci/concourse/pipelines/tasks/awx/projects-diff.yml
         params:
           TOWER_HOST: ((awx-host))
           TOWER_USERNAME: ((awx-username))
