@@ -109,6 +109,7 @@ class StatsD:
         self.port = kwargs.get("port")
         self.basedir = None
         self.playbook = None
+        self.task = None
 
     def ship_it(self, parent, metric):
         """ Sends the metric to StatsD """
@@ -146,11 +147,24 @@ class StatsD:
             parent._display.display(f"metric: {metric}")
         self.ship_it(parent, metric)
 
-    def v2_runner_on_ok(self, parent, result):
+    def v2_playbook_on_task_start(self, parent, task, task_name):
         """ Constructs the StatsD metric for sending """
-        metric = "ansible.v2_runner_on_ok.{0}.{1}.{2}.{3}.{4}:1|c".format(
+        self.task = base64.b64encode(task_name.encode("utf-8")).decode("utf-8")
+        metric = "ansible.v2_playbook_on_task_start.{0}.{1}.{2}:1|c".format(
             self.playdir,
             self.playbook,
+            self.task,
+        )
+        if parent._display.verbosity:
+            parent._display.display(f"metric: {metric}")
+        self.ship_it(parent, metric)
+
+    def v2_runner_on_ok(self, parent, result):
+        """ Constructs the StatsD metric for sending """
+        metric = "ansible.v2_runner_on_ok.{0}.{1}.{2}.{3}.{4}.{5}:1|c".format(
+            self.playdir,
+            self.playbook,
+            self.task,
             result["_host"],
             str(result["_task"]).replace("TASK: ", ""),
             result["_result"]["changed"],
@@ -161,9 +175,10 @@ class StatsD:
 
     def v2_runner_on_failed(self, parent, result):
         """ Constructs the StatsD metric for sending """
-        metric = "ansible.v2_runner_on_failed.{0}.{1}.{2}.{3}.{4}:1|c".format(
+        metric = "ansible.v2_runner_on_failed.{0}.{1}.{2}.{3}.{4}.{5}:1|c".format(
             self.playdir,
             self.playbook,
+            self.task,
             result["_host"],
             str(result["_task"]).replace("TASK: ", ""),
             result["_result"]["changed"],
@@ -174,9 +189,10 @@ class StatsD:
 
     def v2_runner_on_skipped(self, parent, result):
         """ Constructs the StatsD metric for sending """
-        metric = "ansible.v2_runner_on_skipped.{0}.{1}.{2}.{3}.{4}:1|c".format(
+        metric = "ansible.v2_runner_on_skipped.{0}.{1}.{2}.{3}.{4}.{5}:1|c".format(
             self.playdir,
             self.playbook,
+            self.task,
             result["_host"],
             str(result["_task"]).replace("TASK: ", ""),
             result["_result"]["changed"],
@@ -187,9 +203,10 @@ class StatsD:
 
     def v2_runner_on_unreachable(self, parent, result):
         """ Constructs the StatsD metric for sending """
-        metric = "ansible.v2_runner_on_unreachable.{0}.{1}.{2}.{3}.{4}:1|c".format(
+        metric = "ansible.v2_runner_on_unreachable.{0}.{1}.{2}.{3}.{4}.{5}:1|c".format(
             self.playdir,
             self.playbook,
+            self.task,
             result["_host"],
             str(result["_task"]).replace("TASK: ", ""),
             result["_result"]["changed"],
@@ -249,6 +266,12 @@ class CallbackModule(CallbackBase):
             self._display.display("*** v2_playbook_on_start ***", color=C.COLOR_DEBUG)
             self._display.display(str(playbook.__dict__), color=C.COLOR_DEBUG)
         self.statsd.v2_playbook_on_start(self, playbook.__dict__, playbook.get_plays())
+
+    def v2_playbook_on_task_start(self, task, **kwargs):
+        if self._display.verbosity:
+            self._display.display("*** v2_playbook_on_task_start ***", color=C.COLOR_DEBUG)
+            self._display.display(str(task.__dict__), color=C.COLOR_DEBUG)
+        self.statsd.v2_playbook_on_task_start(self, task.__dict__, task.name)
 
     def v2_playbook_on_play_start(self, play, **kwargs):
         self.play = play
