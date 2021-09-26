@@ -1,0 +1,204 @@
+- name: create statsd namespace
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: statsd
+
+- name: create statsd configmap
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: statsd-exporter-config
+        namespace: statsd
+      data:
+        statsd_mapping.yml: |
+          mappings:
+            - match: "awx_workflow.*.*.*.*.*"
+              match_metric_type: counter
+              name: "awx_workflow_counter_${5}"
+              labels:
+                environment: "$1"
+                workflow: "$2"
+                train: "$3"
+                job_template: "$4"
+                metric_type: "counter"
+            - match: "awx_workflow.*.*.*.*.*"
+              match_metric_type: gauge
+              name: "awx_workflow_gauge_${5}"
+              labels:
+                environment: "$1"
+                workflow: "$2"
+                train: "$3"
+                job_template: "$4"
+                metric_type: "gauge"
+            - match: "awx_job_template.*.*.*.*"
+              match_metric_type: counter
+              name: "awx_job_template_counter_${4}"
+              labels:
+                environment: "$1"
+                train: "$2"
+                job_template: "$3"
+                metric_type: "counter"
+            - match: "awx_job_template.*.*.*.*"
+              match_metric_type: gauge
+              name: "awx_job_template_gauge_${4}"
+              labels:
+                environment: "$1"
+                train: "$2"
+                job_template: "$3"
+                metric_type: "gauge"
+            - match: "awx_workflow.*.*.*.*.*.*"
+              match_metric_type: counter
+              name: "awx_workflow_counter_${6}"
+              labels:
+                environment: "$1"
+                workflow: "$2"
+                train: "$3"
+                job_template: "$4"
+                hostname: "$5"
+                metric_type: "counter"
+            - match: "awx_workflow.*.*.*.*.*.*.*"
+              match_metric_type: counter
+              name: "awx_workflow_counter_${7}"
+              labels:
+                environment: "$1"
+                workflow: "$2"
+                train: "$3"
+                job_template: "$4"
+                hostname: "$5"
+                fail_time: "$6"
+                metric_type: "counter"
+            - match: "awx_workflow.*.*.*.*.*.*"
+              match_metric_type: gauge
+              name: "awx_workflow_gauge_${6}"
+              labels:
+                environment: "$1"
+                workflow: "$2"
+                train: "$3"
+                job_template: "$4"
+                hostname: "$5"
+                metric_type: "gauge"
+            - match: "."
+              match_type: regex
+              action: drop
+              name: "dropped"
+
+- name: create statsd configmap
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: statsd
+        namespace: statsd
+      spec:
+        serviceName: statsd-svc
+        replicas: 1
+        selector:
+          matchLabels:
+            app: statsd
+        updateStrategy:
+          type: RollingUpdate
+        template:
+          metadata:
+            labels:
+              name: statsd-deploy
+              app: statsd
+          spec:
+            containers:
+              # - name: statsd
+              #   image: graphiteapp/graphite-statsd:1.1.7-9
+              #   imagePullPolicy: Always
+              #   ports:
+              #     - containerPort: 80
+              #       name: nginx
+              #     - containerPort: 2003
+              #       name: carb-plain
+              #     - containerPort: 2004
+              #       name: carb-pickle
+              #     - containerPort: 2023
+              #       name: carb-agg-plain
+              #     - containerPort: 2024
+              #       name: carb-agg-pickle
+              #     - containerPort: 8080
+              #       name: gunicorn
+              #     - containerPort: 8125
+              #       name: statsd
+              #     - containerPort: 8126
+              #       name: statsd-admin
+              #   env:
+              #     - name: STATSD_INTERFACE
+              #       value: tcp
+              #   resources:
+              #     requests:
+              #       memory: "500Mi"
+              #       cpu: "250m"
+              - name: statsd-exporter
+                image: prom/statsd-exporter:v0.18.0
+                args: ['--statsd.mapping-config=/tmp/statsd_mapping.yml']
+                imagePullPolicy: Always
+                ports:
+                  - containerPort: 9102
+                    name: web
+                  - containerPort: 9125
+                    name: statsd
+                env:
+                  - name: STATSD_INTERFACE
+                    value: tcp
+                resources:
+                  requests:
+                    memory: "500Mi"
+                    cpu: "250m"
+                volumeMounts:
+                  - name: statsd-exporter-config
+                    mountPath: /tmp/
+                    readOnly: true
+            volumes:
+              - name: statsd-exporter-config
+                configMap:
+                  name: statsd-exporter-config
+                  items:
+                    - key: statsd_mapping.yml
+                      path: statsd_mapping.yml
+
+- name: create statsd configmap
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: statsd-svc
+        namespace: statsd
+        labels:
+          name: statsd-svc
+        annotations:
+          traefik.ingress.kubernetes.io/affinity: "false"
+      spec:
+        type: LoadBalancer
+        ports:
+          - name: statsd-web
+            port: 80
+            targetPort: 80
+          - name: statsd
+            port: 8125
+            targetPort: 8125
+          - name: statsd-exp-web
+            port: 9102
+            targetPort: 9102
+          - name: statsd-exp
+            port: 9125
+            targetPort: 9125
+        selector:
+          name: statsd-deploy
