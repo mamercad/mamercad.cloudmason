@@ -117,17 +117,25 @@ class StatsD:
             sock.connect((self.host, int(self.port)))
             sock.sendall(metric.encode())
             if parent._display.verbosity:
-                parent._display.display(f"Sent metric {metric} to StatsD at {self.host}:{self.port}")
+                parent._display.display(
+                    f"Sent metric {metric} to StatsD at {self.host}:{self.port}"
+                )
         except Exception as e:
             if parent._display.verbosity:
-                parent._display.display(f"Failed to sent metric {metric} to StatsD at {self.host}:{self.port} ({e})")
+                parent._display.display(
+                    f"Failed to sent metric {metric} to StatsD at {self.host}:{self.port} ({e})"
+                )
         finally:
             sock.close()
 
     def v2_playbook_on_start(self, parent, playbook, plays):
         """ Constructs the StatsD metric for sending """
-        self.playdir = base64.b64encode(playbook["_basedir"].encode("utf-8")).decode("utf-8")
-        self.playbook = playbook["_file_name"].replace(".", "_") # e.g., replace ".yml" with "_yml"
+        self.playdir = base64.b64encode(playbook["_basedir"].encode("utf-8")).decode(
+            "utf-8"
+        )
+        self.playbook = playbook["_file_name"].replace(
+            ".", "_"
+        )  # e.g., replace ".yml" with "_yml"
         self.plays = base64.b64encode(str(plays).encode("utf-8")).decode("utf-8")
         metric = "ansible.v2_playbook_on_start.{0}.{1}.{2}:1|c".format(
             self.playdir,
@@ -227,8 +235,12 @@ class CallbackModule(CallbackBase):
             self._display.display(
                 f"*** statsd callback plugin settings ***", color=C.COLOR_DEBUG
             )
-            self._display.display(f"statsd_host: {self.statsd_host}", color=C.COLOR_DEBUG)
-            self._display.display(f"statsd_port: {self.statsd_port}", color=C.COLOR_DEBUG)
+            self._display.display(
+                f"statsd_host: {self.statsd_host}", color=C.COLOR_DEBUG
+            )
+            self._display.display(
+                f"statsd_port: {self.statsd_port}", color=C.COLOR_DEBUG
+            )
 
         self.statsd = StatsD(host=self.statsd_host, port=self.statsd_port)
 
@@ -269,7 +281,9 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_unreachable(self, result, **kwargs):
         if self._display.verbosity:
-            self._display.display("*** v2_runner_on_unreachable ***", color=C.COLOR_DEBUG)
+            self._display.display(
+                "*** v2_runner_on_unreachable ***", color=C.COLOR_DEBUG
+            )
             self._display.display(str(result.__dict__), color=C.COLOR_DEBUG)
         self.statsd.v2_runner_on_unreachable(self, result.__dict__)
 
