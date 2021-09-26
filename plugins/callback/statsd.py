@@ -144,7 +144,7 @@ class StatsD:
                     )
                     if parent._display.verbosity:
                         parent._display.display(f"metric: {metric}")
-                    self.ship_it(metric)
+                    self.ship_it(parent, metric)
 
 
 class CallbackModule(CallbackBase):
