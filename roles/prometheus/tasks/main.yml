@@ -160,6 +160,12 @@
               target_label: __address__     # The blackbox exporter's real hostname:port.
           scrape_interval: 15m
           scrape_timeout: 5m
+        - job_name: statsd
+          static_configs:
+            - targets: {{ statsd_targets }}
+          metrics_path: /metrics
+          scrape_interval: 1m
+          scrape_timeout: 30s
   notify: restart-prometheus
   become: true
 
