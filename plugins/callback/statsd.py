@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = """
 author: Mark Mercado (@mamercad)
 name: mamercad.cloudmason.statsd
-type: notification
+type: aggregate
 requirements:
   - Python C(os), and C(socket) libraries.
 short_description: Send Ansible playbook result metrics to a StatsD (or StatsD Prometheus Exporter) endpoint.
@@ -100,7 +100,7 @@ import base64
 
 from ansible.plugins.callback import CallbackBase
 from ansible import constants as C
-from __main__ import cli
+# from __main__ import cli
 
 
 class StatsD:
@@ -137,7 +137,8 @@ class StatsD:
         self.playbook = playbook["_file_name"].replace(
             ".", "_"
         )  # e.g., replace ".yml" with "_yml"
-        self.plays = base64.b64encode(str(plays).encode("utf-8")).decode("utf-8")
+        # self.plays = base64.b64encode(str(plays).encode("utf-8")).decode("utf-8")
+        self.plays = str(plays).replace("[", "").replace("]", "")
         metric = "ansible.v2_playbook_on_start.{0}.{1}.{2}:1|c".format(
             self.playdir,
             self.playbook,
@@ -149,7 +150,8 @@ class StatsD:
 
     def v2_playbook_on_task_start(self, parent, task, task_name):
         """ Constructs the StatsD metric for sending """
-        self.task = base64.b64encode(task_name.encode("utf-8")).decode("utf-8")
+        # self.task = base64.b64encode(task_name.encode("utf-8")).decode("utf-8")
+        self.task = task_name
         metric = "ansible.v2_playbook_on_task_start.{0}.{1}.{2}:1|c".format(
             self.playdir,
             self.playbook,
@@ -233,7 +235,7 @@ class StatsD:
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = "notification"
+    CALLBACK_TYPE = "aggregate"
     CALLBACK_NAME = "mamercad.cloudmason.statsd"
     CALLBACK_NEEDS_WHITELIST = True
 
