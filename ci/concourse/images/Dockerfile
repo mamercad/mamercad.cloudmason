@@ -4,7 +4,7 @@ COPY requirements.txt /
 COPY requirements.yml /
 
 RUN apk update && \
-    apk add py3-virtualenv python3-dev gcc musl-dev libffi-dev git && \
+    apk add py3-virtualenv python3-dev gcc musl-dev libffi-dev git jq && \
     virtualenv -p python3 /venv && \
     source /venv/bin/activate && \
     pip3 install --upgrade pip && \
