@@ -36,6 +36,65 @@ options:
         key: statsd_port
 """
 
+#  mappings:
+#    - match: "ansible.v2_playbook_on_start.*.*.*"
+#      match_metric_type: counter
+#      name: "ansible"
+#      labels:
+#        event: "v2_playbook_on_start"
+#        playdir: "$1"
+#        playbook: "$2"
+#        plays: "$3"
+#    - match: "ansible.v2_runner_on_ok.*.*.*.*.*"
+#      match_metric_type: counter
+#      name: "ansible"
+#      labels:
+#        event: "v2_runner_on_ok"
+#        playdir: "$1"
+#        playbook: "$2"
+#        host: "$3"
+#        task: "$4"
+#        changed: "$5"
+#    - match: "ansible.v2_runner_on_failed.*.*.*.*.*"
+#      match_metric_type: counter
+#      name: "ansible"
+#      labels:
+#        event: "v2_runner_on_failed"
+#        playdir: "$1"
+#        playbook: "$2"
+#        host: "$3"
+#        task: "$4"
+#        changed: "$5"
+#    - match: "ansible.v2_runner_on_skipped.*.*.*.*.*"
+#      match_metric_type: counter
+#      name: "ansible"
+#      labels:
+#        event: "v2_runner_on_skipped"
+#        playdir: "$1"
+#        playbook: "$2"
+#        host: "$3"
+#        task: "$4"
+#        changed: "$5"
+#    - match: "ansible.v2_runner_on_unreachable.*.*.*.*.*"
+#      match_metric_type: counter
+#      name: "ansible"
+#      labels:
+#        event: "v2_runner_on_unreachable"
+#        playdir: "$1"
+#        playbook: "$2"
+#        host: "$3"
+#        task: "$4"
+#        changed: "$5"
+#    - match: "ansible.v2_playbook_on_stats.*.*.*.*"
+#      match_metric_type: counter
+#      name: "ansible"
+#      labels:
+#        event: "v2_playbook_on_stats"
+#        playdir: "$1"
+#        playbook: "$2"
+#        result: "$3"
+#        host: "$4"
+
 import socket
 import base64
 
