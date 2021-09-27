@@ -21,144 +21,196 @@
       data:
         statsd_mapping.yml: |
           mappings:
-            - match: "ansible.v2_playbook_on_start.*.*.*"
+
+            - match: ansible.counter.stats.*.*.*.*
               match_metric_type: counter
-              name: "ansible"
+              name: ansible_counter
               labels:
-                event: "v2_playbook_on_start"
-                playdir: "$1"
-                playbook: "$2"
-                plays: "$3"
-            - match: "ansible.v2_playbook_on_task_start.*.*.*"
-              match_metric_type: counter
-              name: "ansible"
-              labels:
-                event: "v2_playbook_on_task_start"
-                playdir: "$1"
-                playbook: "$2"
-                task: "$3"
-            - match: "ansible.v2_runner_on_ok.*.*.*.*.*.*"
-              match_metric_type: counter
-              name: "ansible"
-              labels:
-                event: "v2_runner_on_ok"
-                playdir: "$1"
-                playbook: "$2"
-                task: "$3"
-                host: "$4"
-                task: "$5"
-                changed: "$6"
-            - match: "ansible.v2_runner_on_failed.*.*.*.*.*.*"
-              match_metric_type: counter
-              name: "ansible"
-              labels:
-                event: "v2_runner_on_failed"
-                playdir: "$1"
-                playbook: "$2"
-                task: "$3"
-                host: "$4"
-                task: "$5"
-                changed: "$6"
-            - match: "ansible.v2_runner_on_skipped.*.*.*.*.*.*"
-              match_metric_type: counter
-              name: "ansible"
-              labels:
-                event: "v2_runner_on_skipped"
-                playdir: "$1"
-                playbook: "$2"
-                task: "$3"
-                host: "$4"
-                task: "$5"
-                changed: "$6"
-            - match: "ansible.v2_runner_on_unreachable.*.*.*.*.*.*"
-              match_metric_type: counter
-              name: "ansible"
-              labels:
-                event: "v2_runner_on_unreachable"
-                playdir: "$1"
-                playbook: "$2"
-                task: "$3"
-                host: "$4"
-                task: "$5"
-                changed: "$6"
-            - match: "ansible.v2_playbook_on_stats.*.*.*.*"
-              match_metric_type: counter
-              name: "ansible"
-              labels:
-                event: "v2_playbook_on_stats"
-                playdir: "$1"
+                event: "stats"
+                type: "counter"
+                basedir: "$1"
                 playbook: "$2"
                 result: "$3"
                 host: "$4"
-            - match: "awx_workflow.*.*.*.*.*"
-              match_metric_type: counter
-              name: "awx_workflow_counter_${5}"
-              labels:
-                environment: "$1"
-                workflow: "$2"
-                train: "$3"
-                job_template: "$4"
-                metric_type: "counter"
-            - match: "awx_workflow.*.*.*.*.*"
+
+            - match: ansible.gauge.stats.*.*
               match_metric_type: gauge
-              name: "awx_workflow_gauge_${5}"
+              name: ansible_gauge
               labels:
-                environment: "$1"
-                workflow: "$2"
-                train: "$3"
-                job_template: "$4"
-                metric_type: "gauge"
-            - match: "awx_job_template.*.*.*.*"
+                event: "stats"
+                type: "gauge"
+                basedir: "$1"
+                playbook: "$2"
+
+            - match: ansible.counter.*.*.*.*.*.*
               match_metric_type: counter
-              name: "awx_job_template_counter_${4}"
+              name: ansible_counter
               labels:
-                environment: "$1"
-                train: "$2"
-                job_template: "$3"
-                metric_type: "counter"
-            - match: "awx_job_template.*.*.*.*"
+                event: "task"
+                type: "counter"
+                basedir: "$1"
+                playbook: "$2"
+                play: "$3"
+                task: "$4"
+                host: "$5"
+                result: "$6"
+
+            - match: ansible.gauge.*.*.*.*.*.*
               match_metric_type: gauge
-              name: "awx_job_template_gauge_${4}"
+              name: ansible_gauge
               labels:
-                environment: "$1"
-                train: "$2"
-                job_template: "$3"
-                metric_type: "gauge"
-            - match: "awx_workflow.*.*.*.*.*.*"
-              match_metric_type: counter
-              name: "awx_workflow_counter_${6}"
-              labels:
-                environment: "$1"
-                workflow: "$2"
-                train: "$3"
-                job_template: "$4"
-                hostname: "$5"
-                metric_type: "counter"
-            - match: "awx_workflow.*.*.*.*.*.*.*"
-              match_metric_type: counter
-              name: "awx_workflow_counter_${7}"
-              labels:
-                environment: "$1"
-                workflow: "$2"
-                train: "$3"
-                job_template: "$4"
-                hostname: "$5"
-                fail_time: "$6"
-                metric_type: "counter"
-            - match: "awx_workflow.*.*.*.*.*.*"
-              match_metric_type: gauge
-              name: "awx_workflow_gauge_${6}"
-              labels:
-                environment: "$1"
-                workflow: "$2"
-                train: "$3"
-                job_template: "$4"
-                hostname: "$5"
-                metric_type: "gauge"
+                event: "task"
+                type: "gauge"
+                basedir: "$1"
+                playbook: "$2"
+                play: "$3"
+                task: "$4"
+                host: "$5"
+                result: "$6"
+
             - match: "."
               match_type: regex
               action: drop
               name: "dropped"
+
+            # - match: "ansible.v2_playbook_on_start.*.*.*"
+            #   match_metric_type: counter
+            #   name: "ansible"
+            #   labels:
+            #     event: "v2_playbook_on_start"
+            #     playdir: "$1"
+            #     playbook: "$2"
+            #     plays: "$3"
+            # - match: "ansible.v2_playbook_on_task_start.*.*.*"
+            #   match_metric_type: counter
+            #   name: "ansible"
+            #   labels:
+            #     event: "v2_playbook_on_task_start"
+            #     playdir: "$1"
+            #     playbook: "$2"
+            #     task: "$3"
+            # - match: "ansible.v2_runner_on_ok.*.*.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "ansible"
+            #   labels:
+            #     event: "v2_runner_on_ok"
+            #     playdir: "$1"
+            #     playbook: "$2"
+            #     task: "$3"
+            #     host: "$4"
+            #     task: "$5"
+            #     changed: "$6"
+            # - match: "ansible.v2_runner_on_failed.*.*.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "ansible"
+            #   labels:
+            #     event: "v2_runner_on_failed"
+            #     playdir: "$1"
+            #     playbook: "$2"
+            #     task: "$3"
+            #     host: "$4"
+            #     task: "$5"
+            #     changed: "$6"
+            # - match: "ansible.v2_runner_on_skipped.*.*.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "ansible"
+            #   labels:
+            #     event: "v2_runner_on_skipped"
+            #     playdir: "$1"
+            #     playbook: "$2"
+            #     task: "$3"
+            #     host: "$4"
+            #     task: "$5"
+            #     changed: "$6"
+            # - match: "ansible.v2_runner_on_unreachable.*.*.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "ansible"
+            #   labels:
+            #     event: "v2_runner_on_unreachable"
+            #     playdir: "$1"
+            #     playbook: "$2"
+            #     task: "$3"
+            #     host: "$4"
+            #     task: "$5"
+            #     changed: "$6"
+            # - match: "ansible.v2_playbook_on_stats.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "ansible"
+            #   labels:
+            #     event: "v2_playbook_on_stats"
+            #     playdir: "$1"
+            #     playbook: "$2"
+            #     result: "$3"
+            #     host: "$4"
+            # - match: "awx_workflow.*.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "awx_workflow_counter_${5}"
+            #   labels:
+            #     environment: "$1"
+            #     workflow: "$2"
+            #     train: "$3"
+            #     job_template: "$4"
+            #     metric_type: "counter"
+            # - match: "awx_workflow.*.*.*.*.*"
+            #   match_metric_type: gauge
+            #   name: "awx_workflow_gauge_${5}"
+            #   labels:
+            #     environment: "$1"
+            #     workflow: "$2"
+            #     train: "$3"
+            #     job_template: "$4"
+            #     metric_type: "gauge"
+            # - match: "awx_job_template.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "awx_job_template_counter_${4}"
+            #   labels:
+            #     environment: "$1"
+            #     train: "$2"
+            #     job_template: "$3"
+            #     metric_type: "counter"
+            # - match: "awx_job_template.*.*.*.*"
+            #   match_metric_type: gauge
+            #   name: "awx_job_template_gauge_${4}"
+            #   labels:
+            #     environment: "$1"
+            #     train: "$2"
+            #     job_template: "$3"
+            #     metric_type: "gauge"
+            # - match: "awx_workflow.*.*.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "awx_workflow_counter_${6}"
+            #   labels:
+            #     environment: "$1"
+            #     workflow: "$2"
+            #     train: "$3"
+            #     job_template: "$4"
+            #     hostname: "$5"
+            #     metric_type: "counter"
+            # - match: "awx_workflow.*.*.*.*.*.*.*"
+            #   match_metric_type: counter
+            #   name: "awx_workflow_counter_${7}"
+            #   labels:
+            #     environment: "$1"
+            #     workflow: "$2"
+            #     train: "$3"
+            #     job_template: "$4"
+            #     hostname: "$5"
+            #     fail_time: "$6"
+            #     metric_type: "counter"
+            # - match: "awx_workflow.*.*.*.*.*.*"
+            #   match_metric_type: gauge
+            #   name: "awx_workflow_gauge_${6}"
+            #   labels:
+            #     environment: "$1"
+            #     workflow: "$2"
+            #     train: "$3"
+            #     job_template: "$4"
+            #     hostname: "$5"
+            #     metric_type: "gauge"
+            # - match: "."
+            #   match_type: regex
+            #   action: drop
+            #   name: "dropped"
 
 - name: create statsd configmap
   kubernetes.core.k8s:
