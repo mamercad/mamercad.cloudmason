@@ -1,0 +1,11 @@
+---
+- name: tailscale
+  hosts: lenovo
+  connection: ssh
+  gather_facts: true
+  become: false
+  tasks:
+    - name: include tailscale role (main tasks)
+      ansible.builtin.include_role:
+        name: tailscale
+        tasks_from: main.yml
