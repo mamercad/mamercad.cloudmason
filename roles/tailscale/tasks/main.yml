@@ -1,0 +1,32 @@
+- name: install tailscale gpg key
+  ansible.builtin.apt_key:
+    state: present
+    url: https://pkgs.tailscale.com/stable/ubuntu/focal.gpg
+  become: true
+
+- name: install tailscale repo
+  ansible.builtin.apt_repository:
+    state: present
+    repo: deb https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main
+  become: true
+
+- name: install tailscale
+  ansible.builtin.apt:
+    state: present
+    name: tailscale
+    update_cache: true
+  become: true
+
+# this drops and auth link to the screen, not sure what to do right now
+# - name: tailscale up
+#   ansible.builtin.command: tailscale up
+#   become: true
+
+- name: get tailscale ip
+  ansible.builtin.command: tailscale ip -4
+  become: true
+  register: tailscale_ip
+
+- name: show tailscale ip
+  ansible.builtin.debug:
+    msg: "{{ tailscale_ip.stdout }}"
