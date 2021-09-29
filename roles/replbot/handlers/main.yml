@@ -1,0 +1,5 @@
+- name: restart replbot
+  ansible.builtin.systemd:
+    name: replbot
+    state: restarted
+  become: true
