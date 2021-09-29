@@ -1,0 +1,46 @@
+- name: fetch replbot
+  ansible.builtin.get_url:
+    url: "{{ replbot_deb }}"
+    dest: /tmp/replbot.deb
+    checksum: sha256:{{ replbot_sha256 }}"
+  become: true
+
+- name: install replbot
+  ansible.builtin.apt:
+    state: present
+    deb: /tmp/replbot.deb
+  become: true
+
+- name: install addons
+  ansible.builtin.apt:
+    state: present
+    name:
+      - tmux
+      - asciinema
+      # - ttyd
+  become: true
+
+- name: set replbot token
+  ansible.builtin.replace:
+    path: /etc/replbot/config.yml
+    regexp: "^bot-token: MUST_BE_SET$"
+    replace: "bot-token: {{ replbot_token }}"
+    backup: true
+  become: true
+  notify: restart replbot
+
+- name: start and enable
+  ansible.builtin.systemd:
+    name: replbot
+    state: started
+    enabled: true
+  become: true
+
+- name: lock down replbot config
+  ansible.builtin.file:
+    path: /etc/replbot/config.yml
+    owner: replbot
+    group: replbot
+    mode: 0640
+  become: true
+  notify: restart replbot
