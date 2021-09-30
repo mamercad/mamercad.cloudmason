@@ -1,2 +1,5 @@
 replbot_deb: https://github.com/binwiederhier/replbot/releases/download/v0.6.1/replbot_0.6.1_amd64.deb
 replbot_sha256: 7112da4b7737117472d2ac73c747b6d69b5d1446a473cd023b1c60673d4e216b
+
+ttyd_binary: https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64
+ttyd_sha256: d69320cc45f51d144242935abe3443ad7d2fd1356a6732879ab175a406eafa85

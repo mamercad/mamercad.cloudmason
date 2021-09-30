@@ -3,6 +3,9 @@
     url: "{{ replbot_deb }}"
     dest: /tmp/replbot.deb
     checksum: sha256:{{ replbot_sha256 }}"
+    owner: root
+    group: root
+    mode: 0644
   become: true
 
 - name: install replbot
@@ -42,5 +45,33 @@
     owner: replbot
     group: replbot
     mode: 0640
+  become: true
+  notify: restart replbot
+
+- name: fetch ttyd
+  ansible.builtin.get_url:
+    url: "{{ ttyd_binary }}"
+    dest: /usr/local/bin/ttyd
+    checksum: sha256:{{ ttyd_sha256 }}"
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+
+- name: set replbot web-address
+  ansible.builtin.replace:
+    path: /etc/replbot/config.yml
+    regexp: "^# web-address:$"
+    replace: "web-address: cloudmason.org:{{ web_port }}"
+    backup: true
+  become: true
+  notify: restart replbot
+
+- name: set replbot default-web
+  ansible.builtin.replace:
+    path: /etc/replbot/config.yml
+    regexp: "^# default-web: false"
+    replace: "default-web: true"
+    backup: true
   become: true
   notify: restart replbot
