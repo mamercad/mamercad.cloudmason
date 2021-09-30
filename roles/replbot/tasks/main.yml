@@ -58,11 +58,11 @@
     mode: 0755
   become: true
 
-- name: set replbot web-address
+- name: replace replbot web-address with web-host
   ansible.builtin.replace:
     path: /etc/replbot/config.yml
-    regexp: "^# web-address:$"
-    replace: "web-address: cloudmason.org:{{ web_port }}"
+    regexp: "^.*web-address:.*"
+    replace: "web-host: {{ web_host }}:{{ web_port }}"
     backup: true
   become: true
   notify: restart replbot
@@ -72,6 +72,15 @@
     path: /etc/replbot/config.yml
     regexp: "^# default-web: false"
     replace: "default-web: true"
+    backup: true
+  become: true
+  notify: restart replbot
+
+- name: set replbot share-host
+  ansible.builtin.replace:
+    path: /etc/replbot/config.yml
+    regexp: "^# share-host:$"
+    replace: "share-host: {{ web_host }}:{{ share_port }}"
     backup: true
   become: true
   notify: restart replbot
