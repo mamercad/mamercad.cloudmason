@@ -33,14 +33,23 @@ DOCUMENTATION = """
         - section: callback_slack
           key: slack_channel
     slack_format:
-      description: How it looks :)
-      required: false
+      description: Textual display style.
+      choices: ["plain", "fixed"]
       default: plain
       env:
         - name: SLACK_FORMAT
       ini:
         - section: callback_slack
           key: slack_format
+    slack_cadence:
+      description: Realtime or buffered.
+      choice: ["realtime", "buffered"]
+      default: realtime
+      env:
+        - name: SLACK_CADENCE
+      ini:
+        - section: callback_slack
+          key: slack_cadence
     slack_threading:
       description: Use Slack threads (or not).
       default: false
@@ -128,8 +137,11 @@ class CallbackModule(CallbackBase):
         self.slack_bot_token = self.get_option("slack_bot_token")
         self.slack_channel = self.get_option("slack_channel")
         self.slack_format = self.get_option("slack_format")
+        self.slack_cadence = self.get_option("slack_cadence")
         self.slack_threading = self.get_option("slack_threading")
         self.ansible_events = self.get_option("ansible_events").split(",")
+
+        self.slack_buffer = []
 
         self.slack = Slack(self._display, self.slack_bot_token, self.slack_channel, self.slack_threading)
 
@@ -155,6 +167,8 @@ class CallbackModule(CallbackBase):
                 return(f"```{text}```")
             else:
                 return(f"`{text}`")
+        else:
+            return(f"{text}")
 
     def v2_playbook_on_start(self, playbook, **kwargs):
 
@@ -189,7 +203,10 @@ class CallbackModule(CallbackBase):
                     ]
                 }
             ]
-            self.slack.post_message(text=text, blocks=blocks)
+            if self.slack_cadence == "realtime":
+                self.slack.post_message(text=text, blocks=blocks)
+            else:
+                self.slack_buffer.append(blocks)
 
     def v2_playbook_on_play_start(self, play):
         self.play_uuid = str(play._uuid)
@@ -209,7 +226,10 @@ class CallbackModule(CallbackBase):
                     }
                 }
             ]
-            self.slack.post_message(text=text, blocks=blocks)
+            if self.slack_cadence == "realtime":
+                self.slack.post_message(text=text, blocks=blocks)
+            else:
+                self.slack_buffer.append(blocks)
 
     def v2_playbook_on_task_start(self, task, **kwargs):
 
@@ -235,7 +255,10 @@ class CallbackModule(CallbackBase):
                     }
                 }
             ]
-            self.slack.post_message(text=text, blocks=blocks)
+            if self.slack_cadence == "realtime":
+                self.slack.post_message(text=text, blocks=blocks)
+            else:
+                self.slack_buffer.append(blocks)
 
     def _runner_on(self, status, result):
         task_uuid = self.current_task_uuid
@@ -265,8 +288,10 @@ class CallbackModule(CallbackBase):
                 }
             }
         ]
-
-        self.slack.post_message(text=text, blocks=blocks)
+        if self.slack_cadence == "realtime":
+            self.slack.post_message(text=text, blocks=blocks)
+        else:
+            self.slack_buffer.append(blocks)
 
     def v2_runner_on_ok(self, result, *args, **kwargs):
         self._runner_on("ok", result)
@@ -313,7 +338,16 @@ class CallbackModule(CallbackBase):
                 }
             }
         ]
-        self.slack.post_message(text=text, blocks=blocks)
+        if self.slack_cadence == "realtime":
+            self.slack.post_message(text=text, blocks=blocks)
+        else:
+            self.slack_buffer.append(blocks)
+
+        print = self._display.display
+        blocks = []
+        for b in self.slack_buffer:
+            blocks.append(b[0])
+        self.slack.post_message(blocks=blocks)
 
         if "v2_playbook_on_stats" in self.ansible_events:
             pass
