@@ -100,6 +100,16 @@
             service: lenovo-repl-sshd
             entryPoints:
               - lenovo-replbot-sshd
+          thinkpad-ttyd:
+            rule: HostSNI(`*`)
+            service: thinkpad-repl-ttyd
+            entryPoints:
+              - thinkpad-replbot-ttyd
+          thinkpad-sshd:
+            rule: HostSNI(`*`)
+            service: thinkpad-repl-sshd
+            entryPoints:
+              - thinkpad-replbot-sshd
         services:
           lenovo-replbot-ttyd:
             loadBalancer:
@@ -109,6 +119,14 @@
             loadBalancer:
               servers:
                 - address: lenovo.cloudmason.org:8384
+          thinkpad-replbot-ttyd:
+            loadBalancer:
+              servers:
+                - address: thinkpad.cloudmason.org:7373
+          thinkpad-replbot-sshd:
+            loadBalancer:
+              servers:
+                - address: thinkpad.cloudmason.org:7374
       http:
         routers:
           apex:
