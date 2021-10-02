@@ -35,201 +35,246 @@
     creates: "{{ traefik_home }}/traefik"
   become: true
 
-- name: deploy traefik.toml
+- name: deploy traefik.yaml
   ansible.builtin.copy:
-    dest: "{{ traefik_home }}/traefik.toml"
+    dest: "{{ traefik_home }}/traefik.yaml"
     owner: "{{ traefik_user }}"
     group: "{{ traefik_group }}"
     mode: 0644
+    backup: true
     content: |
-      defaultEntryPoints = ["http", "https"]
-
-      [entryPoints]
-        [entryPoints.http]
-          address = ":80"
-          [entryPoints.http.http.redirections]
-            [entryPoints.http.http.redirections.entryPoint]
-              to = "https"
-              scheme = "https"
-        [entryPoints.https]
-          address = ":443"
-
-      [providers]
-        [providers.file]
-          filename = "{{ traefik_home }}/traefik_dynamic.toml"
-
-      [certificatesResolvers.myresolver.acme]
-        email = "{{ traefik_cloudflare_api_email }}"
-        storage = "{{ traefik_home }}/acme.json"
-        # caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
-        caServer = "https://acme-v02.api.letsencrypt.org/directory"
-        [certificatesResolvers.myresolver.acme.dnsChallenge]
-          provider = "cloudflare"
-          delayBeforeCheck = 0
-          resolvers = ["1.1.1.1:53", "8.8.8.8:53"]
-
-      [log]
-        filePath = "{{ traefik_home }}/traefik.log"
-        level = "WARN"
+      api: {}
+      defaultEntryPoints:
+        - http
+        - https
+      entryPoints:
+        http:
+          address: :80
+          http:
+            redirections:
+              entryPoint:
+                to: https
+                scheme: https
+        https:
+          address: :443
+        traefik:
+          address: :8080
+      providers:
+        file:
+          filename: "{{ traefik_home }}/traefik_dynamic.yaml"
+      certificatesResolvers:
+        myresolver:
+          acme:
+            email: "{{ traefik_cloudflare_api_email }}"
+            storage: "{{ traefik_home }}/acme.json"
+            caServer: https://acme-v02.api.letsencrypt.org/directory
+            dnsChallenge:
+              provider: cloudflare
+              delayBeforeCheck: 0
+              resolvers:
+                - 1.1.1.1:53
+                - 8.8.8.8:53
+      log:
+        level: DEBUG
+        # filePath: '{{ traefik_home }}/traefik.log'
   notify: restart-traefik
   become: true
 
-- name: deploy traefik_dynamic.toml
+- name: deploy traefik_dynamic.yaml
   ansible.builtin.copy:
-    dest: "{{ traefik_home }}/traefik_dynamic.toml"
+    dest: "{{ traefik_home }}/traefik_dynamic.yaml"
     owner: "{{ traefik_user }}"
     group: "{{ traefik_group }}"
     mode: 0644
+    backup: true
     content: |
-      [http]
-        [http.routers]
-          [http.routers.apex]
-            rule = "Host(`cloudmason.org`)"
-            service = "apex"
-            [http.routers.apex.tls]
-              certResolver = "myresolver"
-              [[http.routers.apex.tls.domains]]
-                main = "cloudmason.org"
-                sans = ["*.cloudmason.org"]
-          [http.routers.awx]
-            rule = "Host(`awx.cloudmason.org`)"
-            service = "awx"
-            [http.routers.awx.tls]
-          [http.routers.awx-dev]
-            rule = "Host(`awx-dev.cloudmason.org`)"
-            service = "awx-dev"
-            [http.routers.awx-dev.tls]
-          [http.routers.opennebula]
-            rule = "Host(`opennebula.cloudmason.org`)"
-            service = "opennebula"
-            [http.routers.opennebula.tls]
-          [http.routers.fireedge]
-            rule = "Host(`fireedge.cloudmason.org`)"
-            service = "fireedge"
-            [http.routers.fireedge.tls]
-          [http.routers.zabbix]
-            rule = "Host(`zabbix.cloudmason.org`)"
-            service = "zabbix"
-            [http.routers.zabbix.tls]
-          [http.routers.concourse]
-            rule = "Host(`concourse.cloudmason.org`)"
-            service = "concourse"
-            [http.routers.concourse.tls]
-          [http.routers.vault]
-            rule = "Host(`vault.cloudmason.org`)"
-            service = "vault"
-            [http.routers.vault.tls]
-          [http.routers.grafana]
-            rule = "Host(`grafana.cloudmason.org`)"
-            service = "grafana"
-            [http.routers.grafana.tls]
-          [http.routers.prometheus]
-            rule = "Host(`prometheus.cloudmason.org`)"
-            service = "prometheus"
-            [http.routers.prometheus.tls]
-          [http.routers.web]
-            rule = "Host(`web.cloudmason.org`)"
-            service = "web"
-            [http.routers.web.tls]
-          [http.routers.www]
-            rule = "Host(`www.cloudmason.org`)"
-            service = "www"
-            [http.routers.www.tls]
-          [http.routers.unifi]
-            rule = "Host(`unifi.cloudmason.org`)"
-            service = "unifi"
-            [http.routers.unifi.tls]
-          [http.routers.nzbget]
-            rule = "Host(`nzbget.cloudmason.org`)"
-            # middlewares = ["admin-user"]
-            service = "nzbget"
-            [http.routers.nzbget.tls]
-          [http.routers.sonarr]
-            rule = "Host(`sonarr.cloudmason.org`)"
-            # middlewares = ["admin-user"]
-            service = "sonarr"
-            [http.routers.sonarr.tls]
-          [http.routers.radarr]
-            rule = "Host(`radarr.cloudmason.org`)"
-            # middlewares = ["admin-user"]
-            service = "radarr"
-            [http.routers.radarr.tls]
-          [http.routers.thelounge]
-            rule = "Host(`thelounge.cloudmason.org`)"
-            service = "thelounge"
-            [http.routers.thelounge.tls]
-          [http.routers.qnapweb]
-            rule = "Host(`qnapweb.cloudmason.org`)"
-            service = "qnapweb"
-            [http.routers.qnapweb.tls]
-
-        [http.middlewares]
-          [http.middlewares.admin-user.basicAuth]
-            users = ["{{ traefik_admin_username }}:{{ traefik_admin_password }}"]
-          [http.middlewares.zabbix.addPrefix]
-            prefix = "/zabbix"
-
-        [http.services]
-          [http.services.apex.loadBalancer]
-            [[http.services.apex.loadBalancer.servers]]
-              url = "http://cloudmason.org:8000/"
-          [http.services.awx.loadBalancer]
-            [[http.services.awx.loadBalancer.servers]]
-              url = "http://awx-service.awx.thinkpad.cloudmason.org:80/"
-          [http.services.awx-dev.loadBalancer]
-            [[http.services.awx-dev.loadBalancer.servers]]
-              url = "http://awx-dev-service.default.lenovo.cloudmason.org:80/"
-          [http.services.opennebula.loadBalancer]
-            [[http.services.opennebula.loadBalancer.servers]]
-              url = "http://thinkpad.cloudmason.org:9869/"
-          [http.services.fireedge.loadBalancer]
-            [[http.services.fireedge.loadBalancer.servers]]
-              url = "http://thinkpad.cloudmason.org:2616/"
-          [http.services.zabbix.loadBalancer]
-            [[http.services.zabbix.loadBalancer.servers]]
-              url = "http://thinkpad.cloudmason.org:8080/"
-          [http.services.concourse.loadBalancer]
-            [[http.services.concourse.loadBalancer.servers]]
-              url = "http://concourse-web.concourse-main.thinkpad.cloudmason.org:8080/"
-          [http.services.vault.loadBalancer]
-            [[http.services.vault.loadBalancer.servers]]
-              url = "http://vault-ui.vault-main.thinkpad.cloudmason.org:8200/"
-          [http.services.grafana.loadBalancer]
-            [[http.services.grafana.loadBalancer.servers]]
-              url = "http://thinkpad.cloudmason.org:3000/"
-          [http.services.prometheus.loadBalancer]
-            [[http.services.prometheus.loadBalancer.servers]]
-              url = "http://thinkpad.cloudmason.org:9090/"
-          [http.services.web.loadBalancer]
-            [[http.services.web.loadBalancer.servers]]
-              url = "http://web.cloudmason.org:8000/"
-          [http.services.www.loadBalancer]
-            [[http.services.www.loadBalancer.servers]]
-              url = "http://web.cloudmason.org:8000/"
-          [http.services.unifi.loadBalancer]
-            [[http.services.unifi.loadBalancer.servers]]
-              url = "https://cloudkey2.cloudmason.org:8443/"
-          [http.services.nzbget.loadBalancer]
-            [[http.services.nzbget.loadBalancer.servers]]
-              url = "http://qnap.cloudmason.org:11000/"
-          [http.services.sonarr.loadBalancer]
-            [[http.services.sonarr.loadBalancer.servers]]
-              url = "http://qnap.cloudmason.org:11001/"
-          [http.services.radarr.loadBalancer]
-            [[http.services.radarr.loadBalancer.servers]]
-              url = "http://qnap.cloudmason.org:11002/"
-          [http.services.thelounge.loadBalancer]
-            [[http.services.thelounge.loadBalancer.servers]]
-              url = "http://thinkpad.cloudmason.org:9000/"
-          [http.services.qnapweb.loadBalancer]
-            [[http.services.qnapweb.loadBalancer.servers]]
-              url = "http://qnap.cloudmason.org:10000/"
-
-      [tls.options]
-        [tls.options.default]
-          minVersion = "VersionTLS12"
-        [tls.options.mintls13]
-          minVersion = "VersionTLS13"
+      tcp:
+        routers:
+          lenovo-ttyd:
+            rule: HostSNI(`*`)
+            service: lenovo-repl-ttyd
+            entryPoints:
+              - lenovo-replbot-ttyd
+          lenovo-sshd:
+            rule: HostSNI(`*`)
+            service: lenovo-repl-sshd
+            entryPoints:
+              - lenovo-replbot-sshd
+        services:
+          lenovo-replbot-ttyd:
+            loadBalancer:
+              servers:
+                - address: lenovo.cloudmason.org:8383
+          lenovo-replbot-sshd:
+            loadBalancer:
+              servers:
+                - address: lenovo.cloudmason.org:8384
+      http:
+        routers:
+          apex:
+            rule: Host(`cloudmason.org`)
+            service: apex
+            tls:
+              certResolver: myresolver
+              domains:
+                - main: cloudmason.org
+                  sans:
+                    - '*.cloudmason.org'
+          awx:
+            rule: Host(`awx.cloudmason.org`)
+            service: awx
+            tls: {}
+          awx-dev:
+            rule: Host(`awx-dev.cloudmason.org`)
+            service: awx-dev
+            tls: {}
+          opennebula:
+            rule: Host(`opennebula.cloudmason.org`)
+            service: opennebula
+            tls: {}
+          fireedge:
+            rule: Host(`fireedge.cloudmason.org`)
+            service: fireedge
+            tls: {}
+          zabbix:
+            rule: Host(`zabbix.cloudmason.org`)
+            service: zabbix
+            tls: {}
+          concourse:
+            rule: Host(`concourse.cloudmason.org`)
+            service: concourse
+            tls: {}
+          vault:
+            rule: Host(`vault.cloudmason.org`)
+            service: vault
+            tls: {}
+          grafana:
+            rule: Host(`grafana.cloudmason.org`)
+            service: grafana
+            tls: {}
+          prometheus:
+            rule: Host(`prometheus.cloudmason.org`)
+            service: prometheus
+            tls: {}
+          web:
+            rule: Host(`web.cloudmason.org`)
+            service: web
+            tls: {}
+          www:
+            rule: Host(`www.cloudmason.org`)
+            service: www
+            tls: {}
+          unifi:
+            rule: Host(`unifi.cloudmason.org`)
+            service: unifi
+            tls: {}
+          nzbget:
+            rule: Host(`nzbget.cloudmason.org`)
+            service: nzbget
+            tls: {}
+          sonarr:
+            rule: Host(`sonarr.cloudmason.org`)
+            service: sonarr
+            tls: {}
+          radarr:
+            rule: Host(`radarr.cloudmason.org`)
+            service: radarr
+            tls: {}
+          thelounge:
+            rule: Host(`thelounge.cloudmason.org`)
+            service: thelounge
+            tls: {}
+          qnapweb:
+            rule: Host(`qnapweb.cloudmason.org`)
+            service: qnapweb
+            tls: {}
+        middlewares:
+          admin-user:
+            basicAuth:
+              users:
+                - "{{ traefik_admin_username }}:{{ traefik_admin_password }}"
+          zabbix:
+            addPrefix:
+              prefix: /zabbix
+        services:
+          apex:
+            loadBalancer:
+              servers:
+                - url: http://cloudmason.org:8000/
+          awx:
+            loadBalancer:
+              servers:
+                - url: http://awx-service.awx.thinkpad.cloudmason.org:80/
+          awx-dev:
+            loadBalancer:
+              servers:
+                - url: http://awx-dev-service.default.lenovo.cloudmason.org:80/
+          opennebula:
+            loadBalancer:
+              servers:
+                - url: http://thinkpad.cloudmason.org:9869/
+          fireedge:
+            loadBalancer:
+              servers:
+                - url: http://thinkpad.cloudmason.org:2616/
+          zabbix:
+            loadBalancer:
+              servers:
+                - url: http://thinkpad.cloudmason.org:8080/
+          concourse:
+            loadBalancer:
+              servers:
+                - url: http://concourse-web.concourse-main.thinkpad.cloudmason.org:8080/
+          vault:
+            loadBalancer:
+              servers:
+                - url: http://vault-ui.vault-main.thinkpad.cloudmason.org:8200/
+          grafana:
+            loadBalancer:
+              servers:
+                - url: http://thinkpad.cloudmason.org:3000/
+          prometheus:
+            loadBalancer:
+              servers:
+                - url: http://thinkpad.cloudmason.org:9090/
+          web:
+            loadBalancer:
+              servers:
+                - url: http://web.cloudmason.org:8000/
+          www:
+            loadBalancer:
+              servers:
+                - url: http://web.cloudmason.org:8000/
+          unifi:
+            loadBalancer:
+              servers:
+                - url: https://cloudkey2.cloudmason.org:8443/
+          nzbget:
+            loadBalancer:
+              servers:
+                - url: http://qnap.cloudmason.org:11000/
+          sonarr:
+            loadBalancer:
+              servers:
+                - url: http://qnap.cloudmason.org:11001/
+          radarr:
+            loadBalancer:
+              servers:
+                - url: http://qnap.cloudmason.org:11002/
+          thelounge:
+            loadBalancer:
+              servers:
+                - url: http://thinkpad.cloudmason.org:9000/
+          qnapweb:
+            loadBalancer:
+              servers:
+                - url: http://qnap.cloudmason.org:10000/
+      tls:
+        options:
+          default:
+            minVersion: VersionTLS12
+          mintls13:
+            minVersion: VersionTLS13
   notify: restart-traefik
   become: true
 
@@ -258,7 +303,7 @@
       AmbientCapabilities=CAP_NET_BIND_SERVICE
       Type=notify
       Environment=CF_DNS_API_TOKEN={{ traefik_cloudflare_api_key }}
-      ExecStart={{ traefik_home }}/traefik --configFile={{ traefik_home }}/traefik.toml
+      ExecStart={{ traefik_home }}/traefik --configFile={{ traefik_home }}/traefik.yaml
       Restart=always
       WatchdogSec=1s
 
