@@ -79,7 +79,7 @@
 - name: set replbot share-host
   ansible.builtin.replace:
     path: /etc/replbot/config.yml
-    regexp: "^# share-host:$"
+    regexp: "^.*share-host:.*"
     replace: "share-host: {{ web_host }}:{{ share_port }}"
     backup: true
   become: true
