@@ -98,11 +98,11 @@ class CallbackModule(CallbackBase):
     def _runner_on(self, status, result):
         task_uuid = self.current_task_uuid
         self.ansible["results"][task_uuid] = {
-           "uuid": task_uuid,
-           "status": status,
-           "host": result._host,
-           "result": result._result,
-           "task": result._task,
+            "uuid": task_uuid,
+            "status": status,
+            "host": result._host,
+            "result": result._result,
+            "task": result._task,
         }
 
     def v2_runner_on_ok(self, result, **kwargs):
