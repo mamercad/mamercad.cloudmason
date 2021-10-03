@@ -170,8 +170,6 @@ class SlackMessage(object):
         if context:
             self.blocks.append(self._slack_block_context())
 
-        self.print(str(self.blocks), color=C.COLOR_ERROR)
-
     def _slack_text(self):
         pieces = []
 
@@ -215,7 +213,6 @@ class SlackMessage(object):
         }
 
     def send(self):
-        self.print("SlackMessage send", color=C.COLOR_ERROR)
         self.slack.send(text=self._slack_text(), blocks=self.blocks)
 
     def get_blocks(self):
@@ -246,6 +243,8 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).set_options(
             task_keys=task_keys, var_options=var_options, direct=direct
         )
+
+        self.verbosity = self._display.verbosity
 
         self.slack_bot_token = self.get_option("slack_bot_token")
         self.slack_channel = self.get_option("slack_channel")
@@ -286,7 +285,8 @@ class CallbackModule(CallbackBase):
 
 
     def v2_playbook_on_start(self, playbook, **kwargs):
-        self._display.display("v2_playbook_on_start", color=C.COLOR_DEBUG)
+        if self.verbosity >= 3:
+            self._display.display("v2_playbook_on_start", color=C.COLOR_DEBUG)
 
         self.ansible["playbook"]["basedir"] = playbook._basedir
         self.ansible["playbook"]["filename"] = playbook._file_name
@@ -325,7 +325,9 @@ class CallbackModule(CallbackBase):
                 self.slack_messages.push(message)
 
     def v2_playbook_on_play_start(self, play):
-        self._display.display("v2_playbook_on_play_start", color=C.COLOR_DEBUG)
+        if self.verbosity >= 3:
+            self._display.display("v2_playbook_on_play_start", color=C.COLOR_DEBUG)
+
         self.play_uuid = str(play._uuid)
         self.play_name = str(play.name)
 
@@ -350,7 +352,8 @@ class CallbackModule(CallbackBase):
                 self.slack_messages.push(message)
 
     def v2_playbook_on_task_start(self, task, **kwargs):
-        self._display.display("v2_playbook_on_task_start", color=C.COLOR_DEBUG)
+        if self.verbosity:
+            self._display.display("v2_playbook_on_task_start", color=C.COLOR_DEBUG)
 
         self.ansible["tasks"].append(
             {
@@ -394,10 +397,6 @@ class CallbackModule(CallbackBase):
 
         host = result._host
 
-        print = self._display.display
-        print(str(status), color=C.COLOR_ERROR)
-        print(str(result._result), color=C.COLOR_ERROR)
-
         key = None
 
         if "msg" in result._result.keys():
@@ -440,27 +439,32 @@ class CallbackModule(CallbackBase):
             self.slack_messages.push(message)
 
     def v2_runner_on_ok(self, result, *args, **kwargs):
-        self._display.display("v2_runner_on_ok", color=C.COLOR_DEBUG)
+        if self.verbosity >= 3:
+            self._display.display("v2_runner_on_ok", color=C.COLOR_DEBUG)
         if "v2_runner_on_ok" in self.ansible_events:
             self._runner_on("ok", result)
 
     def v2_runner_on_skipped(self, result, *args, **kwargs):
-        self._display.display("v2_runner_on_skipped", color=C.COLOR_DEBUG)
+        if self.verbosity >= 3:
+            self._display.display("v2_runner_on_skipped", color=C.COLOR_DEBUG)
         if "v2_runner_on_skipped" in self.ansible_events:
             self._runner_on("skipped", result)
 
     def v2_runner_on_unreachable(self, result, *args, **kwargs):
-        self._display.display("v2_runner_on_unreachable", color=C.COLOR_DEBUG)
+        if self.verbosity >= 3:
+            self._display.display("v2_runner_on_unreachable", color=C.COLOR_DEBUG)
         if "v2_runner_on_unreachable" in self.ansible_events:
             self._runner_on("unreachable", result)
 
     def v2_runner_on_failed(self, result, *args, **kwargs):
-        self._display.display("v2_runner_on_failed", color=C.COLOR_DEBUG)
+        if self.verbosity >= 3:
+            self._display.display("v2_runner_on_failed", color=C.COLOR_DEBUG)
         if "v2_runner_on_failed" in self.ansible_events:
             self._runner_on("failed", result)
 
     def v2_playbook_on_stats(self, stats, *args, **kwargs):
-        self._display.display("v2_runner_on_stats", color=C.COLOR_DEBUG)
+        if self.verbosity >= 3:
+            self._display.display("v2_runner_on_stats", color=C.COLOR_DEBUG)
         if "v2_playbook_on_stats" in self.ansible_events:
 
             summaries = []
