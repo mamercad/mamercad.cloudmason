@@ -415,8 +415,10 @@ class CallbackModule(CallbackBase):
 
 
         if status == "ok":
-            post += " ⮕ :ballot_box_with_check:"
+            post += " ⮕ :white_check_mark:"
         if status == "failed":
+            post += " ⮕ :x:"
+        if status == "unreachable":
             post += " ⮕ :skull:"
 
         text = {
