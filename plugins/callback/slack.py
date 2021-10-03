@@ -146,7 +146,9 @@ class SlackMessages(object):
         for message in self.messages:
             blocks.append(message.get_blocks())
         flatten_blocks = [item for sublist in blocks for item in sublist]
-        self.slack.send(text="hello world", blocks=flatten_blocks)
+        # self.slack.send(text="hello world", blocks=flatten_blocks)
+        # not sure what to use as text here
+        self.slack.send(blocks=flatten_blocks)
 
 class SlackMessage(object):
     def __init__(self, print, slack, text, context, divider=False, *args, **kwargs):
@@ -174,8 +176,7 @@ class SlackMessage(object):
         pieces = []
 
         if "ts" in self.text:
-            now = datetime.datetime.now()
-            pieces.append(f"{now.hour:02d}:{now.minute:02d}")
+            pieces.append(f"{self.text['ts']}")
 
         if "pre" in self.text:
             pieces.append(f"*{self.text['pre']}*")
@@ -279,6 +280,11 @@ class CallbackModule(CallbackBase):
             self.disabled = True
 
 
+    def _get_ts(self):
+        now = datetime.datetime.now()
+        return f"{now.hour:02d}:{now.minute:02d}"
+
+
     def v2_playbook_on_start(self, playbook, **kwargs):
         self._display.display("v2_playbook_on_start", color=C.COLOR_DEBUG)
 
@@ -292,7 +298,7 @@ class CallbackModule(CallbackBase):
             filename = playbook._file_name
 
             text = {
-                "ts": "",
+                "ts": self._get_ts(),
                 "pre": "PLAYBOOK",
                 "text": "Starting playbook",
                 "post": ":rocket:",
@@ -328,7 +334,7 @@ class CallbackModule(CallbackBase):
 
         if "v2_playbook_on_play_start" in self.ansible_events:
             text = {
-                "ts": "",
+                "ts": self._get_ts(),
                 "pre": "PLAY",
                 "text": self.play_name,
                 "post": "",
@@ -361,7 +367,7 @@ class CallbackModule(CallbackBase):
         if "v2_playbook_on_task_start" in self.ansible_events:
             task_name = str(task.get_name())
             text = {
-                "ts": "",
+                "ts": self._get_ts(),
                 "pre": "TASK",
                 "text": task_name,
                 "post": "",
@@ -415,7 +421,7 @@ class CallbackModule(CallbackBase):
             post += " ⮕ :skull:"
 
         text = {
-            "ts": "",
+            "ts": self._get_ts(),
             "pre": status,
             "text": host,
             "post": post,
@@ -472,7 +478,7 @@ class CallbackModule(CallbackBase):
                 summary_lines += summary["host"] + ": " + summary["stats"] + "\n"
 
             text = {
-                "ts": "",
+                "ts": self._get_ts(),
                 "pre": f"PLAY RECAP",
             }
             context = {
