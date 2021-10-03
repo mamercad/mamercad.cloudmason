@@ -400,6 +400,10 @@ class CallbackModule(CallbackBase):
         else:
             post = f"changed={str(changed).lower()}"
 
+        if status == "ok":
+            post += " ⮕ :ballot_box_with_check:"
+        if status == "failed":
+            post += " ⮕ :skull:"
         text = {
             "pre": status,
             "text": host,
