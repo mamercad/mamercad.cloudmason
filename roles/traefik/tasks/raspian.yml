@@ -138,6 +138,10 @@
                 - main: cloudmason.org
                   sans:
                     - '*.cloudmason.org'
+          ara:
+            rule: Host(`ara.cloudmason.org`)
+            service: ara
+            tls: {}
           awx:
             rule: Host(`awx.cloudmason.org`)
             service: awx
@@ -219,6 +223,10 @@
             loadBalancer:
               servers:
                 - url: http://cloudmason.org:8000/
+          ara:
+            loadBalancer:
+              servers:
+                - url: http://ara-svc.ara.lenovo.cloudmason.org:8000/
           awx:
             loadBalancer:
               servers:
