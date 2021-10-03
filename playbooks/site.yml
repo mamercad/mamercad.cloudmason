@@ -5,6 +5,7 @@
   connection: ssh
   gather_facts: false
   become: false
+  tags: ping
   tasks:
     - name: ping
       action: ping
@@ -14,6 +15,7 @@
   connection: ssh
   gather_facts: true
   become: false
+  tags: powerdns
   tasks:
     - name: include powerdns role (rasbian tasks)
       ansible.builtin.include_role:
@@ -26,6 +28,7 @@
   connection: ssh
   gather_facts: false
   become: false
+  tags: octodns
   tasks:
     - name: include octodns role (wan tasks)
       ansible.builtin.include_role:
@@ -40,6 +43,7 @@
   connection: local
   gather_facts: false
   become: false
+  tags: octodns
   tasks:
     - name: include octodns role (main tasks)
       ansible.builtin.include_role:
@@ -54,6 +58,7 @@
   connection: ssh
   gather_facts: true
   become: false
+  tags: traefik
   tasks:
     - name: include traefik role (rasbian tasks)
       ansible.builtin.include_role:
