@@ -75,6 +75,7 @@ import json
 import yaml
 import requests
 from pprint import pprint
+import datetime
 
 from ansible.plugins.callback import CallbackBase
 from ansible import constants as C
@@ -171,6 +172,10 @@ class SlackMessage(object):
 
     def _slack_text(self):
         pieces = []
+
+        if "ts" in self.text:
+            now = datetime.datetime.now()
+            pieces.append(f"{now.hour:02d}:{now.minute:02d}")
 
         if "pre" in self.text:
             pieces.append(f"*{self.text['pre']}*")
@@ -287,6 +292,7 @@ class CallbackModule(CallbackBase):
             filename = playbook._file_name
 
             text = {
+                "ts": "",
                 "pre": "PLAYBOOK",
                 "text": "Starting playbook",
                 "post": ":rocket:",
@@ -322,6 +328,7 @@ class CallbackModule(CallbackBase):
 
         if "v2_playbook_on_play_start" in self.ansible_events:
             text = {
+                "ts": "",
                 "pre": "PLAY",
                 "text": self.play_name,
                 "post": "",
@@ -354,6 +361,7 @@ class CallbackModule(CallbackBase):
         if "v2_playbook_on_task_start" in self.ansible_events:
             task_name = str(task.get_name())
             text = {
+                "ts": "",
                 "pre": "TASK",
                 "text": task_name,
                 "post": "",
@@ -400,11 +408,14 @@ class CallbackModule(CallbackBase):
         else:
             post = f"changed={str(changed).lower()}"
 
+
         if status == "ok":
             post += " ⮕ :ballot_box_with_check:"
         if status == "failed":
             post += " ⮕ :skull:"
+
         text = {
+            "ts": "",
             "pre": status,
             "text": host,
             "post": post,
@@ -461,6 +472,7 @@ class CallbackModule(CallbackBase):
                 summary_lines += summary["host"] + ": " + summary["stats"] + "\n"
 
             text = {
+                "ts": "",
                 "pre": f"PLAY RECAP",
             }
             context = {
