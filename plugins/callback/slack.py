@@ -3,6 +3,9 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from os import stat
+from re import I
+
 __metaclass__ = type
 
 DOCUMENTATION = """
@@ -34,7 +37,7 @@ DOCUMENTATION = """
           key: slack_channel
     slack_format:
       description: Textual display style.
-      choices: ["plain", "fixed"]
+      choices: ["plain", "fixed", "visual"]
       default: plain
       env:
         - name: SLACK_FORMAT
@@ -71,19 +74,21 @@ DOCUMENTATION = """
 import json
 import yaml
 import requests
+from pprint import pprint
 
 from ansible.plugins.callback import CallbackBase
 from ansible import constants as C
 
+
 class Slack(object):
-    def __init__(self, display, token, channel, threading):
-        self.display = display
+    def __init__(self, print, token, channel, threading):
+        self.print = print
         self.token = token
         self.channel = channel
         self.threading = threading
         self.thread_ts = None
 
-    def post_message(self, **kwargs):
+    def send(self, *args, **kwargs):
         headers = {
             "Authorization": f"Bearer {self.token}",
             "Content-type": "application/json; charset=utf-8",
@@ -94,22 +99,122 @@ class Slack(object):
             **kwargs,
         }
 
-        # if self.threading:
-        #     payload.update({"thread_ts": self.thread_ts})
+        if self.threading:
+            payload.update({"thread_ts": self.thread_ts})
 
         slack = requests.post(
             "https://slack.com/api/chat.postMessage", headers=headers, json=payload
         )
 
-        # if slack.status_code != requests.codes.ok:
-        #     self._display.error(slack.text)
-        # else:
-        response = slack.json()
-        # if response.get("ok", False) is not True:
-        #     self.display.display(slack.text)
-        # else:
-        #     if self.slack_ts is None:
-        #         self.slack_ts = response.get("ts", None)
+        if slack.status_code != requests.codes.ok:
+            self.print(slack.text, color=C.COLOR_ERROR)
+        else:
+            response = slack.json()
+            if response.get("ok", False) is not True:
+                self.print(slack.text, color=C.COLOR_ERROR)
+            else:
+                if self.thread_ts is None:
+                    self.thread_ts = response.get("ts", None)
+                self.print(f"Slack message sent ts={self.thread_ts}", C.COLOR_DEBUG)
+
+
+class SlackMessages(object):
+    def __init__(self, print, slack):
+        self.print = print
+        self.slack = slack
+        self.messages = []
+
+    def __str__(self):
+        return str(self.messages)
+
+    def push(self, message):
+        self.messages.append(message)
+
+    def __iter__(self):
+        self.i = 0
+        return self
+
+    def __next__(self):
+        if self.i < len(self.messages):
+            self.i += 1
+            return self.messages[self.i - 1]
+        raise StopIteration
+
+    def send(self):
+        blocks = []
+        for message in self.messages:
+            blocks.append(message.get_blocks())
+        flatten_blocks = [item for sublist in blocks for item in sublist]
+        self.slack.send(text="hello world", blocks=flatten_blocks)
+
+class SlackMessage(object):
+    def __init__(self, print, slack, text, context, divider=False, *args, **kwargs):
+        self.print = print
+        self.slack = slack
+        self.text = text
+        self.context = context
+        self.divider = divider
+        self.buffered = []
+
+        self.blocks = []
+
+        if divider:
+            self.blocks.append(self._slack_divider())
+
+        if text:
+            self.blocks.append(self._slack_block_section())
+
+        if context:
+            self.blocks.append(self._slack_block_context())
+
+        self.print(str(self.blocks), color=C.COLOR_ERROR)
+
+    def _slack_text(self):
+        pieces = []
+
+        if "pre" in self.text:
+            pieces.append(f"*{self.text['pre']}*")
+
+        if "text" in self.text:
+            pieces.append(f"[ {self.text['text']} ]")
+
+        if "post" in self.text:
+            pieces.append(f"⮕ {self.text['post']}")
+
+        return(" ".join(pieces))
+
+    def _slack_divider(self):
+        return {
+            "type": "divider",
+        }
+
+    def _slack_block_section(self):
+        return {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": str(self._slack_text()),
+            },
+        }
+
+    def _slack_block_context(self):
+        return {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": f"{self.context['text']}",
+                }
+            ],
+        }
+
+    def send(self):
+        self.print("SlackMessage send", color=C.COLOR_ERROR)
+        self.slack.send(text=self._slack_text(), blocks=self.blocks)
+
+    def get_blocks(self):
+        return self.blocks
+
 
 class CallbackModule(CallbackBase):
 
@@ -132,7 +237,9 @@ class CallbackModule(CallbackBase):
         self.current_task_name = None
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super(CallbackModule, self).set_options(
+            task_keys=task_keys, var_options=var_options, direct=direct
+        )
 
         self.slack_bot_token = self.get_option("slack_bot_token")
         self.slack_channel = self.get_option("slack_channel")
@@ -141,9 +248,14 @@ class CallbackModule(CallbackBase):
         self.slack_threading = self.get_option("slack_threading")
         self.ansible_events = self.get_option("ansible_events").split(",")
 
-        self.slack_buffer = []
+        self.slack = Slack(
+            print=self._display.display,
+            token=self.slack_bot_token,
+            channel=self.slack_channel,
+            threading=self.slack_threading,
+        )
 
-        self.slack = Slack(self._display, self.slack_bot_token, self.slack_channel, self.slack_threading)
+        self.slack_messages = SlackMessages(print=self._display.display, slack=self.slack)
 
         if self.slack_bot_token is None:
             self._display.warning(
@@ -161,16 +273,9 @@ class CallbackModule(CallbackBase):
             )
             self.disabled = True
 
-    def _format(self, text, multline=True):
-        if self.slack_format == "fixed":
-            if multline:
-                return(f"```{text}```")
-            else:
-                return(f"`{text}`")
-        else:
-            return(f"{text}")
 
     def v2_playbook_on_start(self, playbook, **kwargs):
+        self._display.display("v2_playbook_on_start", color=C.COLOR_DEBUG)
 
         self.ansible["playbook"]["basedir"] = playbook._basedir
         self.ansible["playbook"]["filename"] = playbook._file_name
@@ -180,35 +285,35 @@ class CallbackModule(CallbackBase):
             plays = str(playbook.get_plays())[1:-1]
             basedir = playbook._basedir
             filename = playbook._file_name
-            text="Starting playbook"
-            blocks = [
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "Starting playbook :rocket:",
-                    }
-                },
-                {
-                    "type": "context",
-                    "elements": [
-                        {
-                            "type": "mrkdwn",
-                            "text": (
-                                f"Directory: {basedir}\n"
-                                f"Filename: {filename}\n"
-                                f"Plays: {plays}\n"
-                            )
-                        }
-                    ]
-                }
-            ]
+
+            text = {
+                "pre": "PLAYBOOK",
+                "text": "Starting playbook",
+                "post": ":rocket:",
+            }
+            context = {
+                "text": (
+                    f"Directory: {basedir}\n"
+                    f"Filename: {filename}\n"
+                    f"Plays: {plays}\n"
+                )
+            }
+
+            message = SlackMessage(
+                print=self._display.display,
+                slack=self.slack,
+                text=text,
+                context=context,
+                divider=True,
+            )
+
             if self.slack_cadence == "realtime":
-                self.slack.post_message(text=text, blocks=blocks)
+                message.send()
             else:
-                self.slack_buffer.append(blocks)
+                self.slack_messages.push(message)
 
     def v2_playbook_on_play_start(self, play):
+        self._display.display("v2_playbook_on_play_start", color=C.COLOR_DEBUG)
         self.play_uuid = str(play._uuid)
         self.play_name = str(play.name)
 
@@ -216,49 +321,52 @@ class CallbackModule(CallbackBase):
         self.current_play_name = self.play_name
 
         if "v2_playbook_on_play_start" in self.ansible_events:
-            text = self._format(f"PLAY [ {self.current_play_name} ]")
-            blocks = [
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": f"{text}",
-                    }
-                }
-            ]
+            text = {
+                "pre": "PLAY",
+                "text": self.play_name,
+                "post": "",
+            }
+
+            message = SlackMessage(
+                print=self._display.display, slack=self.slack, text=text, context={}
+            )
+
             if self.slack_cadence == "realtime":
-                self.slack.post_message(text=text, blocks=blocks)
+                message.send()
             else:
-                self.slack_buffer.append(blocks)
+                self.slack_messages.push(message)
 
     def v2_playbook_on_task_start(self, task, **kwargs):
+        self._display.display("v2_playbook_on_task_start", color=C.COLOR_DEBUG)
 
-        self.ansible["tasks"].append({
-          "uuid": task._uuid,
-          "path": task.get_path(),
-          "role": task._role,
-          "task": task.get_name(),
-        })
+        self.ansible["tasks"].append(
+            {
+                "uuid": task._uuid,
+                "path": task.get_path(),
+                "role": task._role,
+                "task": task.get_name(),
+            }
+        )
 
         self.current_task_uuid = task._uuid
         self.current_task_name = task.get_name()
 
         if "v2_playbook_on_task_start" in self.ansible_events:
             task_name = str(task.get_name())
-            text = self._format(f"TASK [ {task_name} ]")
-            blocks = [
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": f"{text}",
-                    }
-                }
-            ]
+            text = {
+                "pre": "TASK",
+                "text": task_name,
+                "post": "",
+            }
+
+            message = SlackMessage(
+                print=self._display.display, slack=self.slack, text=text, context={}
+            )
+
             if self.slack_cadence == "realtime":
-                self.slack.post_message(text=text, blocks=blocks)
+                message.send()
             else:
-                self.slack_buffer.append(blocks)
+                self.slack_messages.push(message)
 
     def _runner_on(self, status, result):
         task_uuid = self.current_task_uuid
@@ -271,83 +379,97 @@ class CallbackModule(CallbackBase):
         }
 
         host = result._host
-        changed = str(result._result["changed"]).lower()
-        msg = str(result._result["msg"])
-
-        text = self._format(f"{status}: [ {host} ] => changed={changed}")
-        msg = self._format(msg)
-        blocks = [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": (
-                        f"{text}\n"
-                        f"{msg}\n"
-                    )
-                }
-            }
-        ]
-        if self.slack_cadence == "realtime":
-            self.slack.post_message(text=text, blocks=blocks)
-        else:
-            self.slack_buffer.append(blocks)
-
-    def v2_runner_on_ok(self, result, *args, **kwargs):
-        self._runner_on("ok", result)
-        if "v2_runner_on_ok" in self.ansible_events:
-            pass
-
-    def v2_runner_on_skipped(self, result, *args, **kwargs):
-        self._runner_on("skipped", result)
-        if "v2_runner_on_skipped" in self.ansible_events:
-            pass
-
-    def v2_runner_on_unreachable(self, result, *args, **kwargs):
-        self._runner_on("unreachable", result)
-        if "v2_runner_on_unreachable" in self.ansible_events:
-            pass
-
-    def v2_runner_on_failed(self, result, *args, **kwargs):
-        self._runner_on("failed", result)
-        if "v2_runner_on_failed" in self.ansible_events:
-            pass
-
-    def v2_playbook_on_stats(self, stats, *args, **kwargs):
-
-        summaries = []
-        _hosts = sorted(stats.processed.keys())
-        for _host in _hosts:
-            summary = stats.summarize(_host)
-            host = str(_host)
-            statsline = " ".join("{!s}={!r}".format(key, val) for (key, val) in summary.items())
-            summaries.append({"host": host, "stats": statsline})
-
-        summary_lines = "PLAY RECAP\n"
-        for summary in summaries:
-            summary_lines += summary["host"] + ": " + summary["stats"] + "\n"
-
-        text = f"PLAY RECAP"
-        summary_lines = self._format(summary_lines, multline=True)
-        blocks = [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"{summary_lines}"
-                }
-            }
-        ]
-        if self.slack_cadence == "realtime":
-            self.slack.post_message(text=text, blocks=blocks)
-        else:
-            self.slack_buffer.append(blocks)
 
         print = self._display.display
-        blocks = []
-        for b in self.slack_buffer:
-            blocks.append(b[0])
-        self.slack.post_message(blocks=blocks)
+        print(str(status), color=C.COLOR_ERROR)
+        print(str(result._result), color=C.COLOR_ERROR)
 
+        key = None
+
+        if "msg" in result._result.keys():
+            key = "msg"
+        else:
+            # hrm the "first key", definitely not sure about this
+            key = list(result._result.keys())[0]
+
+        msg = str(result._result[key]).strip()
+
+        changed = result._result.get("changed")
+        if changed is None:
+            post = ""
+        else:
+            post = f"changed={str(changed).lower()}"
+
+        text = {
+            "pre": status,
+            "text": host,
+            "post": post,
+        }
+        context = {
+            "text": f"```{key}: {msg}```",
+        }
+
+        message = SlackMessage(
+            print=self._display.display, slack=self.slack, text=text, context=context
+        )
+
+        if self.slack_cadence == "realtime":
+            message.send()
+        else:
+            self.slack_messages.push(message)
+
+    def v2_runner_on_ok(self, result, *args, **kwargs):
+        self._display.display("v2_runner_on_ok", color=C.COLOR_DEBUG)
+        if "v2_runner_on_ok" in self.ansible_events:
+            self._runner_on("ok", result)
+
+    def v2_runner_on_skipped(self, result, *args, **kwargs):
+        self._display.display("v2_runner_on_skipped", color=C.COLOR_DEBUG)
+        if "v2_runner_on_skipped" in self.ansible_events:
+            self._runner_on("skipped", result)
+
+    def v2_runner_on_unreachable(self, result, *args, **kwargs):
+        self._display.display("v2_runner_on_unreachable", color=C.COLOR_DEBUG)
+        if "v2_runner_on_unreachable" in self.ansible_events:
+            self._runner_on("unreachable", result)
+
+    def v2_runner_on_failed(self, result, *args, **kwargs):
+        self._display.display("v2_runner_on_failed", color=C.COLOR_DEBUG)
+        if "v2_runner_on_failed" in self.ansible_events:
+            self._runner_on("failed", result)
+
+    def v2_playbook_on_stats(self, stats, *args, **kwargs):
+        self._display.display("v2_runner_on_stats", color=C.COLOR_DEBUG)
         if "v2_playbook_on_stats" in self.ansible_events:
-            pass
+
+            summaries = []
+            _hosts = sorted(stats.processed.keys())
+            for _host in _hosts:
+                summary = stats.summarize(_host)
+                host = str(_host)
+                statsline = " ".join(
+                    "{!s}={!r}".format(key, val) for (key, val) in summary.items()
+                )
+                summaries.append({"host": host, "stats": statsline})
+
+            summary_lines = ""
+            for summary in summaries:
+                summary_lines += summary["host"] + ": " + summary["stats"] + "\n"
+
+            text = {
+                "pre": f"PLAY RECAP",
+            }
+            context = {
+                "text": f"```{summary_lines}```",
+            }
+
+            message = SlackMessage(
+                print=self._display.display, slack=self.slack, text=text, context=context
+            )
+
+            if self.slack_cadence == "realtime":
+                message.send()
+            else:
+                self.slack_messages.push(message)
+
+            self.slack_messages.send()
