@@ -77,7 +77,7 @@ prometheus:
   ttl: 3600
 cloudkey:
   type: A
-  value: {{ hostvars.cloudkey.ansible_host }}
+  value: {{ hostvars.gateway.eth0 }}
   ttl: 3600
 lenovo:
   type: A
