@@ -170,8 +170,16 @@ class SlackMessage(object):
         if context:
             self.blocks.append(self._slack_block_context())
 
+
+    def _alphabet(self, string):
+        words = string.split(" ")
+        return "".join([f":alphabet-white-{letter.lower()}:" for word in words for letter in list(word)])
+
     def _slack_text(self):
         pieces = []
+
+        if "indent" in self.text:
+            pieces.append(f"{self.text['indent']}")
 
         if "ts" in self.text:
             pieces.append(f"{self.text['ts']}")
@@ -336,6 +344,7 @@ class CallbackModule(CallbackBase):
 
         if "v2_playbook_on_play_start" in self.ansible_events:
             text = {
+                "indent": ":arrow_right:",
                 "ts": self._get_ts(),
                 "pre": "PLAY",
                 "text": self.play_name,
@@ -370,6 +379,7 @@ class CallbackModule(CallbackBase):
         if "v2_playbook_on_task_start" in self.ansible_events:
             task_name = str(task.get_name())
             text = {
+                "indent": ":arrow_right: :arrow_right:",
                 "ts": self._get_ts(),
                 "pre": "TASK",
                 "text": task_name,
@@ -413,7 +423,6 @@ class CallbackModule(CallbackBase):
         else:
             post = f"changed={str(changed).lower()}"
 
-
         if status == "ok":
             post += " ⮕ :white_check_mark:"
         if status == "failed":
@@ -422,6 +431,7 @@ class CallbackModule(CallbackBase):
             post += " ⮕ :skull:"
 
         text = {
+            "indent": ":arrow_right: :arrow_right: :arrow_right:",
             "ts": self._get_ts(),
             "pre": status,
             "text": host,
