@@ -1,0 +1,55 @@
+---
+- name: testing play
+  hosts: "{{ ansible_limit | default('true', 'localhost') }}"
+  connection: "{{ 'local' if (ansible_limit | default('true', 'localhost') == 'localhost') else 'ssh' }}"
+  gather_facts: false
+  become: false
+
+  tasks:
+
+    - name: debug
+      ansible.builtin.debug:
+        msg: debug
+
+    - name: ping
+      ansible.builtin.ping:
+
+    # - name: sleep
+    #   ansible.builtin.pause:
+    #     minutes: 1
+
+    - name: fail
+      ansible.builtin.fail:
+      # when: 3 | random == 1
+
+    # - name: debug
+    #   ansible.builtin.debug:
+    #     msg: debug
+    #   when: inventory_hostname == 'thinkpad5'
+
+    # - name: fail
+    #   ansible.builtin.fail:
+
+#- name: testing2 play
+#  hosts: localhost
+#  connection: local
+#  gather_facts: false
+#  become: false
+#
+#  tasks:
+#
+#    - name: debug
+#      ansible.builtin.debug:
+#        msg: debug
+#
+#- name: testing3 play
+#  hosts: localhost
+#  connection: local
+#  gather_facts: false
+#  become: false
+#
+#  tasks:
+#
+#    - name: role
+#      ansible.builtin.include_role:
+#        name: testing
