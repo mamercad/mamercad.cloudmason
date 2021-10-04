@@ -13,7 +13,11 @@
 
     - name: debug
       ansible.builtin.debug:
-        msg: foo is {{ foo }}
+        msg: foo is {{ foo | default('<undefined>', true) }}
+
+    - name: debug
+      ansible.builtin.debug:
+        msg: bar is {{ bar | default('<undefined>', true) }}
 
     - name: ping
       ansible.builtin.ping:
