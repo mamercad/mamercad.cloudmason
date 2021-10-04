@@ -47,6 +47,12 @@
           organization: Cloudmason
           scm_type: git
           scm_url: https://github.com/mamercad/mamercad.cloudmason.git
+          scm_branch: main
+          scm_allow_override: true
+          scm_clean: true
+          scm_delete_on_update: true
+          scm_update_on_launch: true
+          scm_update_cache_timeout: 3600
       inventories:
         - name: Cloudmason
           description: Cloudmason
@@ -769,6 +775,7 @@
           ask_credential_on_launch: true
           ask_limit_on_launch: true
           limit: localhost
+          ask_variables_on_launch: true
 
   tasks:
 
