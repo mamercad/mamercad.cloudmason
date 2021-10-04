@@ -13,7 +13,7 @@
 
     - name: debug
       ansible.builtin.debug:
-        var: foo is {{ foo }}
+        msg: foo is {{ foo }}
 
     - name: ping
       ansible.builtin.ping:
