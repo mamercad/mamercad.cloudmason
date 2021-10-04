@@ -757,6 +757,18 @@
           ask_credential_on_launch: false
           ask_limit_on_launch: false
           limit: gateway,localhost
+        - name: Cloudmason / sleep
+          job_type: run
+          organization: Cloudmason
+          inventory: Cloudmason
+          ask_inventory_on_launch: true
+          project: Cloudmason
+          playbook: playbooks/sleep.yml
+          credentials:
+            - Cloudmason Machine (awx)
+          ask_credential_on_launch: true
+          ask_limit_on_launch: true
+          limit: localhost
 
   tasks:
 
