@@ -1,0 +1,21 @@
+---
+- name: wait
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+
+  tasks:
+
+    - name: Launch a job
+      awx.awx.tower_job_launch:
+        job_template: Cloudmason / sleep
+        extra_vars:
+          minutes: 1
+      register: job
+
+    - name: Wait for job
+      tower_job_wait:
+        job_id: "{{ job.id }}"
+        timeout: 90
+        interval: 5
