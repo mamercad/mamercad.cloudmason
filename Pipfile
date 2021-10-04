@@ -9,6 +9,7 @@ ansible-lint = "5.0.12"
 
 [dev-packages]
 kubernetes = "18.20.0"
+ara = "1.5.7"
 
 [requires]
 python_version = "3.8"
