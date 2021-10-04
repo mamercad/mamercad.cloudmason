@@ -5,11 +5,15 @@
   gather_facts: false
   become: false
 
+  vars:
+
+    foo: bar
+
   tasks:
 
     - name: debug
       ansible.builtin.debug:
-        msg: debug
+        var: foo is {{ foo }}
 
     - name: ping
       ansible.builtin.ping:
