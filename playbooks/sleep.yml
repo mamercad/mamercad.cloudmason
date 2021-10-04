@@ -1,0 +1,10 @@
+---
+- name: sleep
+  hosts: "{{ ansible_limit | default('all', true) }}"
+  connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
+  gather_facts: false
+  become: false
+  tasks:
+    - name: sleep
+      ansible.builtin.pause:
+        minutes: "{{ minutes | default(1, true) }}"
