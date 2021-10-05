@@ -806,10 +806,10 @@
           organization: Cloudmason
           inventory: Cloudmason
           ask_inventory_on_launch: true
-          project: Ansible Tower Samples
+          project: Ansible Tower Samples / test
           playbook: sleep.yml
           credentials:
-            - Cloudmason Machine (awx)
+            - "Cloudmason Machine (awx)"
           ask_credential_on_launch: true
           ask_limit_on_launch: true
           limit: localhost
