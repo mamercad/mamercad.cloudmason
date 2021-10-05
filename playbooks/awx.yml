@@ -801,6 +801,19 @@
           ask_limit_on_launch: true
           limit: localhost
           ask_variables_on_launch: true
+        - name: Ansible Tower Samples / sleep
+          job_type: run
+          organization: Cloudmason
+          inventory: Cloudmason
+          ask_inventory_on_launch: true
+          project: Ansible Tower Samples
+          playbook: sleep.yml
+          credentials:
+            - Cloudmason Machine (awx)
+          ask_credential_on_launch: true
+          ask_limit_on_launch: true
+          limit: localhost
+          ask_variables_on_launch: true
       execution_environments:
         - name: ansible-ee
           image: quay.io/mamercad/ansible-ee:0.1.0
