@@ -53,6 +53,18 @@
           scm_delete_on_update: true
           scm_update_on_launch: true
           scm_update_cache_timeout: 3600
+        - name: Ansible Tower Samples / test
+          description: Ansible Tower Samples / test
+          organization: Cloudmason
+          scm_type: git
+          scm_url: https://github.com/mamercad/ansible-tower-samples.git
+          scm_branch: test
+          scm_allow_override: true
+          scm_clean: true
+          scm_delete_on_update: true
+          scm_update_on_launch: true
+          scm_update_cache_timeout: 3600
+          default_environment: ansible-ee
       inventories:
         - name: Cloudmason
           description: Cloudmason
@@ -789,6 +801,9 @@
           ask_limit_on_launch: true
           limit: localhost
           ask_variables_on_launch: true
+      execution_environments:
+        - name: ansible-ee
+          image: quay.io/mamercad/ansible-ee:0.1.0
 
   tasks:
 
