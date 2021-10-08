@@ -1,0 +1,15 @@
+---
+- name: unreachable
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  tasks:
+    - name: wait for port to close
+      ansible.builtin.wait_for:
+        host: localhost
+        port: 8000
+        state: stopped
+        delay: 1
+        sleep: 1
+        timeout: 10
