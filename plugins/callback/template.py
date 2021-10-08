@@ -26,8 +26,6 @@ DOCUMENTATION = """
           key: ansible_events
 """
 
-import json
-
 from ansible.plugins.callback import CallbackBase
 from ansible import constants as C
 
