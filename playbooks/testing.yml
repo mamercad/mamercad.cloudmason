@@ -5,13 +5,19 @@
   gather_facts: false
   become: false
 
+  vars:
+
+      xxx: a
+      yyy: b
+      zzz: c
+
   tasks:
 
     - name: debug
       ansible.builtin.debug:
         msg: debug
 
-    - name: vault
-      ansible.builtin.debug:
-        msg: |
-          Hello, Vault {{ lookup('hashi_vault', 'secret=secret/hello') }}
+    # - name: vault
+    #   ansible.builtin.debug:
+    #     msg: |
+    #       Hello, Vault {{ lookup('hashi_vault', 'secret=secret/hello') }}
