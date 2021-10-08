@@ -27,7 +27,6 @@ DOCUMENTATION = """
 """
 
 import json
-from pprint import pprint
 
 from ansible.plugins.callback import CallbackBase
 from ansible import constants as C
