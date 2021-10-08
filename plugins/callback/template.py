@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
   author: Mark Mercado (@mamercad)
-  name: mamercad.cloudmason.template
+  name: template
   type: notification
   requirements:
     - Allow in configuration C(callbacks_enabled = mamercad.cloudmason.template) in C([default]).
@@ -37,7 +37,7 @@ class CallbackModule(CallbackBase):
 
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "aggregate"
-    CALLBACK_NAME = "mamercad.cloudmason.template"
+    CALLBACK_NAME = "template"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
