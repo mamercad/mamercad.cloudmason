@@ -30,20 +30,7 @@ import json
 from pprint import pprint
 
 from ansible.plugins.callback import CallbackBase
-
-
-class Porcelain(object):
-
-    def __init__(self):
-        pass
-
-    def dump(self, parent):
-        print = parent._display.display
-        print("#"*80)
-        playbook = parent.ansible["playbook"]
-        for k in playbook:
-            print(f"{k} ({str(type(playbook[k]))}) {str(playbook[k])}")
-        print("#"*80)
+from ansible import constants as C
 
 
 class CallbackModule(CallbackBase):
@@ -55,106 +42,89 @@ class CallbackModule(CallbackBase):
 
     def __init__(self, display=None):
         super(CallbackModule, self).__init__(display=display)
-        self.ansible = {}
-        self.ansible["playbook"] = {}
-        self.ansible["tasks"] = []
-        self.ansible["results"] = {}  # keyed by task uuid
-        self.ansible["summary"] = {}
+        self.print = self._display.display
+        self.verbosity = self._display.verbosity
 
-        self.current_task_uuid = None
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(
             task_keys=task_keys, var_options=var_options, direct=direct
         )
-        self.porcelain = Porcelain()
-        self.ansible_events = self.get_option("ansible_events").split(",")
+
+    def _all_vars(self, host=None, task=None):
+        # host and task need to be specified in case 'magic variables' (host vars, group vars, etc)
+        # need to be loaded as well
+        return self._play.get_variable_manager().get_vars(
+            play=self._play,
+            host=host,
+            task=task
+        )
 
     def v2_playbook_on_start(self, playbook, **kwargs):
+        self.playbook = playbook
+        self.playbook_file_name = playbook._file_name
 
-        self.ansible["playbook"]["basedir"] = playbook._basedir
-        self.ansible["playbook"]["filename"] = playbook._file_name
-        self.ansible["playbook"]["plays"] = playbook.get_plays()
 
-        if "v2_playbook_on_start" in self.ansible_events:
-            pass
+    def v2_playbook_on_play_start(self, play):
+        self.play = play
+        self.vm = play.get_variable_manager()
+        self.extra_vars = self.vm.extra_vars
+        self.play_vars = self.vm.get_vars(self.play)
+        self.hostvars = self.vm.get_vars()['hostvars']
+
+        # name = play.get_name().strip()
+        # if not name:
+        #     msg = u"play"
+        # else:
+        #     msg = u"PLAY [%s]" % name
+
+        # self._play = play
+
+        # self._display.banner(msg)
+        # self._play = play
+
+        # self._host_total = len(self._all_vars()['vars']['ansible_play_hosts_all'])
+        # self._task_total = len(self._play.get_tasks()[0])
+        # # self.print(str(self._all_vars()), color=C.COLOR_ERROR)
+        # # self.print(str(self._all_vars()['vars']), color=C.COLOR_ERROR)
+        # self.print(str(pprint(self._all_vars()['vars'])), color=C.COLOR_ERROR)
+
+    def v2_playbook_on_include(self, included_file):
+        self.included_file = included_file
 
     def v2_playbook_on_task_start(self, task, **kwargs):
-
-        self.ansible["tasks"].append({
-          "uuid": task._uuid,
-          "path": task.get_path(),
-          "role": task._role,
-          "task": task.get_name(),
-        })
-
-        self.current_task_uuid = task._uuid
-
-        if "v2_playbook_on_task_start" in self.ansible_events:
-            pass
+        self.task = task
 
     def _runner_on(self, status, result):
-        task_uuid = self.current_task_uuid
-        self.ansible["results"][task_uuid] = {
-            "uuid": task_uuid,
-            "status": status,
-            "host": result._host,
-            "result": result._result,
-            "task": result._task,
-        }
+        pass
 
     def v2_runner_on_ok(self, result, **kwargs):
-        self._runner_on("ok", result)
-        if "v2_runner_on_ok" in self.ansible_events:
-            pass
+        # host_vars = self.vm.get_vars()['hostvars'][result._host.name]
+        # self._display.display(pprint(str(host_vars)))
+        pass
 
     def v2_runner_on_skipped(self, result, **kwargs):
-        self._runner_on("skipped", result)
-        if "v2_runner_on_skipped" in self.ansible_events:
-            pass
+        pass
 
     def v2_runner_on_unreachable(self, result, **kwargs):
-        self._runner_on("unreachable", result)
-        if "v2_runner_on_unreachable" in self.ansible_events:
-            pass
+        pass
 
     def v2_runner_on_failed(self, result, **kwargs):
-        self._runner_on("failed", result)
-        if "v2_runner_on_failed" in self.ansible_events:
-            pass
+        pass
 
     def v2_playbook_on_stats(self, stats):
+        pass
+        self.print("============== extra_vars ===============================")
+        self.print(str(self.extra_vars))
+        self.print("============== play_vars ===============================")
+        self.print(str(self.play_vars))
+        self.print("============== hostvars ===============================")
+        self.print(str(self.hostvars))
 
-        _hosts = sorted(stats.processed.keys())
-        for _host in _hosts:
-            summary = stats.summarize(_host)
-            host = str(_host)
-            self.ansible["summary"][host] = summary
-
-        #     print("====")
-        #     print(str(summary))
-        #     statsline = " ".join(
-        #         "{!s}={!r}".format(key, val) for (key, val) in summary.items()
-        #     )
-        #     print(str(statsline))
-        #     # stats.append(f"{_host} : {_statsline}")
-
-        print = self._display.display
-
-        print("==== PLAYBOOK ====")
-        print(str(self.ansible["playbook"]))
-
-        print("==== TASKS ====")
-        for task in self.ansible["tasks"]:
-          print(str(task))
-
-        print("==== RESULTS ====")
-        for result in self.ansible["results"]:
-          print(str(result))
-          print(str(self.ansible["results"][result]))
-
-        print("==== SUMMARY ====")
-        print(str(self.ansible["summary"]))
-
-        if "v2_playbook_on_stats" in self.ansible_events:
-            pass
+        self.print("=======================================================")
+        if "xxx" in self.extra_vars:
+            self.print(f"extra_vars {self.extra_vars['xxx']}")
+        elif "xxx" in self.play_vars:
+            self.print(f"play_vars {self.play_vars['xxx']}")
+        else:
+            self.print("no")
