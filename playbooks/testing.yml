@@ -14,4 +14,4 @@
     - name: vault
       ansible.builtin.debug:
         msg: |
-          Hello, Vault {{ lookup('community.general.hashi_vault', 'secret=secret/hello') }}
+          Hello, Vault {{ lookup('hashi_vault', 'secret=secret/hello') }}
