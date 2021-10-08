@@ -5,59 +5,13 @@
   gather_facts: false
   become: false
 
-  vars:
-
-    foo: bar
-
   tasks:
 
     - name: debug
       ansible.builtin.debug:
-        msg: foo is {{ foo | default('<undefined>', true) }}
+        msg: debug
 
-    - name: debug
+    - name: vault
       ansible.builtin.debug:
-        msg: bar is {{ bar | default('<undefined>', true) }}
-
-    - name: ping
-      ansible.builtin.ping:
-
-    # - name: sleep
-    #   ansible.builtin.pause:
-    #     minutes: 1
-
-    - name: fail
-      ansible.builtin.fail:
-      # when: 3 | random == 1
-
-    # - name: debug
-    #   ansible.builtin.debug:
-    #     msg: debug
-    #   when: inventory_hostname == 'thinkpad5'
-
-    # - name: fail
-    #   ansible.builtin.fail:
-
-#- name: testing2 play
-#  hosts: localhost
-#  connection: local
-#  gather_facts: false
-#  become: false
-#
-#  tasks:
-#
-#    - name: debug
-#      ansible.builtin.debug:
-#        msg: debug
-#
-#- name: testing3 play
-#  hosts: localhost
-#  connection: local
-#  gather_facts: false
-#  become: false
-#
-#  tasks:
-#
-#    - name: role
-#      ansible.builtin.include_role:
-#        name: testing
+        msg: |
+          Hello, Vault {{ lookup('hashi_vault', 'secret=secret/hello') }}
