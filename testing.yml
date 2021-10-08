@@ -1,0 +1,23 @@
+---
+- name: testing play
+  hosts: "{{ ansible_limit | default('true', 'localhost') }}"
+  connection: "{{ 'local' if (ansible_limit | default('true', 'localhost') == 'localhost') else 'ssh' }}"
+  gather_facts: false
+  become: false
+
+  vars:
+
+      xxx: a
+      yyy: b
+      zzz: c
+
+  tasks:
+
+    - name: debug
+      ansible.builtin.debug:
+        msg: debug
+
+    # - name: vault
+    #   ansible.builtin.debug:
+    #     msg: |
+    #       Hello, Vault {{ lookup('hashi_vault', 'secret=secret/hello') }}
