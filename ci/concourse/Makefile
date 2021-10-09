@@ -21,8 +21,8 @@ fly-pipelines:
 fly-set-pipelines:
 	fly -t cloudmason set-pipeline \
 		--pipeline hello --config pipelines/hello.yml \
-		--var github-access-token="$(shell cat ~/.concourse-github-access-token)" \
-		--var slack-webhook="$(shell cat ~/.concourse-slack-webhook)" \
+		--var github-access-token="$(shell lpass show Homelab\Concourse/Github --password)" \
+		--var slack-webhook="$(shell lpass show Homelab\Concourse/Slack --password)" \
 		--non-interactive
 
 fly-unpause-pipelines:
