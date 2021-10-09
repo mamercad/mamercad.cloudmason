@@ -1,6 +1,6 @@
 ---
 - name: tailscale
-  hosts: lenovo
+  hosts: ubuntu
   connection: ssh
   gather_facts: true
   become: false
