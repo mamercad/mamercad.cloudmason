@@ -6,6 +6,7 @@
     group: unifi
     mode: 0755
 
+# https://www.amandablevins.com/blog/2021/3/4/configuring-ubiquiti-unifi-gear-for-starlink
 - name: deploy wan2_failover config (config.gateway.json)
   ansible.builtin.copy:
     dest: /srv/unifi/data/sites/default/config.gateway.json
@@ -35,46 +36,48 @@
               }
             }
           },
-          "source-validation": "disable",
-          "interfaces": {
-            "ethernet": {
-              "eth0": {
-                "dhcp-options": {
-                  "default-route": "update"
-                },
-                "duplex": "auto",
-                "speed": "auto"
+          "source-validation": "disable"
+        },
+        "interfaces": {
+          "ethernet": {
+            "eth0": {
+              "dhcp-options": {
+                "default-route": "update"
               },
-              "eth1": {
-                "duplex": "auto",
-                "speed": "auto"
+              "duplex": "auto",
+              "speed": "auto"
+            },
+            "eth1": {
+              "duplex": "auto",
+              "speed": "auto"
+            },
+            "eth2": {
+              "dhcp-options": {
+                "default-route": "update"
               },
-              "eth2": {
-                "dhcp-options": {
-                  "default-route": "update"
-                },
-                "duplex": "auto",
-                "speed": "auto"
-              }
+              "duplex": "auto",
+              "speed": "auto"
             }
           }
         },
         "load-balance": {
-          "wan2_failover": {
-            "flush-on-active": "disable",
-            "interface": {
-              "eth0": {
-                "failover-only": "''"
+          "group": {
+            "wan2_failover": {
+              "flush-on-active": "disable",
+              "interface": {
+                "eth0": {
+                  "failover-only": "''"
+                },
+                "eth2": "''"
               },
-              "eth2": "''"
+              "lb-local": "enable",
+              "lb-local-metric-change": "enable"
             },
-            "lb-local": "enable",
-            "lb-local-metric-change": "enable"
-          },
-          "wan_failover": {
-            "flush-on-active": "disable",
-            "lb-local": "enable",
-            "lb-local-metric-change": "enable"
+            "wan_failover": {
+              "flush-on-active": "disable",
+              "lb-local": "enable",
+              "lb-local-metric-change": "enable"
+            }
           }
         }
       }
