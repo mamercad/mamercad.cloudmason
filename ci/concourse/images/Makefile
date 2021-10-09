@@ -1,10 +1,12 @@
-.PHONY: build
+.PHONY: login build push
+
+.DEFAULT_GOAL := push
+
+login:
+	docker login --username mamercad --password "$(lpass show 'Homelab\Ansible/Vault' --password)"
 
 build:
 	docker build -t mamercad/alpine-ansible:latest .
 
-login:
-	docker login --username mamercad --password "$(cat ~/.vault-pass)"
-
-push:
+push: build
 	docker push mamercad/alpine-ansible:latest
