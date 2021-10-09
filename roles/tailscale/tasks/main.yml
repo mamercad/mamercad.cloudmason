@@ -17,10 +17,9 @@
     update_cache: true
   become: true
 
-# this drops and auth link to the screen, not sure what to do right now
-# - name: tailscale up
-#   ansible.builtin.command: tailscale up
-#   become: true
+- name: tell user to run tailscape up
+  ansible.builtin.pause:
+    prompt: run "sudo tailscale up" and auth
 
 - name: get tailscale ip  # noqa no-changed-when
   ansible.builtin.command: tailscale ip -4
