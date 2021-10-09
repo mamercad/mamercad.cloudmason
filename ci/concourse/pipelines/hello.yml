@@ -24,7 +24,7 @@ resources:
 
 jobs:
 
-  - name: test
+  - name: lint
     public: true
     plan:
 
@@ -72,7 +72,7 @@ jobs:
     plan:
 
       - get: source
-        passed: ['test']
+        passed: ['lint']
         trigger: true
 
       - task: ansible
