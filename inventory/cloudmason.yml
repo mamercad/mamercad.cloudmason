@@ -12,6 +12,10 @@ all:
       ansible_user: mamercad
       ansible_python_interpreter: /usr/bin/python
       interfaces: ['eth0', 'eth1', 'eth2']
+    usg:
+      ansible_host: 192.168.1.1
+      ansible_network_os: vyos.vyos.vyos
+      ansible_user: mamercad
     minecraft1:
       ansible_host: 192.168.1.74
       ansible_user: ubuntu
