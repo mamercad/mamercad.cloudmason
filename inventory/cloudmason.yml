@@ -151,8 +151,16 @@ all:
         thinkpad:
   vars:
     me:
+      user: mark
+      group: mark
+      groups:
+        - adm
+        - sudo
+      home: /home/mark
+      full_name: Mark Mercado
       email:
         personal: mamercad@gmail.com
+      shell: /usr/bin/zsh
     network:
       domain: cloudmason.org
       gateway: 192.168.1.1
