@@ -22,7 +22,7 @@
 #   ansible.builtin.command: tailscale up
 #   become: true
 
-- name: get tailscale ip
+- name: get tailscale ip  # noqa no-changed-when
   ansible.builtin.command: tailscale ip -4
   become: true
   register: tailscale_ip

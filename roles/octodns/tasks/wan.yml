@@ -6,7 +6,7 @@
     loop_var: interface
   register: addresses
 
-- name: set facts
+- name: set facts  # noqa var-naming
   ansible.builtin.set_fact:
     "{{ item.interface }}": "{{ item.stdout | trim }}"
   loop: "{{ addresses.results }}"
