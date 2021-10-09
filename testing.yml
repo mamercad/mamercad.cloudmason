@@ -13,9 +13,10 @@
 
   tasks:
 
-    - name: debug
-      ansible.builtin.debug:
-        msg: |
+    - name: pause
+      ansible.builtin.pause:
+        seconds: 0
+        prompt: |
           xxx: {{ xxx }}
           yyy: {{ yyy }}
           zzz: {{ zzz }}
