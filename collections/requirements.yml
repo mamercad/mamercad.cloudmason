@@ -7,6 +7,8 @@ collections:
     version: 3.6.0
   - name: kubernetes.core
     version: 2.1.1
+  - name: vyos.vyos
+    version: 2.0.0
   # - name: https://github.com/TerryHowe/ansible-modules-hashivault.git
   #   type: git
   #   version: 4.6.4
