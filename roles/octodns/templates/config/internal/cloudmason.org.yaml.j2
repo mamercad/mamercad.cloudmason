@@ -21,12 +21,15 @@ alexa2:
 alexa3:
   type: A
   value: 192.168.1.80
-ringbasestation:
-  type: A
-  value: 192.168.1.122
 alexa5:
   type: A
   value: 192.168.1.57
+alexa6:
+  type: A
+  value: 192.168.1.56
+alexa7:
+  type: A
+  value: 192.168.1.71
 alexashow1:
   type: A
   value: 192.168.1.124
@@ -45,21 +48,12 @@ awx-dev:
 awx-dev-service.default.lenovo:
   type: A
   value: 192.168.1.241
-opennebula:
-  type: CNAME
-  value: net.cloudmason.org.
-fireedge:
-  type: CNAME
-  value: net.cloudmason.org.
-traefik.kube-system.thinkpad:
-  type: A
-  value: 192.168.1.200
-awx.lenovo:
-  type: A
-  value: 192.168.1.242
 awx-service.awx.thinkpad:
   type: A
   value: 192.168.1.201
+awx.lenovo:
+  type: A
+  value: 192.168.1.242
 basement:
   type: A
   value: 192.168.1.63
@@ -72,6 +66,9 @@ bedroom:
 biaslighting:
   type: A
   value: 192.168.1.149
+boomer:
+  type: A
+  value: 192.168.1.106
 buddyipad:
   type: A
   value: 192.168.1.97
@@ -81,9 +78,6 @@ buddyiphone:
 buddyrokutv:
   type: A
   value: 192.168.1.55
-sunfire:
-  type: A
-  value: 192.168.1.50
 buddyxboxx:
   type: A
   value: 192.168.1.101
@@ -123,26 +117,20 @@ concourse:
 concourse-web.concourse-main.thinkpad:
   type: A
   value: 192.168.1.202
-vault:
-  type: CNAME
-  value: net.cloudmason.org.
-vault-ui.vault-main.thinkpad:
-  type: A
-  value: 192.168.1.204
 db2:
   type: A
   value: 192.168.1.107
 db3:
   type: A
   value: 192.168.1.137
+diningroom:
+  type: A
+  value: 192.168.1.87
 dns:
   type: A
   values:
     - 192.168.1.10
     - 192.168.1.11
-diningroom:
-  type: A
-  value: 192.168.1.87
 docker:
   type: CNAME
   value: net.cloudmason.org.
@@ -152,15 +140,21 @@ docker.lenovo:
 familyroom:
   type: A
   value: 192.168.1.120
+fireedge:
+  type: CNAME
+  value: net.cloudmason.org.
 fuji:
   type: A
   value: 192.168.1.51
-gala-wireless:
-  type: A
-  value: 192.168.1.138
+gala:
+  type: CNAME
+  value: gala-wired.cloudmason.org.
 gala-wired:
   type: A
   value: 192.168.1.73
+gala-wireless:
+  type: A
+  value: 192.168.1.138
 garagedoor:
   type: A
   value: 192.168.1.121
@@ -176,6 +170,9 @@ honeycrisp:
 indiphone:
   type: A
   value: 192.168.1.58
+jira:
+  type: CNAME
+  value: cloudmason.atlassian.net.
 jonagold:
   type: A
   value: 192.168.1.110
@@ -191,12 +188,6 @@ juderokutv:
 judeswitch:
   type: A
   value: 192.168.1.94
-alexa7:
-  type: A
-  value: 192.168.1.71
-alexa6:
-  type: A
-  value: 192.168.1.56
 judeypc:
   type: A
   value: 192.168.1.77
@@ -206,9 +197,6 @@ kiali:
 lenovo:
   type: A
   value: 192.168.1.98
-maryipad:
-  type: A
-  value: 192.168.1.115
 livingroomtv:
   type: A
   value: 192.168.1.112
@@ -223,6 +211,9 @@ markrog:
 markxboxone:
   type: A
   value: 192.168.1.47
+maryipad:
+  type: A
+  value: 192.168.1.115
 maryipad2:
   type: A
   value: 192.168.1.83
@@ -232,21 +223,18 @@ maryiphone:
 marymacbook:
   type: A
   value: 192.168.1.162
-boomer:
-  type: A
-  value: 192.168.1.106
 marypcwifi:
   type: A
   value: 192.168.1.90
 maryrog:
   type: A
   value: 192.168.1.100
-minecraft:
-  type: CNAME
-  value: thinkpad.cloudmason.org.
 minecraf1:
   type: A
   value: 192.168.1.74
+minecraft:
+  type: CNAME
+  value: thinkpad.cloudmason.org.
 nest:
   type: A
   value: 192.168.1.76
@@ -297,18 +285,24 @@ ooma:
 openhab:
   type: A
   value: 192.168.1.20
+opennebula:
+  type: CNAME
+  value: net.cloudmason.org.
 plugoutside2:
   type: A
   value: 192.168.1.98
 printer:
   type: A
   value: 192.168.1.134
-prometheus:
-  type: CNAME
-  value: net.cloudmason.org.
 prodesk:
   type: A
   value: 192.168.1.127
+prometheus:
+  type: CNAME
+  value: net.cloudmason.org.
+pws:
+  type: A
+  value: 192.168.1.49
 qnap:
   type: A
   values:
@@ -329,6 +323,9 @@ radarr:
 retroarcade:
   type: A
   value: 192.168.1.103
+ringbasestation:
+  type: A
+  value: 192.168.1.122
 ringbridge:
   type: A
   value: 192.168.1.133
@@ -340,7 +337,7 @@ rog-wifi:
   value: 192.168.1.102
 rokubedroom:
   type: A
-  value: 192.168.1.123
+  value: 192.168.1.43
 rokufamilyroom:
   type: A
   value: 192.168.1.135
@@ -356,9 +353,6 @@ sense:
 smarthub:
   type: A
   value: 192.168.1.41
-pws:
-  type: A
-  value: 192.168.1.49
 smartplug2:
   type: A
   value: 192.168.1.132
@@ -382,9 +376,18 @@ smtp:
 sonarr:
   type: CNAME
   value: net.cloudmason.org.
+statsd:
+  type: CNAME
+  value: statsd-svc.statsd.thinkpad.cloudmason.org.
+statsd-svc.statsd.thinkpad:
+  type: A
+  value: 192.168.1.205
 streamlabs:
   type: A
   value: 192.168.1.86
+sunfire:
+  type: A
+  value: 192.168.1.50
 switch1:
   type: A
   value: 192.168.1.95
@@ -400,9 +403,6 @@ switch4:
 thelounge:
   type: CNAME
   value: net.cloudmason.org.
-gala:
-  type: CNAME
-  value: gala-wired.cloudmason.org.
 thinkpad:
   type: CNAME
   value: thinkpad-wired.cloudmason.org.
@@ -412,19 +412,28 @@ thinkpad-wired:
 thinkpad-wireless:
   type: A
   value: 192.168.1.139
+traefik:
+  type: CNAME
+  value: net.cloudmason.org.
+traefik.kube-system.thinkpad:
+  type: A
+  value: 192.168.1.200
 unifi:
   type: CNAME
   value: cloudkey.cloudmason.org.
 valheim:
   type: CNAME
   value: thinkpad.cloudmason.org.
+vault:
+  type: CNAME
+  value: net.cloudmason.org.
+vault-ui.vault-main.thinkpad:
+  type: A
+  value: 192.168.1.204
 web:
   type: CNAME
   value: net.cloudmason.org.
 www:
-  type: CNAME
-  value: net.cloudmason.org.
-traefik:
   type: CNAME
   value: net.cloudmason.org.
 wyzeback:
@@ -436,12 +445,3 @@ wyzefront:
 zabbix:
   type: CNAME
   value: net.cloudmason.org.
-statsd-svc.statsd.thinkpad:
-  type: A
-  value: 192.168.1.205
-statsd:
-  type: CNAME
-  value: statsd-svc.statsd.thinkpad.cloudmason.org.
-jira:
-  type: CNAME
-  value: cloudmason.atlassian.net.
