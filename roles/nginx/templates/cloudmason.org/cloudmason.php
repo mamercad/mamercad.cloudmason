@@ -78,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <!-- <li class="nav-item"><a class="nav-link" href="/sabnzbd">Sabnzbd</a></li> -->
       <li class="nav-item"><a class="nav-link" href="https://github.com/mamercad/">GitHub</a></li>
       <li class="nav-item"><a class="nav-link" href="https://mamercad.github.io/">Blog</a></li>
+      <li class="nav-item"><a class="nav-link" href="https://cloudkey.cloudmason.org:8443/">UniFi</a></li>
+      <li class="nav-item"><a class="nav-link" href="https://dash.cloudflare.com/">Cloudflare</a></li>
+      <li class="nav-item"><a class="nav-link" href="https://login.tailscale.com/">Tailscale</a></li>
       <li class="nav-item"><a class="nav-link" href="weather.php">PWS</a></li>
     </ul>
     <form class="form-inline my-2 my-lg-0">
