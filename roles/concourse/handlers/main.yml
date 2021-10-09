@@ -1,0 +1,2 @@
+- name: restart-concourse
+  ansible.builtin.command: kubectl --context {{ context }} --namespace concourse-main rollout restart deployment concourse-web
