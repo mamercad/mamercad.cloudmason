@@ -1,0 +1,63 @@
+- name: ensure mark group exists
+  ansible.builtin.group:
+    state: present
+    name: "{{ me.group }}"
+  become: true
+
+- name: ensure mark user exists
+  ansible.builtin.user:
+    name: "{{ me.user }}"
+    comment: "{{ me.full_name }}"
+    group: "{{ me.group }}"
+    home: "{{ me.home }}"
+    shell: "{{ me.shell }}"
+    groups: "{{ me.groups }}"
+    append: true
+    password: "{{ lookup('community.general.lastpass', 'Personal/password', field='notes') }}"
+  become: true
+
+- name: give mark passwordless sudo
+  ansible.builtin.copy:
+    content: "{{ me.user }} ALL=(ALL:ALL) NOPASSWD:ALL"
+    dest: /etc/sudoers.d/{{ me.user }}
+    mode: 0440
+  become: true
+
+- name: create ~mark/.ssh
+  ansible.builtin.file:
+    state: directory
+    path: "{{ me.home }}/.ssh"
+    owner: "{{ me.user }}"
+    group: "{{ me.group }}"
+    mode: 0700
+  become: true
+
+- name: deploy ~mark/.ssh/authorized_keys
+  ansible.builtin.copy:
+    dest: "{{ me.home }}/.ssh/authorized_keys"
+    backup: true
+    owner: "{{ me.user }}"
+    group: "{{ me.group }}"
+    mode: 0644
+    content: "{{ lookup('community.general.lastpass', 'Personal/ssh.key.pub', field='notes') }}\n"
+  become: true
+
+- name: deploy ~mark/.ssh/personal.key.pub
+  ansible.builtin.copy:
+    dest: "{{ me.home }}/.ssh/personal.key.pub"
+    backup: true
+    owner: "{{ me.user }}"
+    group: "{{ me.group }}"
+    mode: 0644
+    content: "{{ lookup('community.general.lastpass', 'Personal/ssh.key.pub', field='notes') }}\n"
+  become: true
+
+- name: deploy ~mark/.ssh/personal.key
+  ansible.builtin.copy:
+    dest: "{{ me.home }}/.ssh/personal.key"
+    backup: true
+    owner: "{{ me.user }}"
+    group: "{{ me.group }}"
+    mode: 0600
+    content: "{{ lookup('community.general.lastpass', 'Personal/ssh.key', field='notes') }}\n"
+  become: true
