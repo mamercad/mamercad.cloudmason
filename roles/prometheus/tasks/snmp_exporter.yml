@@ -18,6 +18,7 @@
     path: /opt/prometheus/snmp_exporter
     owner: prometheus
     group: prometheus
+    mode: 0755
   become: true
 
 - name: deploy snmp_exporter binary to /opt/prometheus/snmp_exporter

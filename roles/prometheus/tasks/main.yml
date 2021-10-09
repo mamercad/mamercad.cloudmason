@@ -26,6 +26,7 @@
     state: directory
     owner: prometheus
     group: prometheus
+    mode: 0755
   become: true
 
 - name: unarchive prometheus tarball
@@ -172,6 +173,9 @@
 - name: deploy prometheus systemd unit
   ansible.builtin.copy:
     dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: 0644
     content: |
       [Unit]
       Description=Prometheus
