@@ -1,0 +1,25 @@
+---
+
+- name: unifi
+  hosts: unifi,&gateway
+  tags: usg
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: usg
+      ansible.builtin.include_role:
+        name: unifi
+        tasks_from: usg.yml
+
+- name: unifi
+  hosts: unifi,&cloudkey
+  tags: cloudkey
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: usg
+      ansible.builtin.include_role:
+        name: unifi
+        tasks_from: cloudkey.yml
