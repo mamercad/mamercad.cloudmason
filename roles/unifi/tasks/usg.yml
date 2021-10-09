@@ -1,0 +1,16 @@
+- name: mca-ctrl -t dump-cfg
+  ansible.builtin.shell:
+    cmd: |
+      pwd
+      mca-ctrl -t dump-cfg >config.txt 2>&1
+      ls -l config.txt
+
+- name: download config.txt
+  ansible.builtin.fetch:
+    src: config.txt
+    dest: fetch
+
+- name: download config.boot
+  ansible.builtin.fetch:
+    src: /config/config.boot
+    dest: fetch

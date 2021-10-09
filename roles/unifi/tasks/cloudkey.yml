@@ -1,0 +1,7 @@
+- name: ensure /srv/unifi/data/sites/default exists
+  ansible.builtin.file:
+    state: directory
+    path: /srv/unifi/data/sites/default
+    owner: unifi
+    group: unifi
+    mode: 0755
