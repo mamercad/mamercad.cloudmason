@@ -5,3 +5,76 @@
     owner: unifi
     group: unifi
     mode: 0755
+
+- name: deploy wan2_failover config (config.gateway.json)
+  ansible.builtin.copy:
+    dest: /srv/unifi/data/sites/default/config.gateway.json
+    backup: true
+    owner: unifi
+    group: unifi
+    mode: 0644
+    content: |
+      {
+        "firewall": {
+          "ip-src-route": "disable",
+          "ipv6-receive-redirects": "disable",
+          "ipv6-src-route": "disable",
+          "log-martians": "enable",
+          "modify": {
+            "LOAD_BALANCE": {
+              "rule": {
+                "2501": {
+                  "action": "modify",
+                  "modify": {
+                    "lb-group": "wan2_failover"
+                  },
+                  "source": {
+                    "address": "192.168.15.0/24"
+                  }
+                }
+              }
+            }
+          },
+          "source-validation": "disable",
+          "interfaces": {
+            "ethernet": {
+              "eth0": {
+                "dhcp-options": {
+                  "default-route": "update"
+                },
+                "duplex": "auto",
+                "speed": "auto"
+              },
+              "eth1": {
+                "duplex": "auto",
+                "speed": "auto"
+              },
+              "eth2": {
+                "dhcp-options": {
+                  "default-route": "update"
+                },
+                "duplex": "auto",
+                "speed": "auto"
+              }
+            }
+          }
+        },
+        "load-balance": {
+          "wan2_failover": {
+            "flush-on-active": "disable",
+            "interface": {
+              "eth0": {
+                "failover-only": "''"
+              },
+              "eth2": "''"
+            },
+            "lb-local": "enable",
+            "lb-local-metric-change": "enable"
+          },
+          "wan_failover": {
+            "flush-on-active": "disable",
+            "lb-local": "enable",
+            "lb-local-metric-change": "enable"
+          }
+        }
+      }
