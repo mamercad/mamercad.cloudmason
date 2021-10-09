@@ -11,6 +11,7 @@ ansible-lint = "5.0.12"
 kubernetes = "18.20.0"
 ara = "1.5.7"
 ansible-builder = "1.0.1"
+paramiko = "2.7.2"
 
 [requires]
 python_version = "3.8"
