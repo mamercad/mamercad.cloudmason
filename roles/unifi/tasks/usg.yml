@@ -1,4 +1,4 @@
-- name: mca-ctrl -t dump-cfg
+- name: mca-ctrl -t dump-cfg  # noqa no-changed-when
   ansible.builtin.shell:
     cmd: |
       pwd
