@@ -1,0 +1,7 @@
+- name: vyos
+  vyos.vyos.vyos_command:
+    commands:
+      - show interfaces
+      - show firewall
+      - show load-balance status
+      - show load-balance watchdog
