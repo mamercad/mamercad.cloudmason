@@ -1,0 +1,24 @@
+---
+- name: ubuntu
+  hosts: ubuntu
+  connection: ssh
+  gather_facts: true
+  become: false
+
+  tasks:
+
+    - name: include latest
+      when: latest | default(false, true)
+      ansible.builtin.include_role:
+        name: ubuntu
+        tasks_from: latest.yml
+
+    - name: include packages
+      ansible.builtin.include_role:
+        name: ubuntu
+        tasks_from: packages.yml
+
+    - name: include user
+      ansible.builtin.include_role:
+        name: ubuntu
+        tasks_from: user.yml
