@@ -60,4 +60,5 @@
     group: "{{ me.group }}"
     mode: 0600
     content: "{{ lookup('community.general.lastpass', 'Personal/ssh.key', field='notes') }}\n"
+  no_log: true
   become: true
