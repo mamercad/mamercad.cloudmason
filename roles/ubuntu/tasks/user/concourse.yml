@@ -1,0 +1,57 @@
+- name: ensure concourse group exists
+  ansible.builtin.group:
+    state: present
+    name: concourse
+  become: true
+
+- name: ensure concourse user exists
+  ansible.builtin.user:
+    name: concourse
+    comment: Concourse CI
+    group: concourse
+    home: /home/concourse
+    shell: /bin/bash
+    # groups: concourse
+    # append: true
+    password: "{{ lookup('community.general.lastpass', 'Homelab\\Concourse/Password', field='password') }}"
+  become: true
+
+- name: create ~concourse/.ssh
+  ansible.builtin.file:
+    state: directory
+    path: /home/concourse/.ssh
+    owner: concourse
+    group: concourse
+    mode: 0700
+  become: true
+
+- name: deploy ~concourse/.ssh/authorized_keys
+  ansible.builtin.copy:
+    dest: "/home/concourse/.ssh/authorized_keys"
+    backup: true
+    owner: concourse
+    group: concourse
+    mode: 0644
+    content: "{{ lookup('community.general.lastpass', 'Homelab\\Concourse/concourse.key.pub', field='notes') }}\n"
+  become: true
+
+- name: deploy ~concourse/.ssh/id_rsa.pub
+  ansible.builtin.copy:
+    dest: "/home/concourse/.ssh/id_rsa.pub"
+    backup: true
+    owner: concourse
+    group: concourse
+    mode: 0644
+    content: "{{ lookup('community.general.lastpass', 'Homelab\\Concourse/concourse.key.pub', field='notes') }}\n"
+  become: true
+
+- name: deploy ~concourse/.ssh/is_rsa
+  ansible.builtin.copy:
+    dest: "/home/concourse/.ssh/id_rsa"
+    backup: true
+    owner: concourse
+    group: concourse
+    mode: 0600
+    content: "{{ lookup('community.general.lastpass', 'Homelab\\Concourse/concourse.key', field='notes') }}\n"
+  no_log: true
+  become: true
