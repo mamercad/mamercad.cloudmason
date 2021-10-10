@@ -68,3 +68,7 @@
     msg: |
       CONCOURSE_VAULT_AUTH_BACKEND="approle"
       CONCOURSE_VAULT_AUTH_PARAM="role_id:{{ roleid.data.role_id }},secret_id:{{ accessor.data.secret_id }}"
+
+- name: set a fact for auth_param
+  ansible.builtin.set_fact:
+    vault_auth_param: "role_id:{{ roleid.data.role_id }},secret_id:{{ accessor.data.secret_id }}"
