@@ -37,13 +37,6 @@
       vars:
         context: thinkpad
         helm_values:
-          replicas: 1
-          web:
-            service:
-              api:
-                type: LoadBalancer
-              workerGateway:
-                type: LoadBalancer
           concourse:
             web:
               externalUrl: https://concourse.cloudmason.org
@@ -53,13 +46,20 @@
                 mainTeam:
                   localUser: "test,mark"
               enableRedactSecrets: true
-              vault:
-                enabled: true
-                url: https://vault.cloudmason.org
-                pathPrefix: concourse
-                authBackend: token
-                useAuthParam: true
-            secrets:
-              create: true
-              localUsers: "test:{{ password }},mark:{{ password }}"
-              vaultAuthParam: "{{ vault_auth_param }}"
+            vault:
+              enabled: true
+              url: https://vault.cloudmason.org
+              pathPrefix: concourse
+              authBackend: approle
+              useAuthParam: true
+          web:
+            replicas: 1
+            service:
+              api:
+                type: LoadBalancer
+              workerGateway:
+                type: LoadBalancer
+          secrets:
+            create: true
+            localUsers: "test:{{ password }},mark:{{ password }}"
+            vaultAuthParam: "{{ vault_auth_param }}"
