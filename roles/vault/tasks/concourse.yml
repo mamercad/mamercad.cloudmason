@@ -1,0 +1,70 @@
+- name: configure vault for concourse
+  ansible.builtin.shell: |
+    vault secrets enable -version=2 -path=concourse kv
+  register: enable
+  failed_when: "'path is already' not in enable.stderr"
+  changed_when: "'path is already' not in enable.stderr"
+
+- name: create concourse policy
+  ansible.builtin.copy:
+    dest: /tmp/concourse-policy.hcl
+    owner: mark
+    group: staff
+    mode: 0644
+    content: |
+      path "concourse/*" {
+        policy = "read"
+      }
+
+- name: configure vault for concourse
+  ansible.builtin.shell: |
+    vault policy write concourse /tmp/concourse-policy.hcl
+  register: policy
+  failed_when: "'Success! Uploaded policy' not in policy.stdout"
+  changed_when: "'Success! Uploaded policy' not in policy.stdout"
+
+- name: enable approle for vault
+  ansible.builtin.shell: |
+    vault auth enable approle
+  register: approle
+  failed_when: "'path is already' not in approle.stderr"
+  changed_when: "'path is already' not in approle.stderr"
+
+- name: write concourse approle
+  ansible.builtin.shell: |
+    vault write auth/approle/role/concourse policies=concourse period=1h
+  register: auth
+  failed_when: "'Success! Data written' not in auth.stdout"
+  changed_when: "'Success! Data written' not in auth.stdout"
+
+- name: read concourse approle
+  ansible.builtin.shell: |
+    vault read -format=json auth/approle/role/concourse/role-id
+  register: roleid
+  failed_when: roleid.rc != 0
+  changed_when: roleid.rc != 0
+
+- name: set a fact for the roleid
+  ansible.builtin.set_fact:
+    roleid: "{{ roleid.stdout }}"
+
+- name: debug
+  ansible.builtin.debug:
+    var: roleid
+
+- name: write concourse approle auth
+  ansible.builtin.shell: |
+    vault write -format=json -f auth/approle/role/concourse/secret-id
+  register: auth
+  failed_when: auth.rc != 0
+  changed_when: auth.rc != 0
+
+- name: set a fact for the auth
+  ansible.builtin.set_fact:
+    accessor: "{{ auth.stdout }}"
+
+- name: debug
+  ansible.builtin.debug:
+    msg: |
+      CONCOURSE_VAULT_AUTH_BACKEND="approle"
+      CONCOURSE_VAULT_AUTH_PARAM="role_id:{{ roleid.data.role_id }},secret_id:{{ accessor.data.secret_id }}"
