@@ -14,6 +14,7 @@
       30636163646163363763353462303866633134356431393264333535623861393836393962356239
       3762363437363862640a663034326230633838356462666132326261393032623463373864643733
       6538
+
     local_users: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       62653031366138646261333433313839323336663835663865363963366636303764636161356437
@@ -23,6 +24,12 @@
       33373461396164653138336137626138313763653533626430326232623465393335
 
   tasks:
+
+    - name: include vault role (concourse tasks)
+      ansible.builtin.include_role:
+        name: vault
+        tasks_from: concourse.yml
+
     - name: include concourse role (main tasks)
       ansible.builtin.include_role:
         name: concourse
@@ -46,6 +53,12 @@
                 mainTeam:
                   localUser: "test,mark"
               enableRedactSecrets: true
+              vault:
+                enabled: true
+                url: https://vault.cloudmason.org
+                pathPrefix: concourse
+                authBackend: token
             secrets:
               create: true
               localUsers: "test:{{ password }},mark:{{ password }}"
+              vaultAuthParam: "{{ vault_auth_param }}"
