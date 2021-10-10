@@ -49,7 +49,7 @@ jobs:
                 stty cols 120
                 source /venv/bin/activate
                 cd source
-                ansible-lint -vv
+                ansible-lint -v
         on_success:
           put: notify
           params:
