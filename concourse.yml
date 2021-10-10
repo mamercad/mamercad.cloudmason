@@ -45,6 +45,7 @@
               auth:
                 mainTeam:
                   localUser: "test,mark"
+              enableRedactSecrets: true
             secrets:
               create: true
               localUsers: "test:{{ password }},mark:{{ password }}"
