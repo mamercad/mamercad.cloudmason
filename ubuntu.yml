@@ -18,7 +18,12 @@
         name: ubuntu
         tasks_from: packages.yml
 
-    - name: include user
+    - name: include user (mark)
       ansible.builtin.include_role:
         name: ubuntu
-        tasks_from: user.yml
+        tasks_from: user/mark.yml
+
+    - name: include user (concourse)
+      ansible.builtin.include_role:
+        name: ubuntu
+        tasks_from: user/concourse.yml
