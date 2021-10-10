@@ -31,14 +31,3 @@
     update_repo_cache: true
     disable_hook: true
     values: "{{ helm_values }}"
-
-- name: patch the local-users secret
-  kubernetes.core.k8s:
-    state: patched
-    kind: Secret
-    name: concourse-web
-    namespace: concourse-main
-    definition:
-      data:
-        local-users: "{{ local_users | b64encode }}"
-  notify: restart-concourse
