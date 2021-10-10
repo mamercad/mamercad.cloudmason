@@ -32,7 +32,7 @@
 
 - name: write concourse approle
   ansible.builtin.shell: |
-    vault write auth/approle/role/concourse policies=concourse period=1h
+    vault write auth/approle/role/concourse policies=concourse period=768h
   register: auth
   failed_when: "'Success! Data written' not in auth.stdout"
   changed_when: "'Success! Data written' not in auth.stdout"
