@@ -18,7 +18,3 @@
           ui:
             enabled: true
             serviceType: LoadBalancer
-    - name: include vault role (concourse tasks)
-      ansible.builtin.include_role:
-        name: vault
-        tasks_from: concourse.yml
