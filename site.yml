@@ -1,7 +1,7 @@
 ---
 
 - name: ping
-  hosts: all
+  hosts: all:!unifi_aps
   connection: ssh
   gather_facts: false
   become: false
@@ -9,6 +9,16 @@
   tasks:
     - name: ping
       action: ping
+
+- name: uptime
+  hosts: unifi_aps
+  connection: ssh
+  gather_facts: false
+  become: false
+  tags: uptime
+  tasks:
+    - name: uptime
+      raw: uptime
 
 # - name: powerdns
 #   hosts: powerdns

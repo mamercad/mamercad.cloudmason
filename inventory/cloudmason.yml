@@ -3,6 +3,18 @@ all:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: "{{ lookup('ansible.builtin.pipe', 'which python3') }}"
+    basement:
+      ansible_host: 192.168.1.63
+      ansible_user: mamercad
+    bedroom:
+      ansible_host: 192.168.1.124
+      ansible_user: mamercad
+    diningroom:
+      ansible_host: 192.168.1.87
+      ansible_user: mamercad
+    familyroom:
+      ansible_host: 192.168.1.120
+      ansible_user: mamercad
     cloudkey:
       ansible_host: 192.168.1.3
       ansible_python_interpreter: /usr/bin/python
@@ -101,6 +113,16 @@ all:
       hosts:
         cloudkey:
         gateway:
+        basement:
+        bedroom:
+        diningroom:
+        familyroom:
+    unifi_aps:
+      hosts:
+        basement:
+        bedroom:
+        diningroom:
+        familyroom:
     ubuntu:
       hosts:
         lenovo:
