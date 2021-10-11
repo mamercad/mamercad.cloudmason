@@ -1,11 +1,11 @@
 ---
 
-resource_types:
+# resource_types:
 
-  - name: slack-alert
-    type: docker-image
-    source:
-      repository: arbourd/concourse-slack-alert-resource
+#   - name: slack-alert
+#     type: docker-image
+#     source:
+#       repository: arbourd/concourse-slack-alert-resource
 
 
 resources:
@@ -24,14 +24,14 @@ resources:
 
 jobs:
 
-  - name: lint
+  - name: site
     public: true
     plan:
 
       - get: source
         trigger: true
 
-      - task: ansible
+      - task: lint
         config:
           inputs:
             - name: source
@@ -75,7 +75,30 @@ jobs:
         passed: ['lint']
         trigger: true
 
+      # - task: ssh-key
+      #   params:
+      #     # vault kv put concourse/main/hello SSH_KEY="$(lpass show 'Homelab\Concourse/concourse.key' --notes)"
+      #     SSH_KEY: ((hello.SSH_KEY))
+      #   config:
+      #     platform: linux
+      #     image_resource:
+      #       type: registry-image
+      #       source: { repository: busybox }
+      #     run:
+      #       path: sh
+      #       args:
+      #         - -exc
+      #         - |
+      #           touch ./files/concourse.key
+      #           chmod 600 ./files/concourse.key
+      #           echo "${SSH_KEY}" >./files/concourse.key
+      #     outputs:
+      #       - name: files
+
       - task: ansible
+        params:
+          # vault kv put concourse/main/site CONCOURSE_SSH_KEY="$(lpass show 'Homelab\Concourse/concourse.key' --notes)"
+          CONCOURSE_SSH_KEY: ((site.CONCOURSE_SSH_KEY))
         config:
           inputs:
             - name: source
@@ -91,9 +114,18 @@ jobs:
               - -exc
               - |
                 stty cols 120
+
+                touch concourse.key
+                chmod 600 concourse.key
+                echo "${CONCOURSE_SSH_KEY}" >concourse.key
+                eval $(ssh-agent)
+                ssh-add concourse.key
+                ssh-add -l
+
                 source /venv/bin/activate
                 cd source
-                ansible-playbook -i inventory/cloudmason.yml playbooks/ping.yml -l localhost -v
+                ansible -i inventory/concourse.yml -m ping all
+                ansible-playbook -i inventory/concourse.yml site.yml -v
 
         on_success:
           put: notify
