@@ -12,7 +12,7 @@
 
 - name: install tailscale
   ansible.builtin.apt:
-    state: present
+    state: latest
     name: tailscale
     update_cache: true
   become: true
@@ -20,12 +20,22 @@
 - name: tell user to run tailscape up
   ansible.builtin.pause:
     prompt: run "sudo tailscale up" and auth
+    seconds: 10
+
+- name: show tailscale version
+  ansible.builtin.command: tailscale version
+  register: tailscale_version
+  changed_when: "'tailscale commit' not in tailscale_version.stdout"
 
 - name: get tailscale ip  # noqa no-changed-when
   ansible.builtin.command: tailscale ip -4
   become: true
   register: tailscale_ip
+  changed_when: "'100.' not in tailscale_ip.stdout"
 
-- name: show tailscale ip
+- name: show tailscale version and ip
   ansible.builtin.debug:
-    msg: "{{ tailscale_ip.stdout }}"
+    msg: |
+      Tailscale
+      Version: {{ tailscale_version.stdout }}
+      IP: {{ tailscale_ip.stdout }}
