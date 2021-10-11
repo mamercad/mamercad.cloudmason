@@ -21,10 +21,14 @@ fly-pipelines:
 fly-set-pipelines:
 	fly -t cloudmason set-pipeline \
 		--pipeline hello --config pipelines/hello.yml \
-		--var github-access-token="$(shell lpass show Homelab\Concourse/Github --password)" \
-		--var slack-webhook="$(shell lpass show Homelab\Concourse/Slack --password)" \
 		--non-interactive
 
 fly-unpause-pipelines:
 	fly -t cloudmason unpause-pipeline \
 		--pipeline hello
+
+fly-trigger-deploy:
+	fly -t cloudmason trigger-job -j hello/deploy
+
+fly-destroy-pipelines:
+	fly -t cloudmason destroy-pipeline -p hello
