@@ -24,7 +24,7 @@ resources:
 
 jobs:
 
-  - name: site
+  - name: lint
     public: true
     plan:
 
