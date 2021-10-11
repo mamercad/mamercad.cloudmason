@@ -55,3 +55,10 @@
     content: "{{ lookup('community.general.lastpass', 'Homelab\\Concourse/concourse.key', field='notes') }}\n"
   no_log: true
   become: true
+
+- name: give concourse passwordless sudo
+  ansible.builtin.copy:
+    content: "concourse ALL=(ALL:ALL) NOPASSWD:ALL"
+    dest: /etc/sudoers.d/concourse
+    mode: 0440
+  become: true
