@@ -5,6 +5,7 @@ all:
       ansible_python_interpreter: "{{ lookup('ansible.builtin.pipe', 'which python3') }}"
     prodesk:
       ansible_host: 192.168.1.127
+      ansible_user: concourse
       ansible_python_interpreter: /usr/bin/python3
   children:
     linux:
