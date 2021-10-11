@@ -14,16 +14,19 @@
         tasks_from: latest.yml
 
     - name: include packages
+      when: packages | default(false, true)
       ansible.builtin.include_role:
         name: ubuntu
         tasks_from: packages.yml
 
     - name: include user (mark)
+      when: mark | default(false, true)
       ansible.builtin.include_role:
         name: ubuntu
         tasks_from: user/mark.yml
 
     - name: include user (concourse)
+      when: concourse | default(false, true)
       ansible.builtin.include_role:
         name: ubuntu
         tasks_from: user/concourse.yml
