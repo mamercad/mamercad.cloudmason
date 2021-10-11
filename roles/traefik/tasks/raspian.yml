@@ -166,10 +166,12 @@
             rule: Host(`concourse.cloudmason.org`)
             service: concourse
             tls: {}
+            middlewares: ['internal-only']
           vault:
             rule: Host(`vault.cloudmason.org`)
             service: vault
             tls: {}
+            middlewares: ['internal-only']
           grafana:
             rule: Host(`grafana.cloudmason.org`)
             service: grafana
@@ -215,6 +217,10 @@
             basicAuth:
               users:
                 - "{{ traefik_admin_username }}:{{ traefik_admin_password }}"
+          internal-only:
+            ipWhiteList:
+              sourceRange:
+                - "192.168.1.0/24"
           zabbix:
             addPrefix:
               prefix: /zabbix
