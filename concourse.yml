@@ -7,7 +7,7 @@
 
   vars:
 
-    password: !vault |
+    user_password: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       30316139393930313339633633646131366165643538333262396635333930386462313863646339
       3961653365663262366364396564383730633061636535380a313936313430636239313562386463
@@ -15,22 +15,42 @@
       3762363437363862640a663034326230633838356462666132326261393032623463373864643733
       6538
 
-    local_users: !vault |
+    # vault_auth_param: role_id:...,secret_id:...
+    vault_auth_param: !vault |
       $ANSIBLE_VAULT;1.1;AES256
-      62653031366138646261333433313839323336663835663865363963366636303764636161356437
-      3834623236613336643532666137376631373435343437300a656363663966616263346431363331
-      62386664313565363063656338613034663336626331323630663136623034356135643832313430
-      6535613864376334650a313932613563663335363439343265323866393238303266643333336233
-      33373461396164653138336137626138313763653533626430326232623465393335
+      30353866643637343534373037643532326338336233316338303234366265333137363237333738
+      6536613235613135373766363739313236653465353265660a366564643134313531366233343235
+      65613366663339366333333664343131666661613731313132393962373062303035356636326166
+      6137626636633739310a666137613162313961616666366365643332383530346238323637323161
+      35373563343439643765343531393065393137343433643535376336346336656261326361393864
+      66326436373730353632393534353262353331616464623764353961623836386636386632306561
+      34393038323263356439346632613639653634326636336265333661386333343931616334313735
+      37616665343964626435396362396139633065353663643634396233343634646165323261616262
+      3133
+
+    vault_token: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      32313861343561343035613936336531366435653733623339363061653333396632336565666138
+      3532643130303664613439383938333834653035623331330a613537363835393833643833363835
+      63616164393463396636373135363061666537623465613266343165326139656462333035353561
+      3836353463633936360a313032643061616639336236396164646364366137353764386336313562
+      38643962323136663162393830303133383661336162343234373034333334333637
 
   tasks:
 
     - name: include vault role (concourse tasks)
+      when: vault | default(false, true)
       ansible.builtin.include_role:
         name: vault
         tasks_from: concourse.yml
 
+    - name: debug
+      when: infra | default(false, true)
+      ansible.builtin.debug:
+        var: vault_auth_param
+
     - name: include concourse role (main tasks)
+      when: infra | default(false, true)
       ansible.builtin.include_role:
         name: concourse
         tasks_from: main.yml
@@ -46,12 +66,16 @@
                 mainTeam:
                   localUser: "test,mark"
               enableRedactSecrets: true
-            vault:
-              enabled: true
-              url: https://vault.cloudmason.org
-              pathPrefix: concourse
-              authBackend: approle
-              useAuthParam: true
+              vault:
+                enabled: true
+                url: https://vault.cloudmason.org
+                pathPrefix: concourse
+                sharedPath: concourse
+                # authBackend: approle
+                # useAuthParam: true
+                # useAuthParam: false
+                useAuthParam: false
+                authBackend: token
           web:
             replicas: 1
             service:
@@ -61,5 +85,6 @@
                 type: LoadBalancer
           secrets:
             create: true
-            localUsers: "test:{{ password }},mark:{{ password }}"
-            vaultAuthParam: "{{ vault_auth_param }}"
+            localUsers: "test:{{ user_password }},mark:{{ user_password }}"
+            # vaultAuthParam: "{{ vault_auth_param }}"
+            vaultClientToken: "{{ vault_token }}"
