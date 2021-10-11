@@ -79,6 +79,14 @@ cloudkey:
   type: A
   value: {{ hostvars.gateway.eth0 }}
   ttl: 3600
+vault:
+  type: A
+  value: {{ hostvars.gateway.eth0 }}
+  ttl: 3600
+concourse:
+  type: A
+  value: {{ hostvars.gateway.eth0 }}
+  ttl: 3600
 lenovo:
   type: A
   value: {{ hostvars.lenovo.ansible_host }}
