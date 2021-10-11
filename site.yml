@@ -10,58 +10,58 @@
     - name: ping
       action: ping
 
-- name: powerdns
-  hosts: powerdns
-  connection: ssh
-  gather_facts: true
-  become: false
-  tags: powerdns
-  tasks:
-    - name: include powerdns role (rasbian tasks)
-      ansible.builtin.include_role:
-        name: powerdns
-        tasks_from: raspian.yml
-      when: ansible_architecture == "armv7l"
+# - name: powerdns
+#   hosts: powerdns
+#   connection: ssh
+#   gather_facts: true
+#   become: false
+#   tags: powerdns
+#   tasks:
+#     - name: include powerdns role (rasbian tasks)
+#       ansible.builtin.include_role:
+#         name: powerdns
+#         tasks_from: raspian.yml
+#       when: ansible_architecture == "armv7l"
 
-- name: wan
-  hosts: gateway
-  connection: ssh
-  gather_facts: false
-  become: false
-  tags: octodns
-  tasks:
-    - name: include octodns role (wan tasks)
-      ansible.builtin.include_role:
-        name: octodns
-        tasks_from: wan.yml
-        apply:
-          tags: wan
-      tags: always
+# - name: wan
+#   hosts: gateway
+#   connection: ssh
+#   gather_facts: false
+#   become: false
+#   tags: octodns
+#   tasks:
+#     - name: include octodns role (wan tasks)
+#       ansible.builtin.include_role:
+#         name: octodns
+#         tasks_from: wan.yml
+#         apply:
+#           tags: wan
+#       tags: always
 
-- name: octodns
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  become: false
-  tags: octodns
-  tasks:
-    - name: include octodns role (main tasks)
-      ansible.builtin.include_role:
-        name: octodns
-        tasks_from: main.yml
-      vars:
-        doit: true
-      tags: always
+# - name: octodns
+#   hosts: localhost
+#   connection: local
+#   gather_facts: false
+#   become: false
+#   tags: octodns
+#   tasks:
+#     - name: include octodns role (main tasks)
+#       ansible.builtin.include_role:
+#         name: octodns
+#         tasks_from: main.yml
+#       vars:
+#         doit: true
+#       tags: always
 
-- name: traefik
-  hosts: traefik
-  connection: ssh
-  gather_facts: true
-  become: false
-  tags: traefik
-  tasks:
-    - name: include traefik role (rasbian tasks)
-      ansible.builtin.include_role:
-        name: traefik
-        tasks_from: raspian.yml
-      when: ansible_architecture == "armv7l"
+# - name: traefik
+#   hosts: traefik
+#   connection: ssh
+#   gather_facts: true
+#   become: false
+#   tags: traefik
+#   tasks:
+#     - name: include traefik role (rasbian tasks)
+#       ansible.builtin.include_role:
+#         name: traefik
+#         tasks_from: raspian.yml
+#       when: ansible_architecture == "armv7l"
