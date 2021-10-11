@@ -1,5 +1,9 @@
 ---
 
+# vault kv put concourse/main/site \
+#   SLACK_WEBHOOK="$(lpass show 'Homelab\Concourse/Slack' --notes)" \
+#   CONCOURSE_SSH_KEY="$(lpass show 'Homelab\Concourse/concourse.key' --notes)"
+
 resource_types:
 
   - name: slack-alert
@@ -19,7 +23,7 @@ resources:
   - name: notify
     type: slack-alert
     source:
-      url: ((slack-webhook))
+      url: ((site.SLACK_WEBHOOK))
 
 jobs:
 
@@ -76,7 +80,6 @@ jobs:
 
       - task: ansible
         params:
-          # vault kv put concourse/main/site CONCOURSE_SSH_KEY="$(lpass show 'Homelab\Concourse/concourse.key' --notes)"
           CONCOURSE_SSH_KEY: ((site.CONCOURSE_SSH_KEY))
         config:
           inputs:
