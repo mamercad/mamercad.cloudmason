@@ -1,12 +1,11 @@
 ---
 
-# resource_types:
+resource_types:
 
-#   - name: slack-alert
-#     type: docker-image
-#     source:
-#       repository: arbourd/concourse-slack-alert-resource
-
+  - name: slack-alert
+    type: docker-image
+    source:
+      repository: arbourd/concourse-slack-alert-resource
 
 resources:
 
@@ -74,26 +73,6 @@ jobs:
       - get: source
         passed: ['lint']
         trigger: true
-
-      # - task: ssh-key
-      #   params:
-      #     # vault kv put concourse/main/hello SSH_KEY="$(lpass show 'Homelab\Concourse/concourse.key' --notes)"
-      #     SSH_KEY: ((hello.SSH_KEY))
-      #   config:
-      #     platform: linux
-      #     image_resource:
-      #       type: registry-image
-      #       source: { repository: busybox }
-      #     run:
-      #       path: sh
-      #       args:
-      #         - -exc
-      #         - |
-      #           touch ./files/concourse.key
-      #           chmod 600 ./files/concourse.key
-      #           echo "${SSH_KEY}" >./files/concourse.key
-      #     outputs:
-      #       - name: files
 
       - task: ansible
         params:
