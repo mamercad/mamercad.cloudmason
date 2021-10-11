@@ -10,7 +10,7 @@
     repo: deb https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main
   become: true
 
-- name: install tailscale
+- name: install tailscale  # noqa package-latest
   ansible.builtin.apt:
     state: latest
     name: tailscale
