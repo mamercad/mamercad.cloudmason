@@ -1,0 +1,14 @@
+---
+- name: awx
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+
+  tasks:
+
+    - name: organizations
+      ansible.builtin.include_role:
+        name: awx
+        tasks_from: organizations.yml
+        vars_from: organizations.yml
