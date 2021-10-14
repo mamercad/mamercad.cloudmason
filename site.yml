@@ -8,7 +8,7 @@
   tags: ping
   tasks:
     - name: ping
-      action: ping
+      ansible.builtin.ping:
 
 - name: uptime
   hosts: unifi_aps
@@ -18,7 +18,9 @@
   tags: uptime
   tasks:
     - name: uptime
-      raw: uptime
+      ansible.builtin.raw: uptime
+      register: uptime
+      changed_when: '"load average" not in uptime.stdout'
 
 # - name: powerdns
 #   hosts: powerdns

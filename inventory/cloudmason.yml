@@ -28,10 +28,6 @@ all:
       ansible_host: 192.168.1.1
       ansible_network_os: vyos.vyos.vyos
       ansible_user: mamercad
-    minecraft1:
-      ansible_host: 192.168.1.74
-      ansible_user: ubuntu
-      ansible_python_interpreter: /usr/bin/python3
     net1:
       ansible_host: 192.168.1.10
       ansible_python_interpreter: /usr/bin/python3
@@ -71,19 +67,6 @@ all:
     prodesk:
       ansible_host: 192.168.1.127
       ansible_python_interpreter: /usr/bin/python3
-    sunfire:
-      ansible_host: 192.168.1.50
-      ansible_user: root
-      ansible_python_interpreter: /usr/bin/python3
-      healthchecks_io: !vault |
-        $ANSIBLE_VAULT;1.1;AES256
-        32636461373936663732353534643432616432316563316231386635666130306637326566633637
-        3762383232323237633532306335333765663936633466360a613133353936643162366264666231
-        31353463646434346435326335356665656632323331303965356530333466363030616638363462
-        3064653064363563350a666563393536636237383438643236313963613865333934343637323461
-        62353533613833373766303266643933326338663135363031356630363435616464336130626631
-        36353231663133366131626333306431316565623631353239653735613065383935643830313961
-        353361646261326235303361356236343964
     thinkpad:
       ansible_host: 192.168.1.67
       ansible_python_interpreter: /usr/bin/python3
@@ -155,7 +138,7 @@ all:
         thinkpad:
     grafana_servers:
       hosts:
-        grafana:
+        thinkpad:
     prometheus_clients:
       hosts:
         net1:
