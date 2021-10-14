@@ -18,3 +18,9 @@
         name: awx
         tasks_from: teams.yml
         vars_from: teams.yml
+
+    - name: users
+      ansible.builtin.include_role:
+        name: awx
+        tasks_from: users.yml
+        vars_from: users.yml

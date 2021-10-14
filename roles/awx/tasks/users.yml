@@ -1,0 +1,11 @@
+- name: create users
+  awx.awx.tower_user:
+    state: present
+    username: "{{ item.username }}"
+    first_name: "{{ item.first_name }}"
+    last_name: "{{ item.last_name }}"
+    email: "{{ item.email }}"
+    is_superuser: "{{ item.is_superuser }}"
+    password: "{{ item.password }}"
+  loop: "{{ users | default([], true) }}"
+  no_log: true

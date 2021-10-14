@@ -1,0 +1,7 @@
+users:
+  - username: mark
+    first_name: Mark
+    last_name: Mercado
+    email: mamercad@gmail.com
+    is_superuser: true
+    password: "{{ lookup('community.general.hashi_vault', 'secret=concourse/main/awx/users/mark:password' }}"
