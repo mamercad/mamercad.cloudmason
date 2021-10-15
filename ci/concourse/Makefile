@@ -20,15 +20,15 @@ fly-pipelines:
 
 fly-set-pipelines:
 	fly -t cloudmason set-pipeline \
-		--pipeline site --config pipelines/site.yml \
+		--pipeline awx --config pipelines/awx.yml \
 		--non-interactive
 
 fly-unpause-pipelines:
 	fly -t cloudmason unpause-pipeline \
-		--pipeline site
+		--pipeline awx
 
 fly-trigger-deploy:
-	fly -t cloudmason trigger-job -j site/deploy
+	fly -t cloudmason trigger-job -j awx/deploy
 
 fly-destroy-pipelines:
-	fly -t cloudmason destroy-pipeline -p site
+	fly -t cloudmason destroy-pipeline -p awx
