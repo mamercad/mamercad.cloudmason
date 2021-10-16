@@ -1,0 +1,12 @@
+---
+- name: raspbian
+  hosts: raspbian
+  connection: ssh
+  gather_facts: false
+  become: false
+
+  tasks:
+
+    - name: ubuntu
+      ansible.builtin.include_role:
+        name: ubuntu
