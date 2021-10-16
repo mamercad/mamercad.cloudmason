@@ -1,17 +1,17 @@
 ---
 
-- name: Download the release
-  get_url:
-    url: https://github.com/k3s-io/k3s/releases/download/{{ k3s.version }}/k3s
+- name: download the release
+  ansible.builtin.get_url:
+    url: https://github.com/k3s-io/k3s/releases/download/{{ version }}/{{ binary }}
     dest: /tmp/k3s
-    checksum: sha256:{{ k3s.sha256 }}
+    checksum: sha256:{{ sha256 }}
     owner: root
     group: root
     mode: 0755
   become: true
 
-- name: Move the release
-  copy:
+- name: move the release
+  ansible.builtin.copy:
     src: /tmp/k3s
     remote_src: true
     dest: /usr/local/bin/k3s
@@ -20,8 +20,8 @@
     mode: 0755
   become: true
 
-- name: Deploy the unit
-  template:
+- name: deploy the unit
+  ansible.builtin.template:
     src: k3s.service.j2
     dest: /etc/systemd/system/k3s.service
     owner: root
@@ -29,21 +29,23 @@
     mode: 0644
   become: true
 
-- name: Start and enable
-  systemd:
+- name: start and enable
+  ansible.builtin.systemd:
     name: k3s
     state: started
     enabled: true
   become: true
 
-- name: Fetch the kubeconfig
+- name: fetch the kubeconfig
   ansible.builtin.slurp:
     src: /etc/rancher/k3s/k3s.yaml
   become: true
   register: kubeconfig
+  when: fetch_kubeconfig | default(false, true)
 
-- name: Write the kubeconfig
+- name: show the kubeconfig
   ansible.builtin.pause:
     minutes: 0
     prompt: "{{ kubeconfig.content | b64decode }}"
   delegate_to: localhost
+  when: fetch_kubeconfig | default(false, true)
