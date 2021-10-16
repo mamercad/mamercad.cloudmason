@@ -107,6 +107,9 @@ all:
         39313862653436383861336562343835366637623135333638386631356363663465316162303262
         35643330336363643062633839646631653535653335653536373162663061636561613439323161
         653964326634313535613339363438356566
+    gala:
+      ansible_host: 192.168.1.73
+      ansible_python_interpreter: /usr/bin/python3
   children:
     clusterpi:
       hosts:
@@ -159,6 +162,7 @@ all:
         switch4:
     ubuntu:
       hosts:
+        gala:
         lenovo:
         net1:
         net2:
@@ -194,8 +198,11 @@ all:
         grafana:
     prometheus_clients:
       hosts:
+        gala:
+        lenovo:
         net1:
         net2:
+        prodesk:
         thinkpad:
     snmp_targets:
       hosts:
