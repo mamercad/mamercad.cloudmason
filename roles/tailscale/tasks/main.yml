@@ -20,7 +20,6 @@
 - name: tell user to run tailscape up
   ansible.builtin.pause:
     prompt: run "sudo tailscale up" and auth
-    seconds: 10
 
 - name: show tailscale version
   ansible.builtin.command: tailscale version
