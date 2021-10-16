@@ -1,0 +1,7 @@
+powerdns_version: 4.4
+powerdns_gpg_key_id: 9FAAA5577E8FCF62093D036C1B0C6205FD380FBB
+powerdns_auth_repo: deb http://repo.powerdns.com/ubuntu focal-auth-44 main
+powerdns_auth_repo_filename: powerdns-auth-44
+powerdns_rec_repo: deb http://repo.powerdns.com/ubuntu focal-rec-44 main
+powerdns_rec_repo_filename: powerdns-rec-44
+powerdns_gpg_key_url: https://repo.powerdns.com/FD380FBB-pub.asc

@@ -9,3 +9,15 @@
     name: pdns
     state: restarted
   become: true
+
+- name: restart NetworkManager
+  ansible.builtin.systemd:
+    name: NetworkManager
+    state: restarted
+  become: true
+
+- name: restart systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: restarted
+  become: true

@@ -65,13 +65,13 @@
 
 - name: build prometheus targets (powerdns_auth_targets)
   ansible.builtin.set_fact:
-    powerdns_auth_targets: "{{ powerdns_auth_targets|default([],True) + [item + ':8081'] }}"
+    powerdns_auth_targets: "{{ powerdns_auth_targets|default([],True) + [item + '.' + network.domain + ':8081'] }}"
   loop: "{{ groups.powerdns_servers }}"
   run_once: true
 
 - name: build prometheus targets (powerdns_rec_targets)
   ansible.builtin.set_fact:
-    powerdns_rec_targets: "{{ powerdns_rec_targets|default([],True) + [item + ':8082'] }}"
+    powerdns_rec_targets: "{{ powerdns_rec_targets|default([],True) + [item + '.' + network.domain + ':8082'] }}"
   loop: "{{ groups.powerdns_servers }}"
   run_once: true
 
@@ -108,13 +108,13 @@
         - job_name: powerdns_authoritative
           static_configs:
           - targets: {{ powerdns_auth_targets }}
-          scrape_interval: 15m
-          scrape_timeout: 5m
+          scrape_interval: 1m
+          scrape_timeout: 10s
         - job_name: powerdns_recursor
           static_configs:
           - targets: {{ powerdns_rec_targets }}
-          scrape_interval: 15m
-          scrape_timeout: 5m
+          scrape_interval: 1m
+          scrape_timeout: 10s
         - job_name: 'snmp'
           static_configs:
             - targets: {{ snmp_targets }}
