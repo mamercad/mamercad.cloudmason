@@ -8,8 +8,8 @@ After=network-online.target
 Type=exec
 ExecStartPre=-/sbin/modprobe br_netfilter
 ExecStartPre=-/sbin/modprobe overlay
-Environment=K3S_TOKEN={{ k3s_secrets.token }}
-ExecStart=/usr/local/bin/k3s server {{ k3s_options | default('') }}
+Environment=K3S_TOKEN={{ token }}
+ExecStart=/usr/local/bin/k3s server {{ options | default('', true) }}
 KillMode=process
 Delegate=yes
 LimitNOFILE=1048576
