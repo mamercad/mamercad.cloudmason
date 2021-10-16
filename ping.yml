@@ -1,9 +1,20 @@
 ---
+
 - name: ping
-  hosts: "{{ ansible_limit | default('all', true) }}"
+  hosts: all,!unifi
   connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
   gather_facts: false
   become: false
   tasks:
     - name: ping
       ansible.builtin.ping:
+
+- name: raw
+  hosts: unifi_aps,unifi_switches
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: true
+      ansible.builtin.raw: /bin/true
+      changed_when: false
