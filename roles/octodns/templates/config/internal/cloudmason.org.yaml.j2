@@ -54,15 +54,21 @@ awx-service.awx.thinkpad:
 awx.lenovo:
   type: A
   value: 192.168.1.242
-basement:
+ap1:
   type: A
   value: 192.168.1.63
+basement:
+  type: CNAME
+  value: ap1.cloudmason.org.
 basementlamp2:
   type: A
   value: 192.168.1.144
-bedroom:
+ap4:
   type: A
   value: 192.168.1.124
+bedroom:
+  type: CNAME
+  value: ap4.cloudmason.org.
 biaslighting:
   type: A
   value: 192.168.1.149
@@ -126,9 +132,12 @@ db2:
 db3:
   type: A
   value: 192.168.1.137
-diningroom:
+ap2:
   type: A
   value: 192.168.1.87
+diningroom:
+  type: CNAME
+  value: ap2.cloudmason.org.
 dns:
   type: A
   values:
@@ -140,9 +149,12 @@ docker:
 docker.lenovo:
   type: A
   value: 192.168.1.241
-familyroom:
+ap3:
   type: A
   value: 192.168.1.120
+familyroom:
+  type: CNAME
+  value: ap3.cloudmason.org.
 fireedge:
   type: CNAME
   value: net.cloudmason.org.
