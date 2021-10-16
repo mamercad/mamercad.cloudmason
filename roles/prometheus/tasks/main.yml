@@ -115,52 +115,52 @@
           - targets: {{ powerdns_rec_targets }}
           scrape_interval: 1m
           scrape_timeout: 10s
-        - job_name: 'snmp'
-          static_configs:
-            - targets: {{ snmp_targets }}
-          metrics_path: /snmp
-          params:
-            module: [if_mib]
-          relabel_configs:
-            - source_labels: [__address__]
-              target_label: __param_target
-            - source_labels: [__param_target]
-              target_label: instance
-            - target_label: __address__
-              replacement: 127.0.0.1:9116
-          scrape_interval: 15m
-          scrape_timeout: 5m
-        - job_name: dns
-          metrics_path: /probe
-          static_configs:
-            - targets: {{ dns_targets }}
-          relabel_configs:
-            - source_labels: [__address__]
-              regex: '(.*)@.*@.*'
-              replacement: $1
-              target_label: 'instance'      # instance label for Prometheus datapoints
-            - source_labels: [__address__]
-              regex: '.*@(.*)@.*'
-              replacement: $1
-              target_label: __param_module  # module parameter to blackbox exporter
-            - source_labels: [__address__]
-              regex: '.*@(.*)@.*'
-              replacement: $1
-              target_label: module          # module label for Prometheus datapoints
-            - source_labels: [__address__]
-              regex: '.*@.*@(.*)'
-              replacement: $1
-              target_label: __param_target  # target parameter to blackbox exporter
-            - source_labels: [__address__]
-              regex: '.*@.*@(.*)'
-              replacement: $1
-              target_label: resolver        # resolver label for Prometheus datapoints
-            - source_labels: [__address__]
-              regex: '(.*)@.*@.*'
-              replacement: $1
-              target_label: __address__     # The blackbox exporter's real hostname:port.
-          scrape_interval: 15m
-          scrape_timeout: 5m
+        #- job_name: 'snmp'
+        #  static_configs:
+        #    - targets: {{ snmp_targets }}
+        #  metrics_path: /snmp
+        #  params:
+        #    module: [if_mib]
+        #  relabel_configs:
+        #    - source_labels: [__address__]
+        #      target_label: __param_target
+        #    - source_labels: [__param_target]
+        #      target_label: instance
+        #    - target_label: __address__
+        #      replacement: 127.0.0.1:9116
+        #  scrape_interval: 15m
+        #  scrape_timeout: 5m
+        #- job_name: dns
+        #  metrics_path: /probe
+        #  static_configs:
+        #    - targets: {{ dns_targets }}
+        #  relabel_configs:
+        #    - source_labels: [__address__]
+        #      regex: '(.*)@.*@.*'
+        #      replacement: $1
+        #      target_label: 'instance'      # instance label for Prometheus datapoints
+        #    - source_labels: [__address__]
+        #      regex: '.*@(.*)@.*'
+        #      replacement: $1
+        #      target_label: __param_module  # module parameter to blackbox exporter
+        #    - source_labels: [__address__]
+        #      regex: '.*@(.*)@.*'
+        #      replacement: $1
+        #      target_label: module          # module label for Prometheus datapoints
+        #    - source_labels: [__address__]
+        #      regex: '.*@.*@(.*)'
+        #      replacement: $1
+        #      target_label: __param_target  # target parameter to blackbox exporter
+        #    - source_labels: [__address__]
+        #      regex: '.*@.*@(.*)'
+        #      replacement: $1
+        #      target_label: resolver        # resolver label for Prometheus datapoints
+        #    - source_labels: [__address__]
+        #      regex: '(.*)@.*@.*'
+        #      replacement: $1
+        #      target_label: __address__     # The blackbox exporter's real hostname:port.
+        #  scrape_interval: 15m
+        #  scrape_timeout: 5m
         - job_name: statsd
           static_configs:
             - targets: {{ statsd_targets }}
