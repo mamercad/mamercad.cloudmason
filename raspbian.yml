@@ -2,10 +2,24 @@
 - name: raspbian
   hosts: raspbian:!clusterpi3
   connection: ssh
-  gather_facts: false
+  gather_facts: true
   become: false
 
+  handlers:
+
+    - name: restart tailscaled
+      ansible.builtin.systemd:
+        name: tailscaled
+        state: restarted
+      become: true
+
   tasks:
+
+    - name: set hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+      notify: restart tailscaled
+      become: true
 
     - name: include latest
       when: latest | default(false, true)
@@ -35,13 +49,17 @@
       ansible.builtin.set_fact:
         k3s_options: "--cluster-init"
         fetch_kubeconfig: true
-      when: inventory_hostname == "clusterpi0"
+      when:
+        - k3s | default(false, true)
+        - inventory_hostname == "clusterpi0"
 
     - name: set member options
       ansible.builtin.set_fact:
         k3s_options: "--server https://clusterpi0.cloudmason.org:6443"
         fetch_kubeconfig: false
-      when: inventory_hostname != "clusterpi0"
+      when:
+        - k3s | default(false, true)
+        - inventory_hostname != "clusterpi0"
 
     - name: include k3s
       when: k3s | default(false, true)
@@ -60,3 +78,9 @@
           3635623964393532340a303035663236663839356361616230636661396538326564356134313932
           3365
         options: "{{ k3s_options }} --disable servicelb --write-kubeconfig-mode 0644"
+
+    - name: include tailscale role (main tasks)
+      when: tailscale | default(false, true)
+      ansible.builtin.include_role:
+        name: tailscale
+        tasks_from: main.yml
