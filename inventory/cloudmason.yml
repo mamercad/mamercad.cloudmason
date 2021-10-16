@@ -15,6 +15,18 @@ all:
     ap4:
       ansible_host: 192.168.1.124
       ansible_user: mamercad
+    switch1:
+      ansible_host: 192.168.1.95
+      ansible_user: mamercad
+    switch2:
+      ansible_host: 192.168.1.40
+      ansible_user: mamercad
+    switch3:
+      ansible_host: 192.168.1.70
+      ansible_user: mamercad
+    switch4:
+      ansible_host: 192.168.1.137
+      ansible_user: mamercad
     clusterpi0:
       ansible_host: 192.168.1.62
       ansible_user: pi
@@ -124,16 +136,26 @@ all:
       hosts:
         cloudkey:
         gateway:
-        basement:
-        bedroom:
-        diningroom:
-        familyroom:
+        ap1:
+        ap2:
+        ap3:
+        ap4:
+        switch1:
+        switch2:
+        switch3:
+        switch4:
     unifi_aps:
       hosts:
         ap1:
         ap2:
         ap3:
         ap4:
+    unifi_switches:
+      hosts:
+        switch1:
+        switch2:
+        switch3:
+        switch4:
     ubuntu:
       hosts:
         lenovo:
