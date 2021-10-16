@@ -1,0 +1,99 @@
+- name: set arch
+  ansible.builtin.set_fact:
+    arch: amd64
+  when: ansible_architecture == "x86_64"
+
+- name: set arch
+  ansible.builtin.set_fact:
+    arch: armv7
+  when: ansible_architecture == "armv7l"
+
+- name: purge prometheus-node-exporter
+  ansible.builtin.apt:
+    name: prometheus-node-exporter
+    state: absent
+  become: true
+
+- name: create prometheus group
+  ansible.builtin.group:
+    state: present
+    name: prometheus
+  become: true
+
+- name: create prometheus user
+  ansible.builtin.user:
+    state: present
+    name: prometheus
+    group: prometheus
+    home: /opt/prometheus
+    shell: /bin/bash
+  become: true
+  ignore_errors: true  # might exist already
+
+- name: create /opt/prometheus
+  ansible.builtin.file:
+    path: /opt/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: 0755
+  become: true
+
+- name: fetch node_exporter
+  ansible.builtin.get_url:
+    url: "{{ node_exporter[arch].url }}"
+    checksum: "{{ node_exporter[arch].checksum }}"
+    dest: /tmp/node_exporter-{{ node_exporter[arch].version }}.linux-{{ arch }}.tar.gz
+  become: true
+
+- name: unarchive node_exporter tarball
+  ansible.builtin.unarchive:
+    src: /tmp/node_exporter-{{ node_exporter[arch].version }}.linux-{{ arch }}.tar.gz
+    dest: /tmp/
+    remote_src: yes
+  become: true
+
+- name: create /opt/prometheus/node_exporter
+  ansible.builtin.file:
+    state: directory
+    path: /opt/prometheus/node_exporter
+    owner: prometheus
+    group: prometheus
+    mode: 0755
+  become: true
+
+- name: deploy node_exporter binary to /opt/prometheus/node_exporter
+  ansible.builtin.copy:
+    src: /tmp/node_exporter-{{ node_exporter[arch].version }}.linux-{{ arch }}/node_exporter
+    dest: /opt/prometheus/node_exporter/node_exporter
+    remote_src: true
+    owner: prometheus
+    group: prometheus
+    mode: 0755
+  become: true
+
+- name: deploy node_exporter systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      [Unit]
+      Description=Node Exporter
+      After=network-online.target
+      [Service]
+      User=prometheus
+      Restart=on-failure
+      ExecStart=/opt/prometheus/node_exporter/node_exporter
+      [Install]
+      WantedBy=multi-user.target
+  become: true
+  notify: reload-systemd
+
+- name: start and enable
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: started
+    enabled: true
+  become: true

@@ -12,3 +12,13 @@ blackbox_exporter:
   url: https://github.com/prometheus/blackbox_exporter/releases/download/v0.19.0/blackbox_exporter-0.19.0.linux-amd64.tar.gz
   checksum: sha256:af2ae1394c4f9b46962ac1510e1dacac78115c11e625991fb6c54825d2240896
   version: 0.19.0
+
+node_exporter:
+  amd64:
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.2.2/node_exporter-1.2.2.linux-amd64.tar.gz
+    checksum: sha256:344bd4c0bbd66ff78f14486ec48b89c248139cdd485e992583ea30e89e0e5390
+    version: 1.2.2
+  armv7:
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.2.2/node_exporter-1.2.2.linux-armv7.tar.gz
+    checksum: sha256:2020c5ede7fe11c15951b4c2f3af7706cd7e205215fa9aacafec15e2f976d734
+    version: 1.2.2

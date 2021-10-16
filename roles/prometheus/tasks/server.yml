@@ -1,6 +1,16 @@
+- name: set arch
+  ansible.builtin.set_fact:
+    arch: amd64
+  when: ansible_architecture == "x86_64"
+
+- name: set arch
+  ansible.builtin.set_fact:
+    arch: armv7
+  when: ansible_architecture == "armv7l"
+
 - name: download the prometheus tarball
   ansible.builtin.get_url:
-    url: "{{ release_tarball }}"
+    url: "{{ release_tarball}}"
     dest: /tmp/prometheus.tgz
     checksum: "sha256:{{ release_sha256 }}"
   become: true
@@ -90,8 +100,8 @@
     content: |
       global:
         scrape_interval: 1m
-        scrape_timeout: 30s
-        evaluation_interval: 15m
+        scrape_timeout: 10s
+        evaluation_interval: 5m
       alerting:
         alertmanagers:
         - static_configs:
@@ -166,7 +176,7 @@
             - targets: {{ statsd_targets }}
           metrics_path: /metrics
           scrape_interval: 1m
-          scrape_timeout: 30s
+          scrape_timeout: 10s
   notify: restart-prometheus
   become: true
 

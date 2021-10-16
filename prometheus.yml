@@ -1,11 +1,24 @@
 ---
+
 - name: prometheus
-  hosts: thinkpad
+  hosts: prometheus_servers
   connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
   gather_facts: true
   become: false
   tasks:
-    - name: include prometheus role (main tasks)
+    - name: include prometheus role (server tasks)
       ansible.builtin.include_role:
         name: prometheus
-        tasks_from: main.yml
+        tasks_from: server.yml
+
+- name: prometheus
+  hosts: prometheus_clients
+  connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
+  gather_facts: true
+  become: false
+  tasks:
+    - name: include prometheus role (node_exporter tasks)
+      ansible.builtin.include_role:
+        name: prometheus
+        tasks_from: node_exporter.yml
+
