@@ -8,9 +8,10 @@ ansible = "3.2.0"
 ansible-lint = "5.0.12"
 
 [dev-packages]
-kubernetes = "18.20.0"
 ara = "1.5.7"
 ansible-builder = "1.0.1"
+awxkit = "19.0.1"
+kubernetes = "18.20.0"
 paramiko = "2.7.2"
 pre-commit = "2.15.0"
 
