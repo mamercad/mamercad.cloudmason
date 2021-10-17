@@ -1,7 +1,8 @@
 ---
+
 - name: k3s
-  hosts: "{{ ansible_limit | default('all', true) }}"
-  connection: "{{ 'local' if ansible_limit | default('all', true) == 'localhost' else 'ssh' }}"
+  hosts: thinkpad
+  connection: ssh
   gather_facts: true
   become: false
   tasks:
@@ -9,3 +10,41 @@
       ansible.builtin.include_role:
         name: k3s
         tasks_from: main.yml
+
+- name: k3s
+  hosts: lenovo,prodesk,jonagold
+  connection: ssh
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: set leader options
+      ansible.builtin.set_fact:
+        k3s_options: "--cluster-init"
+        fetch_kubeconfig: true
+      when:
+        - inventory_hostname == "lenovo"
+
+    - name: set member options
+      ansible.builtin.set_fact:
+        k3s_options: "--server https://lenovo.cloudmason.org:6443"
+        fetch_kubeconfig: false
+      when:
+        - inventory_hostname != "lenovo"
+
+    - name: include k3s (main tasks)
+      ansible.builtin.include_role:
+        name: k3s
+        tasks_from: main
+      vars:
+        version: v1.22.2%2Bk3s2
+        binary: k3s
+        sha256: 567e5838dc9d0346ea1aae55b917ee557d3a7b89947de5038eb41a500d87f0d7
+        token: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          31343336303733326134663261633463346634386662306538396238326462363037646330306338
+          3664313635626661623236643939346139386463666266390a653766663261646335616561363634
+          66333061353137353238613863326462343165346161346435353836383764636539643135396333
+          3635623964393532340a303035663236663839356361616230636661396538326564356134313932
+          3365
+        options: "{{ k3s_options }} --disable servicelb --write-kubeconfig-mode 0644"
