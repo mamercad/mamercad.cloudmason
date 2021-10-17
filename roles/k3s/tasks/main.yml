@@ -34,6 +34,7 @@
     name: k3s
     state: started
     enabled: true
+    daemon_reload: true
   become: true
 
 - name: fetch the kubeconfig
