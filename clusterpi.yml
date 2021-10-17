@@ -1,6 +1,6 @@
 ---
-- name: raspbian
-  hosts: raspbian:!clusterpi3
+- name: clusterpi
+  hosts: clusterpi:!clusterpi3
   connection: ssh
   gather_facts: true
   become: false
