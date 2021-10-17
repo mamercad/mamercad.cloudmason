@@ -1,0 +1,18 @@
+---
+- name: healthchecks.io
+  hosts: linux
+  connection: ssh
+  gather_facts: false
+  become: false
+
+  tasks:
+
+    - name: add healthchecks.io to cron
+      ansible.builtin.cron:
+        name: healthchecks.io
+        minute: "00"
+        hour: "*"
+        job: "/usr/bin/curl -s {{ healthchecks_io }} >/dev/null"
+        user: root
+      when: healthchecks_io is defined
+      become: true
