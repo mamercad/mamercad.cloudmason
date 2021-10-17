@@ -4,3 +4,9 @@
     name:
       - zsh
   become: true
+
+- name: install nomachine
+  ansible.builtin.apt:
+    state: present
+    deb: https://cloudmason.org/nomachine_7.6.2_4_amd64.deb
+  become: true
