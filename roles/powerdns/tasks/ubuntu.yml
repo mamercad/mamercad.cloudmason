@@ -5,6 +5,9 @@
     option: dns
     value: none
     backup: yes
+    owner: root
+    group: root
+    mode: 0644
   become: true
   notify: restart NetworkManager
 

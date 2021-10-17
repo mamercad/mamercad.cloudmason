@@ -20,7 +20,7 @@
     name: prometheus
   become: true
 
-- name: create prometheus user
+- name: create prometheus user  # noqa ignore-errors
   ansible.builtin.user:
     state: present
     name: prometheus

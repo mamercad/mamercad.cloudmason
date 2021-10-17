@@ -10,7 +10,7 @@
 
 - name: download the prometheus tarball
   ansible.builtin.get_url:
-    url: "{{ release_tarball}}"
+    url: "{{ release_tarball }}"
     dest: /tmp/prometheus.tgz
     checksum: "sha256:{{ release_sha256 }}"
   become: true
