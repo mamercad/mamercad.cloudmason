@@ -1,0 +1,7 @@
+- name: create inventories
+  awx.awx.tower_inventory:
+    state: present
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    organization: "{{ item.organization }}"
+  loop: "{{ inventories | default([], true) }}"
