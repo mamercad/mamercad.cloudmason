@@ -20,5 +20,9 @@
         - inventories
         - inventory_sources
         - credentials
+        - notification_templates
+        - job_templates
+        - schedules
+        - execution_environments
       loop_control:
         loop_var: thing
