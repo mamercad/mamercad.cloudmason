@@ -1,0 +1,12 @@
+- name: create projects
+  awx.awx.tower_project:
+    state: present
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    organization: "{{ item.organization }}"
+    scm_type: "{{ item.scm_type }}"
+    scm_url: "{{ item.scm_url }}"
+    scm_delete_on_update: "{{ item.scm_delete_on_update }}"
+    scm_update_on_launch: "{{ item.scm_update_on_launch }}"
+    scm_update_cache_timeout: "{{ item.scm_update_cache_timeout }}"
+  loop: "{{ projects | default([], true) }}"
