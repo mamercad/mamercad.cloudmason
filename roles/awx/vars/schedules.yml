@@ -1,0 +1,6 @@
+schedules:
+  - name: Cloudmason / schedule / metronome
+    description: Hourly AWX Metronome
+    rrule: "DTSTART:20210323T000000Z RRULE:FREQ=HOURLY;INTERVAL=1"
+    unified_job_template: Cloudmason / metronome
+    enabled: true

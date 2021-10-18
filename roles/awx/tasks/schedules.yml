@@ -1,0 +1,9 @@
+- name: create schedules
+  awx.awx.tower_schedule:
+    state: present
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    rrule: "{{ item.rrule }}"
+    unified_job_template: "{{ item.unified_job_template }}"
+    enabled: "{{ item.enabled | default(true, false) }}"
+  loop: "{{ schedules | default([], true) }}"
