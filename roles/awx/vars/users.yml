@@ -4,5 +4,4 @@ users:
     last_name: Mercado
     email: mamercad@gmail.com
     is_superuser: true
-    # password: "{{ lookup('community.general.hashi_vault', 'secret=concourse/main/awx/users/mark:password') }}"
-    password: "{{ lookup('ansible.builtin.env', 'AWX_USERS_MARK_PASSWORD') }}"
+    password: "{{ lookup('ansible.builtin.env', 'AWX_USERS_MARK_PASSWORD') | b64decode }}"
