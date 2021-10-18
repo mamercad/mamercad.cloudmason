@@ -6,6 +6,9 @@
 # TOWER_USERNAME="$(lpass show 'Homelab\Concourse/AWX' --username)" \
 # TOWER_PASSWORD="$(lpass show 'Homelab\Concourse/AWX' --password)"
 
+# ❯ vault kv put concourse/main/awx/users/mark \
+# PASSWORD="$(lpass show 'Homelab\Concourse/AWX' --notes | jq -r .users.mark.password)"
+
 # resource_types:
 
 #   - name: slack-alert
