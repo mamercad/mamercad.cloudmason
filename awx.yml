@@ -7,20 +7,18 @@
 
   tasks:
 
-    - name: organizations
+    - name: loop create awx assets
       ansible.builtin.include_role:
         name: awx
-        tasks_from: organizations.yml
-        vars_from: organizations.yml
-
-    - name: teams
-      ansible.builtin.include_role:
-        name: awx
-        tasks_from: teams.yml
-        vars_from: teams.yml
-
-    - name: users
-      ansible.builtin.include_role:
-        name: awx
-        tasks_from: users.yml
-        vars_from: users.yml
+        tasks_from: "{{ thing ~ '.yml' }}"
+        vars_from: "{{ thing ~ '.yml' }}"
+      loop:
+        - organizations
+        - teams
+        - users
+        - projects
+        - inventories
+        - inventory_sources
+        - credentials
+      loop_control:
+        loop_var: thing
