@@ -1,0 +1,11 @@
+inventory_sources:
+  - name: Cloudmason
+    description: Cloudmason
+    organization: Cloudmason
+    inventory: Cloudmason
+    source: scm
+    source_project: Cloudmason
+    source_path: inventory/cloudmason.yml
+    overwrite: true
+    update_cache_timeout: 3600
+    update_on_project_update: true

@@ -1,0 +1,14 @@
+- name: create inventory sources
+  awx.awx.tower_inventory_source:
+    state: present
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    organization: "{{ item.organization }}"
+    inventory: "{{ item.inventory }}"
+    source: "{{ item.source }}"
+    source_project: "{{ item.source_project }}"
+    source_path: "{{ item.source_path }}"
+    overwrite: "{{ item.overwrite }}"
+    update_cache_timeout: "{{ item.update_cache_timeout }}"
+    update_on_project_update: "{{ item.update_on_project_update }}"
+  loop: "{{ inventory_sources | default([], true) }}"
