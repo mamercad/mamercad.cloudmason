@@ -1,0 +1,96 @@
+job_templates:
+
+  - name: Cloudmason / ping
+    job_type: run
+    organization: Cloudmason
+    inventory: Cloudmason
+    ask_inventory_on_launch: true
+    project: Cloudmason
+    playbook: playbooks/ping.yml
+    credentials:
+      - Cloudmason Machine (awx)
+    ask_credential_on_launch: true
+    ask_limit_on_launch: true
+
+  - name: Cloudmason / metronome
+    job_type: run
+    organization: Cloudmason
+    inventory: Cloudmason
+    ask_inventory_on_launch: false
+    project: Cloudmason
+    playbook: playbooks/metronome.yml
+    ask_credential_on_launch: false
+    ask_limit_on_launch: false
+    limit: localhost
+    extra_vars:
+      healthchecks_url: "{{ lookup('ansible.builtin.env', 'AWX_JOB_TEMPLATES_HEALTHCHECKS_ENDPOINT') }}"
+
+  - name: Cloudmason / powerdns
+    job_type: run
+    organization: Cloudmason
+    inventory: Cloudmason
+    ask_inventory_on_launch: false
+    project: Cloudmason
+    playbook: playbooks/powerdns.yml
+    credentials:
+      - Cloudmason Machine (awx)
+      - Cloudmason Vault
+    ask_credential_on_launch: false
+    ask_limit_on_launch: false
+    limit: powerdns
+
+  - name: Cloudmason / octodns
+    job_type: run
+    organization: Cloudmason
+    inventory: Cloudmason
+    ask_inventory_on_launch: false
+    project: Cloudmason
+    playbook: playbooks/octodns.yml
+    credentials:
+      - Cloudmason Machine (awx)
+      - Cloudmason Vault
+    ask_credential_on_launch: false
+    ask_limit_on_launch: false
+    limit: gateway,localhost
+
+  - name: Cloudmason / sleep
+    job_type: run
+    organization: Cloudmason
+    inventory: Cloudmason
+    ask_inventory_on_launch: true
+    project: Cloudmason
+    playbook: playbooks/sleep.yml
+    credentials:
+      - Cloudmason Machine (awx)
+    ask_credential_on_launch: true
+    ask_limit_on_launch: true
+    limit: localhost
+    ask_variables_on_launch: true
+
+  - name: Cloudmason / testing
+    job_type: run
+    organization: Cloudmason
+    inventory: Cloudmason
+    ask_inventory_on_launch: true
+    project: Cloudmason
+    playbook: playbooks/testing.yml
+    credentials:
+      - Cloudmason Machine (awx)
+    ask_credential_on_launch: true
+    ask_limit_on_launch: true
+    limit: localhost
+    ask_variables_on_launch: true
+
+  - name: Ansible Tower Samples / sleep
+    job_type: run
+    organization: Cloudmason
+    inventory: Cloudmason
+    ask_inventory_on_launch: true
+    project: Ansible Tower Samples / test
+    playbook: sleep.yml
+    credentials:
+      - "Cloudmason Machine (awx)"
+    ask_credential_on_launch: true
+    ask_limit_on_launch: true
+    limit: localhost
+    ask_variables_on_launch: true

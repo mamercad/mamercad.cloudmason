@@ -1,0 +1,17 @@
+- name: create job templates
+  awx.awx.tower_job_template:
+    state: present
+    name: "{{ item.name }}"
+    job_type: "{{ item.job_type }}"
+    organization: "{{ item.organization }}"
+    inventory: "{{ item.inventory }}"
+    ask_inventory_on_launch: "{{ item.ask_inventory_on_launch | default(false, true) }}"
+    project: "{{ item.project }}"
+    playbook: "{{ item.playbook }}"
+    credentials: "{{ item.credentials | default(omit) }}"
+    ask_credential_on_launch: "{{ item.ask_credential_on_launch | default(false, true) }}"
+    ask_limit_on_launch: "{{ item.ask_limit_on_launch | default(false, true) }}"
+    limit: "{{ item.limit | default(omit) }}"
+    extra_vars: "{{ item.extra_vars | default(omit) }}"
+    ask_variables_on_launch: "{{ item.ask_variables_on_launch | default(omit) }}"
+  loop: "{{ job_templates | default([], true) }}"
