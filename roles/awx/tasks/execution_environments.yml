@@ -1,0 +1,9 @@
+- name: create execute environments
+  awx.awx.tower_execution_environment:
+    state: present
+    name: "{{ item.name }}"
+    image: "{{ item.image }}"
+    description: "{{ item.description | default(omit, true) }}"
+    organization: "{{ item.organization | default(omit, true) }}"
+    pull: "{{ item.pull | default(omit, true) }}"
+  loop: "{{ execution_environments | default([], true) }}"

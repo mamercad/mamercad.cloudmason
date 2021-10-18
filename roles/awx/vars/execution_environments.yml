@@ -1,0 +1,3 @@
+execution_environments:
+  - name: ansible-ee
+    image: quay.io/mamercad/ansible-ee:0.1.
