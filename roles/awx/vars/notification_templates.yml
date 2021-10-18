@@ -1,0 +1,8 @@
+notification_templates:
+  - name: Cloudmason Slack
+    organization: Cloudmason
+    notification_type: slack
+    notification_configuration:
+      channels:
+        - "{{ lookup('ansible.builtin.env', 'AWX_NOTIFICATION_TEMPLATES_SLACK_CHANNEL') }}"
+      token: "{{ lookup('ansible.builtin.env', 'AWX_NOTIFICATION_TEMPLATES_SLACK_BOT_TOKEN') }}"

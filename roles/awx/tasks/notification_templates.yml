@@ -1,0 +1,9 @@
+- name: create notification templates
+  awx.awx.tower_notification_template:
+    state: present
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    notification_type: "{{ item.notification_type }}"
+    notification_configuration: "{{ item.notification_configuration }}"
+  loop: "{{ notification_templates | default([], true) }}"
+  no_log: true
