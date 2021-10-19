@@ -8,7 +8,7 @@
 
 - name: set facts  # noqa var-naming
   ansible.builtin.set_fact:
-    "{{ item.interface }}": "{{ item.stdout | trim }}"
+    "{{ item.interface | replace('.', '_') }}": "{{ item.stdout | trim }}"
   loop: "{{ addresses.results }}"
 
 - name: ensure
@@ -25,7 +25,7 @@
     msg: |
       eth0: {{ eth0 }}
       eth1: {{ eth1 }}
-      eth1.15: {{ eth1.15 }}
+      eth1_15: {{ eth1_15 }}
       eth2: {{ eth2 }}
   loop: "{{ interfaces }}"
   loop_control:
