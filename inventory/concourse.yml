@@ -8,13 +8,27 @@ all:
       ansible_user: mamercad
       ansible_python_interpreter: /usr/bin/python
       interfaces: ['eth0', 'eth1', 'eth1.15', 'eth2']
+    lenovo:
+      ansible_host: 192.168.1.98
+      ansible_user: concourse
+      ansible_python_interpreter: /usr/bin/python3
     prodesk:
       ansible_host: 192.168.1.127
       ansible_user: concourse
       ansible_python_interpreter: /usr/bin/python3
     thinkpad:
       ansible_host: 192.168.1.67
+      ansible_user: concourse
       ansible_python_interpreter: /usr/bin/python3
+  vars:
+    mail:
+      forwarders:
+        - host: mx1.forwardemail.net.
+          weight: 10
+        - host: mx2.forwardemail.net.
+          weight: 20
+      email: forward-email=mamercad@gmail.com
+      spf: v=spf1 a mx include:spf.forwardemail.net include:_spf.google.com -all
   children:
     linux:
       hosts:
