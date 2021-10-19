@@ -10,7 +10,7 @@ providers:
     enforce_order: False # I'd rather order by IP
   cloudflare:
     class: octodns.provider.cloudflare.CloudflareProvider
-    token: "{{ lookup('ansible.builtin.env', 'OCTODNS_CLOUDFLARE_API_KEY' }}"
+    token: "{{ lookup('ansible.builtin.env', 'OCTODNS_CLOUDFLARE_API_KEY') }}"
 
 zones:
   letsbuildthe.cloud.:
