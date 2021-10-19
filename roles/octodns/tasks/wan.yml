@@ -1,6 +1,6 @@
 - name: figure out wan addresses
   ansible.builtin.shell:  # noqa no-changed-when
-    cmd: /opt/vyatta/bin/vyatta-show-interfaces | grep 'inet ' | grep {{ interface }} | awk '{print $2}' | sed 's/\/.*$//'
+    cmd: /opt/vyatta/bin/vyatta-show-interfaces | grep 'inet ' | grep '{{ interface }}' | awk '{print $2}' | sed 's/\/.*$//'
   loop: "{{ interfaces }}"
   loop_control:
     loop_var: interface
@@ -25,6 +25,7 @@
     msg: |
       eth0: {{ eth0 }}
       eth1: {{ eth1 }}
+      eth1.15: {{ eth1.15 }}
       eth2: {{ eth2 }}
   loop: "{{ interfaces }}"
   loop_control:
