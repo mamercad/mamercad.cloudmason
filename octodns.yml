@@ -15,8 +15,8 @@
       tags: always
 
 - name: octodns
-  hosts: "{{ ansible_limit | default('localhost', true) }}"
-  connection: "{{ 'local' if ansible_limit | default('localhost', true) == 'localhost' else 'ssh' }}"
+  hosts: localhost
+  connection: local
   gather_facts: false
   become: false
   tasks:
