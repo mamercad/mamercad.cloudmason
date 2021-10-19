@@ -20,15 +20,6 @@ all:
       ansible_host: 192.168.1.67
       ansible_user: concourse
       ansible_python_interpreter: /usr/bin/python3
-  vars:
-    mail:
-      forwarders:
-        - host: mx1.forwardemail.net.
-          weight: 10
-        - host: mx2.forwardemail.net.
-          weight: 20
-      email: forward-email=mamercad@gmail.com
-      spf: v=spf1 a mx include:spf.forwardemail.net include:_spf.google.com -all
   children:
     linux:
       hosts:
