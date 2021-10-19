@@ -4,4 +4,4 @@ users:
     last_name: Mercado
     email: mamercad@gmail.com
     is_superuser: true
-    password: "{{ lookup('ansible.builtin.env', 'AWX_USERS_MARK_PASSWORD') | b64decode }}"
+    password: "{{ lookup('ansible.builtin.env', 'AWX_USERS_MARK_PASSWORD') }}"
