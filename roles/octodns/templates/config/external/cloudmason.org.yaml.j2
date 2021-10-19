@@ -5,15 +5,15 @@
     ttl: 3600
   - type: MX
     values:
-      - exchange: mx1.forwardemail.net.
-        preference: 10
-      - exchange: mx2.forwardemail.net.
-        preference: 20
+      - exchange: {{ mail.forwarders.0.host }}
+        preference: {{ mail.forwarders.0.weight }}
+      - exchange: {{ mail.forwarders.1.host }}
+        preference: {{ mail.forwarders.1.weight }}
     ttl: 3600
   - type: TXT
     values:
-      - forward-email={{ me.email.personal }}
-      - v=spf1 a mx include:spf.forwardemail.net include:_spf.google.com -all
+      - forward-email={{ mail.email }}
+      - {{ mail.spf }}
     ttl: 3600
 att:
   type: A
@@ -90,6 +90,10 @@ concourse:
 lenovo:
   type: A
   value: {{ hostvars.lenovo.ansible_host }}
+  ttl: 3600
+prodesk:
+  type: A
+  value: {{ hostvars.prodesk.ansible_host }}
   ttl: 3600
 thinkpad:
   type: A
