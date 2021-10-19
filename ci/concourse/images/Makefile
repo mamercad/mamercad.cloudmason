@@ -1,4 +1,4 @@
-.PHONY: login build push
+.PHONY: login build push run
 
 .DEFAULT_GOAL := push
 
@@ -10,3 +10,6 @@ build:
 
 push: build
 	docker push mamercad/alpine-ansible:latest
+
+run:
+	docker run --rm -it mamercad/alpine-ansible:latest ash
