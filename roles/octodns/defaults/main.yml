@@ -6,3 +6,12 @@ templates:
     - 1.168.192.in-addr.arpa
     - cloudmason.org
     - letsbuildthe.cloud
+
+mail:
+  forwarders:
+    - host: mx1.forwardemail.net.
+      weight: 10
+    - host: mx2.forwardemail.net.
+      weight: 20
+  email: forward-email=mamercad@gmail.com
+  spf: v=spf1 a mx include:spf.forwardemail.net include:_spf.google.com -all
