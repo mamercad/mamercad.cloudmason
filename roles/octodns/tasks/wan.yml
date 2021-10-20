@@ -1,6 +1,6 @@
 - name: figure out wan addresses
   ansible.builtin.shell:  # noqa no-changed-when
-    cmd: /opt/vyatta/bin/vyatta-show-interfaces | grep 'inet ' | grep {{ interface }} | awk '{print $2}' | sed 's/\/.*$//'
+    cmd: /opt/vyatta/bin/vyatta-show-interfaces | grep 'inet ' | grep -E '{{ interface }}$' | awk '{print $2}' | sed 's/\/.*$//'
   loop: "{{ interfaces }}"
   loop_control:
     loop_var: interface
@@ -8,7 +8,7 @@
 
 - name: set facts  # noqa var-naming
   ansible.builtin.set_fact:
-    "{{ item.interface }}": "{{ item.stdout | trim }}"
+    "{{ item.interface | replace('.', '_') }}": "{{ item.stdout | trim }}"
   loop: "{{ addresses.results }}"
 
 - name: ensure
@@ -25,6 +25,7 @@
     msg: |
       eth0: {{ eth0 }}
       eth1: {{ eth1 }}
+      eth1_15: {{ eth1_15 }}
       eth2: {{ eth2 }}
   loop: "{{ interfaces }}"
   loop_control:

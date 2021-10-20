@@ -22,10 +22,15 @@ fly-set-pipelines:
 	fly -t cloudmason set-pipeline \
 		--pipeline awx --config pipelines/awx.yml \
 		--non-interactive
+	fly -t cloudmason set-pipeline \
+		--pipeline octodns --config pipelines/octodns.yml \
+		--non-interactive
 
 fly-unpause-pipelines:
 	fly -t cloudmason unpause-pipeline \
 		--pipeline awx
+	fly -t cloudmason unpause-pipeline \
+		--pipeline octodns
 
 fly-trigger-deploy:
 	fly -t cloudmason trigger-job -j awx/deploy

@@ -11,7 +11,7 @@ providers:
   net1:
     class: octodns.provider.powerdns.PowerDnsProvider
     host: 192.168.1.10
-    api_key: "{{ powerdns_api_key }}"
+    api_key: "{{ lookup('ansible.builtin.env', 'OCTODNS_POWERDNS_API_KEY') }}"
     port: 8081
     nameserver_values:
       - net1.cloudmason.org.
@@ -20,7 +20,7 @@ providers:
   net2:
     class: octodns.provider.powerdns.PowerDnsProvider
     host: 192.168.1.11
-    api_key: "{{ powerdns_api_key }}"
+    api_key: "{{ lookup('ansible.builtin.env', 'OCTODNS_POWERDNS_API_KEY') }}"
     port: 8081
     nameserver_values:
       - net1.cloudmason.org.
@@ -29,7 +29,7 @@ providers:
   thinkpad:
     class: octodns.provider.powerdns.PowerDnsProvider
     host: 192.168.1.67
-    api_key: "{{ powerdns_api_key }}"
+    api_key: "{{ lookup('ansible.builtin.env', 'OCTODNS_POWERDNS_API_KEY') }}"
     port: 8081
     nameserver_values:
       - net1.cloudmason.org.
@@ -43,18 +43,18 @@ zones:
     targets:
       - net1
       - net2
-      - thinkpad
+      # - thinkpad
   1.168.192.in-addr.arpa.:
     sources:
       - internal
     targets:
       - net1
       - net2
-      - thinkpad
+      # - thinkpad
   letsbuildthe.cloud.:
     sources:
       - internal
     targets:
       - net1
       - net2
-      - thinkpad
+      # - thinkpad

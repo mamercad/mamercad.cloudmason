@@ -15,8 +15,8 @@
       tags: always
 
 - name: octodns
-  hosts: "{{ ansible_limit | default('localhost', true) }}"
-  connection: "{{ 'local' if ansible_limit | default('localhost', true) == 'localhost' else 'ssh' }}"
+  hosts: localhost
+  connection: local
   gather_facts: false
   become: false
   tasks:
@@ -25,21 +25,7 @@
         name: octodns
         tasks_from: main.yml
       vars:
-        doit: true
-      tags: always
-
-- name: pdns
-  hosts: pdns
-  connection: ssh
-  gather_facts: false
-  become: false
-  tasks:
-    - name: include octodns role (pdns tasks)
-      ansible.builtin.include_role:
-        name: octodns
-        tasks_from: pdns.yml
-        apply:
-          tags: pdns
+        doit: false
       tags: always
 
 - name: test
@@ -47,49 +33,24 @@
   connection: local
   gather_facts: false
   become: false
-
-  vars:
-
-    domains:
-      - cloudmason.org
-      - letsbuildthe.cloud
-      - digitalocean.com
-      - github.com
-      - google.com
-
-    nameservers:
-      - 192.168.1.10
-      - 192.168.1.11
-      - 192.168.1.67
-
-    combinations: "{{ domains | product(nameservers) }}"
-
   tasks:
-
-    - name: dig (local resolver)
-      ansible.builtin.assert:
-        that:
-          - "'192.168.1.10' in (lookup('community.general.dig', 'cloudmason.org') | split(','))"
-          - "'192.168.1.11' in (lookup('community.general.dig', 'cloudmason.org') | split(','))"
-
-    - name: dig (each nameserver)
-      ansible.builtin.assert:
-        that:
-          - "'192.168.1.10' in (lookup('community.general.dig', 'cloudmason.org', '@192.168.1.10') | split(','))"
-          - "'192.168.1.11' in (lookup('community.general.dig', 'cloudmason.org', '@192.168.1.10') | split(','))"
-          - "'192.168.1.10' in (lookup('community.general.dig', 'cloudmason.org', '@192.168.1.11') | split(','))"
-          - "'192.168.1.11' in (lookup('community.general.dig', 'cloudmason.org', '@192.168.1.11') | split(','))"
-          - "'192.168.1.10' in (lookup('community.general.dig', 'cloudmason.org', '@192.168.1.67') | split(','))"
-          - "'192.168.1.11' in (lookup('community.general.dig', 'cloudmason.org', '@192.168.1.67') | split(','))"
-
-    - name: dig (local resolver)
-      ansible.builtin.assert:
-        that:
-          - lookup('community.general.dig', item.0) != 'NXDOMAIN'
-      loop: "{{ combinations }}"
-
-    - name: dig (each nameserver)
-      ansible.builtin.assert:
-        that:
-          - lookup('community.general.dig', item.0, '@'+item.1) != 'NXDOMAIN'
-      loop: "{{ combinations }}"
+    - name: include octodns role (test tasks)
+      ansible.builtin.include_role:
+        name: octodns
+        tasks_from: test.yml
+      vars:
+        domains:
+          - cloudmason.org
+          - letsbuildthe.cloud
+          - digitalocean.com
+          - github.com
+          - google.com
+        nameservers:
+          internal:
+            - 192.168.1.10
+            - 192.168.1.11
+          external:
+            - 8.8.8.8
+            - 1.1.1.1
+        combinations: "{{ domains | product(nameservers.internal) }}"
+      tags: always

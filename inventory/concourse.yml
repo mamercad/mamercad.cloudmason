@@ -3,14 +3,32 @@ all:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: "{{ lookup('ansible.builtin.pipe', 'which python3') }}"
+    gateway:
+      ansible_host: 192.168.1.1
+      ansible_user: mamercad
+      ansible_python_interpreter: /usr/bin/python
+      interfaces: ['eth0', 'eth1', 'eth1.15', 'eth2']
+    lenovo:
+      ansible_host: 192.168.1.98
+      ansible_user: concourse
+      ansible_python_interpreter: /usr/bin/python3
     prodesk:
       ansible_host: 192.168.1.127
+      ansible_user: concourse
+      ansible_python_interpreter: /usr/bin/python3
+    thinkpad:
+      ansible_host: 192.168.1.67
       ansible_user: concourse
       ansible_python_interpreter: /usr/bin/python3
   children:
     linux:
       hosts:
         prodesk:
+    pdns:
+      hosts:
+        # net1:
+        # net2:
+        thinkpad:
     ubuntu:
       hosts:
         prodesk:
