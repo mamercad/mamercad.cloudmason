@@ -1,0 +1,23 @@
+- name: dig (local resolver)
+  ansible.builtin.assert:
+    that:
+      - item in (lookup('community.general.dig', 'cloudmason.org') | split(','))
+  loop: "{{ nameservers }}"
+
+- name: dig (each nameserver)
+  ansible.builtin.assert:
+    that:
+      - item.0 in (lookup('community.general.dig', 'cloudmason.org', '@' ~ item.1) | split(','))
+  loop: "{{ nameservers | product(nameservers) }}"
+
+- name: dig (local resolver)
+  ansible.builtin.assert:
+    that:
+      - lookup('community.general.dig', item.0) != 'NXDOMAIN'
+  loop: "{{ combinations }}"
+
+- name: dig (each nameserver)
+  ansible.builtin.assert:
+    that:
+      - lookup('community.general.dig', item.0, '@'+item.1) != 'NXDOMAIN'
+  loop: "{{ combinations }}"
