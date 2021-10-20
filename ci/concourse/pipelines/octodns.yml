@@ -1,11 +1,11 @@
 ---
 
-# resource_types:
+resource_types:
 
-#   - name: slack-alert
-#     type: docker-image
-#     source:
-#       repository: arbourd/concourse-slack-alert-resource
+  - name: slack-alert
+    type: docker-image
+    source:
+      repository: arbourd/concourse-slack-alert-resource
 
 resources:
 
@@ -16,10 +16,10 @@ resources:
       uri: https://github.com/mamercad/mamercad.cloudmason.git
       branch: octodns
 
-  # - name: notify
-  #   type: slack-alert
-  #   source:
-  #     url: ((site.SLACK_WEBHOOK))
+  - name: notify
+    type: slack-alert
+    source:
+      url: ((site.SLACK_WEBHOOK))
 
 jobs:
 
@@ -34,22 +34,8 @@ jobs:
         params:
           ANSIBLE_FORCE_COLOR: true
           CONCOURSE_SSH_KEY: ((awx.CONCOURSE_SSH_KEY))
-          # TOWER_HOST: ((awx.TOWER_HOST))
-          # TOWER_USERNAME: ((awx.TOWER_USERNAME))
-          # TOWER_PASSWORD: ((awx.TOWER_PASSWORD))
-          # AWX_USERS_MARK_PASSWORD: ((awx/users/mark.password))
-          # AWX_CREDENTIALS_CLOUDMASON_GITHUB_SSH_KEY: ((awx/credentials/github.ssh_key))
-          # AWX_CREDENTIALS_CLOUDMASON_AWX_PASSWORD: ((awx/credentials/awx.password))
-          # AWX_CREDENTIALS_CLOUDMASON_AWX_SSH_KEY: ((awx/credentials/awx.ssh_key))
-          # AWX_CREDENTIALS_CLOUDMASON_MARK_PASSWORD: ((awx/credentials/mark.password))
-          # AWX_CREDENTIALS_CLOUDMASON_MARK_SSH_KEY: ((awx/credentials/mark.ssh_key))
-          # AWX_CREDENTIALS_CLOUDMASON_MARK_SSH_KEY_UNLOCK: ((awx/credentials/mark.ssh_key_unlock))
           AWX_CREDENTIALS_CLOUDMASON_MAMERCAD_SSH_KEY: ((awx/credentials/mamercad.ssh_key))
           AWX_CREDENTIALS_CLOUDMASON_MAMERCAD_SSH_KEY_UNLOCK: ((awx/credentials/mamercad.ssh_key_unlock))
-          # AWX_CREDENTIALS_CLOUDMASON_VAULT_PASSWORD: ((awx/credentials/ansible-vault.password))
-          # AWX_NOTIFICATION_TEMPLATES_SLACK_CHANNEL: ((awx/credentials/slack.channel))
-          # AWX_NOTIFICATION_TEMPLATES_SLACK_BOT_TOKEN: ((awx/credentials/slack.bot_token))
-          # AWX_JOB_TEMPLATES_HEALTHCHECKS_ENDPOINT: ((awx/credentials/healthchecks-io.endpoint))
           OCTODNS_CLOUDFLARE_API_KEY: ((octodns/cloudflare.api_key))
           OCTODNS_POWERDNS_API_KEY: ((octodns/powerdns.api_key))
         config:
@@ -85,21 +71,21 @@ jobs:
 
                 source /venv/bin/activate
                 cd source
-                ansible-playbook -i inventory/concourse.yml octodns.yml -e doit=false -v
+                ansible-playbook -i inventory/concourse.yml octodns.yml -v
 
-        # on_success:
-        #   put: notify
-        #   params:
-        #     alert_type: success
-        # on_failure:
-        #   put: notify
-        #   params:
-        #     alert_type: failed
-        # on_abort:
-        #   put: notify
-        #   params:
-        #     alert_type: aborted
-        # on_error:
-        #   put: notify
-        #   params:
-        #     alert_type: errored
+        on_success:
+          put: notify
+          params:
+            alert_type: success
+        on_failure:
+          put: notify
+          params:
+            alert_type: failed
+        on_abort:
+          put: notify
+          params:
+            alert_type: aborted
+        on_error:
+          put: notify
+          params:
+            alert_type: errored
