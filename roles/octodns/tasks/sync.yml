@@ -32,3 +32,4 @@
     - cmds is defined
     - cmds | length > 0
     - doit | default(false, true)
+  notify: restart-pdns-recursor
