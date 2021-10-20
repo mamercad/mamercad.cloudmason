@@ -46,7 +46,11 @@
           - github.com
           - google.com
         nameservers:
-          - 192.168.1.10
-          - 192.168.1.11
-        combinations: "{{ domains | product(nameservers) }}"
+          internal:
+            - 192.168.1.10
+            - 192.168.1.11
+          external:
+            - 8.8.8.8
+            - 1.1.1.1
+        combinations: "{{ domains | product(nameservers.internal) }}"
       tags: always
