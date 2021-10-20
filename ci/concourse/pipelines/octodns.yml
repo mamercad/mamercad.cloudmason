@@ -14,7 +14,8 @@ resources:
     icon: github
     source:
       uri: https://github.com/mamercad/mamercad.cloudmason.git
-      branch: octodns
+      branch: main
+      paths: roles/octodns
 
   - name: notify
     type: slack-alert

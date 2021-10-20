@@ -15,6 +15,7 @@ resources:
     source:
       uri: https://github.com/mamercad/mamercad.cloudmason.git
       branch: main
+      paths: roles/awx
 
   - name: notify
     type: slack-alert

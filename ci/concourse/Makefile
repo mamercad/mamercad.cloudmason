@@ -26,6 +26,12 @@ fly-set-pipelines:
 		--pipeline octodns --config pipelines/octodns.yml \
 		--non-interactive
 
+fly-test-pipelines:
+	fly -t cloudmason validate-pipeline \
+		--config pipelines/awx.yml
+	fly -t cloudmason validate-pipeline \
+		--config pipelines/octodns.yml
+
 fly-unpause-pipelines:
 	fly -t cloudmason unpause-pipeline \
 		--pipeline awx
