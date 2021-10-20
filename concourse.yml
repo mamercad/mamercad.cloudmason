@@ -62,6 +62,8 @@
               externalUrl: https://concourse.cloudmason.org
               localAuth:
                 enabled: true
+              kubernetes:
+                enabled: false  # secrets from k8s
               auth:
                 mainTeam:
                   localUser: "test,mark"
