@@ -224,7 +224,6 @@ all:
       hosts:
         net1:
         net2:
-        thinkpad:
     prometheus_servers:
       hosts:
         thinkpad:
