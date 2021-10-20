@@ -1,23 +1,18 @@
-- name: dig (local resolver)
+- name: dig (internal resolver)
   ansible.builtin.assert:
     that:
-      - item in (lookup('community.general.dig', 'cloudmason.org') | split(','))
-  loop: "{{ nameservers }}"
+      - item in (lookup('community.general.dig', 'cloudmason.org', '@' ~ item) | split(','))
+  loop: "{{ nameservers.internal }}"
 
-- name: dig (each nameserver)
+- name: dig (external resolver)
   ansible.builtin.assert:
     that:
-      - item.0 in (lookup('community.general.dig', 'cloudmason.org', '@' ~ item.1) | split(','))
-  loop: "{{ nameservers | product(nameservers) }}"
+      - hostvars.gateway.eth0 in (lookup('community.general.dig', 'cloudmason.org', '@' ~ item) | split(','))
+      - hostvars.gateway.eth2 in (lookup('community.general.dig', 'letsbuildthe.cloud', '@' ~ item) | split(','))
+  loop: "{{ nameservers.external }}"
 
-- name: dig (local resolver)
+- name: dig (internal resolution)
   ansible.builtin.assert:
     that:
       - lookup('community.general.dig', item.0) != 'NXDOMAIN'
-  loop: "{{ combinations }}"
-
-- name: dig (each nameserver)
-  ansible.builtin.assert:
-    that:
-      - lookup('community.general.dig', item.0, '@'+item.1) != 'NXDOMAIN'
   loop: "{{ combinations }}"
