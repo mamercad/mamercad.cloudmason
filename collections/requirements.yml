@@ -1,6 +1,8 @@
 collections:
   - name: awx.awx
     version: 19.1.0
+  - name: community.crypto
+    version: 1.9.5
   - name: community.digitalocean
     version: 1.9.0
   - name: community.general
