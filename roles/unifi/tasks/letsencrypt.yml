@@ -11,26 +11,41 @@
     cmd: /root/acme.sh
     creates: /root/.acme.sh
 
-- name: get some crypto
-  ansible.builtin.debug:
-    msg: |
-      {{ lookup('community.general.lastpass', 'Homelab\UniFi/CloudKey/Cloudflare', field='notes') }}
-      /root/.acme.sh/acme.sh --issue \
-        --dns dns_cf \
-        --ocsp-must-staple \
-        --keylength 4096 \
-        --server zerossl -d cloudkey.cloudmason.org
+- name: check existing cert
+  community.crypto.get_certificate:
+    host: "{{ hostname }}"
+    port: 8443
+  delegate_to: localhost
+  register: cert
 
-- name: backup /etc/ssl/private
-  community.general.archive:
-    path: /etc/ssl/private
-    dest: /etc/ssl/private.tgz
-    owner: root
-    group: ssl-cert
-    mode: 0644
+- name: renew some crypto
+  when: cert.expired
+  block:
 
-- name: deploy hook and cron
-  ansible.builtin.shell:
-    cmd: |
-      /root/.acme.sh/acme.sh --deploy -d cloudkey.cloudmason.org --deploy-hook unifi
-      /root/.acme.sh/acme.sh --install-cronjob
+    - name: get some crypto
+      ansible.builtin.shell:
+        cmd: |
+          echo /root/.acme.sh/acme.sh \
+            --issue \
+            --dns dns_cf \
+            --ocsp-must-staple \
+            --keylength 4096 \
+            --server zerossl \
+            -d {{ hostname }}
+      environment:
+        CF_Token: "{{ CF_Token }}"
+        CF_Email: "{{ CF_Email }}"
+
+    - name: backup /etc/ssl/private
+      community.general.archive:
+        path: /etc/ssl/private
+        dest: /etc/ssl/private.tgz
+        owner: root
+        group: ssl-cert
+        mode: 0644
+
+    - name: deploy hook and cron
+      ansible.builtin.shell:
+        cmd: |
+          /root/.acme.sh/acme.sh --deploy -d {{ hostname }} --deploy-hook unifi
+          /root/.acme.sh/acme.sh --install-cronjob
