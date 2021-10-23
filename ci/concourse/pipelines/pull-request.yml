@@ -24,7 +24,7 @@ resources:
 
 jobs:
 
-  - name: test
+  - name: test-pr
     plan:
 
       - get: pull-request
@@ -36,7 +36,7 @@ jobs:
           path: pull-request
           status: pending
 
-      - task: unit-test
+      - task: test-pr
         config:
           platform: linux
           image_resource:
