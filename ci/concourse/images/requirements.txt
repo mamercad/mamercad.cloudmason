@@ -5,4 +5,5 @@ ansible-lint==5.2.0
 ansible-modules-hashivault==4.6.4
 hvac==0.11.2
 octodns==0.9.12
+pre-commit==2.15.0
 requests==2.25.1
