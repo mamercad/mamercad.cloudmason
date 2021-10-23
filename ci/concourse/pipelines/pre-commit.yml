@@ -1,11 +1,11 @@
 ---
 
-# resource_types:
+resource_types:
 
-#   - name: slack-alert
-#     type: docker-image
-#     source:
-#       repository: arbourd/concourse-slack-alert-resource
+  - name: slack-alert
+    type: docker-image
+    source:
+      repository: arbourd/concourse-slack-alert-resource
 
 resources:
 
@@ -16,10 +16,10 @@ resources:
       uri: https://github.com/mamercad/mamercad.cloudmason.git
       branch: main
 
-  # - name: notify
-  #   type: slack-alert
-  #   source:
-  #     url: ((site.SLACK_WEBHOOK))
+  - name: notify
+    type: slack-alert
+    source:
+      url: ((site.SLACK_WEBHOOK))
 
 jobs:
 
@@ -70,19 +70,19 @@ jobs:
                 cd source
                 pre-commit run
 
-        # on_success:
-        #   put: notify
-        #   params:
-        #     alert_type: success
-        # on_failure:
-        #   put: notify
-        #   params:
-        #     alert_type: failed
-        # on_abort:
-        #   put: notify
-        #   params:
-        #     alert_type: aborted
-        # on_error:
-        #   put: notify
-        #   params:
-        #     alert_type: errored
+        on_success:
+          put: notify
+          params:
+            alert_type: success
+        on_failure:
+          put: notify
+          params:
+            alert_type: failed
+        on_abort:
+          put: notify
+          params:
+            alert_type: aborted
+        on_error:
+          put: notify
+          params:
+            alert_type: errored
