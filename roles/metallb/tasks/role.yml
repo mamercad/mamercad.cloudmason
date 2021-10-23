@@ -10,14 +10,14 @@
         name: config-watcher
         namespace: metallb-system
       rules:
-      - apiGroups:
-        - ''
-        resources:
-        - configmaps
-        verbs:
-        - get
-        - list
-        - watch
+        - apiGroups:
+            - ""
+          resources:
+            - configmaps
+          verbs:
+            - get
+            - list
+            - watch
 
 - name: create metallb role
   kubernetes.core.k8s:
@@ -31,12 +31,12 @@
         name: pod-lister
         namespace: metallb-system
       rules:
-      - apiGroups:
-        - ''
-        resources:
-        - pods
-        verbs:
-        - list
+        - apiGroups:
+            - ""
+          resources:
+            - pods
+          verbs:
+            - list
 
 - name: create metallb role
   kubernetes.core.k8s:
@@ -50,25 +50,25 @@
         name: controller
         namespace: metallb-system
       rules:
-      - apiGroups:
-        - ''
-        resources:
-        - secrets
-        verbs:
-        - create
-      - apiGroups:
-        - ''
-        resources:
-        - secrets
-        resourceNames:
-        - memberlist
-        verbs:
-        - list
-      - apiGroups:
-        - apps
-        resources:
-        - deployments
-        resourceNames:
-        - controller
-        verbs:
-        - get
+        - apiGroups:
+            - ""
+          resources:
+            - secrets
+          verbs:
+            - create
+        - apiGroups:
+            - ""
+          resources:
+            - secrets
+          resourceNames:
+            - memberlist
+          verbs:
+            - list
+        - apiGroups:
+            - apps
+          resources:
+            - deployments
+          resourceNames:
+            - controller
+          verbs:
+            - get

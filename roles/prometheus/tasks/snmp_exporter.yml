@@ -9,7 +9,7 @@
   ansible.builtin.unarchive:
     src: /tmp/snmp_exporter-{{ snmp_exporter.version }}.linux-amd64.tar.gz
     dest: /tmp/
-    remote_src: yes
+    remote_src: true
   become: true
 
 - name: create /opt/prometheus/snmp_exporter
