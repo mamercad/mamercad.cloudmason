@@ -19,32 +19,32 @@
         template:
           metadata:
             annotations:
-              prometheus.io/port: '7472'
-              prometheus.io/scrape: 'true'
+              prometheus.io/port: "7472"
+              prometheus.io/scrape: "true"
             labels:
               app: metallb
               component: controller
           spec:
             containers:
-            - args:
-              - --port=7472
-              - --config=config
-              env:
-              - name: METALLB_ML_SECRET_NAME
-                value: memberlist
-              - name: METALLB_DEPLOYMENT
-                value: controller
-              image: quay.io/metallb/controller:v0.10.2
-              name: controller
-              ports:
-              - containerPort: 7472
-                name: monitoring
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop:
-                  - all
-                readOnlyRootFilesystem: true
+              - args:
+                  - --port=7472
+                  - --config=config
+                env:
+                  - name: METALLB_ML_SECRET_NAME
+                    value: memberlist
+                  - name: METALLB_DEPLOYMENT
+                    value: controller
+                image: quay.io/metallb/controller:v0.10.2
+                name: controller
+                ports:
+                  - containerPort: 7472
+                    name: monitoring
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                      - all
+                  readOnlyRootFilesystem: true
             nodeSelector:
               kubernetes.io/os: linux
             securityContext:

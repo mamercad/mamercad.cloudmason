@@ -17,8 +17,8 @@
         defaultAllowPrivilegeEscalation: false
         fsGroup:
           ranges:
-          - max: 65535
-            min: 1
+            - max: 65535
+              min: 1
           rule: MustRunAs
         hostIPC: false
         hostNetwork: false
@@ -26,23 +26,23 @@
         privileged: false
         readOnlyRootFilesystem: true
         requiredDropCapabilities:
-        - ALL
+          - ALL
         runAsUser:
           ranges:
-          - max: 65535
-            min: 1
+            - max: 65535
+              min: 1
           rule: MustRunAs
         seLinux:
           rule: RunAsAny
         supplementalGroups:
           ranges:
-          - max: 65535
-            min: 1
+            - max: 65535
+              min: 1
           rule: MustRunAs
         volumes:
-        - configMap
-        - secret
-        - emptyDir
+          - configMap
+          - secret
+          - emptyDir
 
 - name: create metallb psp
   kubernetes.core.k8s:
@@ -58,7 +58,7 @@
       spec:
         allowPrivilegeEscalation: false
         allowedCapabilities:
-        - NET_RAW
+          - NET_RAW
         allowedHostPaths: []
         defaultAddCapabilities: []
         defaultAllowPrivilegeEscalation: false
@@ -68,14 +68,14 @@
         hostNetwork: true
         hostPID: false
         hostPorts:
-        - max: 7472
-          min: 7472
-        - max: 7946
-          min: 7946
+          - max: 7472
+            min: 7472
+          - max: 7946
+            min: 7946
         privileged: true
         readOnlyRootFilesystem: true
         requiredDropCapabilities:
-        - ALL
+          - ALL
         runAsUser:
           rule: RunAsAny
         seLinux:
@@ -83,6 +83,6 @@
         supplementalGroups:
           rule: RunAsAny
         volumes:
-        - configMap
-        - secret
-        - emptyDir
+          - configMap
+          - secret
+          - emptyDir

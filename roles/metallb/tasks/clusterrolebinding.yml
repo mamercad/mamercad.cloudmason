@@ -13,9 +13,9 @@
         kind: ClusterRole
         name: metallb-system:controller
       subjects:
-      - kind: ServiceAccount
-        name: controller
-        namespace: metallb-system
+        - kind: ServiceAccount
+          name: controller
+          namespace: metallb-system
 
 - name: create metallb clusterrolebinding
   kubernetes.core.k8s:
@@ -32,6 +32,6 @@
         kind: ClusterRole
         name: metallb-system:speaker
       subjects:
-      - kind: ServiceAccount
-        name: speaker
-        namespace: metallb-system
+        - kind: ServiceAccount
+          name: speaker
+          namespace: metallb-system
