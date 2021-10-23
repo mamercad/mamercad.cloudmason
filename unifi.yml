@@ -43,4 +43,7 @@
       ansible.builtin.include_role:
         name: unifi
         tasks_from: letsencrypt.yml
-      when: false  # not well tested
+      vars:
+        hostname: cloudkey.cloudmason.org
+        CF_Token: "{{ (lookup('community.general.lastpass', 'Homelab\\UniFi/CloudKey/Cloudflare', field='notes') | from_json)['env']['CF_Token'] }}"
+        CF_Email: "{{ (lookup('community.general.lastpass', 'Homelab\\UniFi/CloudKey/Cloudflare', field='notes') | from_json)['env']['CF_Email'] }}"
