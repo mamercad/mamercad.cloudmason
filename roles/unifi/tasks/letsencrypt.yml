@@ -1,0 +1,36 @@
+- name: fetch acme.sh
+  ansible.builtin.get_url:
+    url: https://get.acme.sh
+    dest: /root/acme.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: run acme.sh
+  ansible.builtin.command:
+    cmd: /root/acme.sh
+    creates: /root/.acme.sh
+
+- name: get some crypto
+  ansible.builtin.debug:
+    msg: |
+      {{ lookup('community.general.lastpass', 'Homelab\UniFi/CloudKey/Cloudflare', field='notes') }}
+      /root/.acme.sh/acme.sh --issue \
+        --dns dns_cf \
+        --ocsp-must-staple \
+        --keylength 4096 \
+        --server zerossl -d cloudkey.cloudmason.org
+
+- name: backup /etc/ssl/private
+  community.general.archive:
+    path: /etc/ssl/private
+    dest: /etc/ssl/private.tgz
+    owner: root
+    group: ssl-cert
+    mode: 0644
+
+- name: deploy hook and cron
+  ansible.builtin.shell:
+    cmd: |
+      /root/.acme.sh/acme.sh --deploy -d cloudkey.cloudmason.org --deploy-hook unifi
+      /root/.acme.sh/acme.sh --install-cronjob
