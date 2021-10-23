@@ -32,3 +32,15 @@
       ansible.builtin.include_role:
         name: unifi
         tasks_from: cloudkey.yml
+
+- name: letsencrypt
+  hosts: cloudkey
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: letsencrypt
+      ansible.builtin.include_role:
+        name: unifi
+        tasks_from: letsencrypt.yml
+      when: false  # not well tested
