@@ -14,10 +14,10 @@
         kind: Role
         name: config-watcher
       subjects:
-      - kind: ServiceAccount
-        name: controller
-      - kind: ServiceAccount
-        name: speaker
+        - kind: ServiceAccount
+          name: controller
+        - kind: ServiceAccount
+          name: speaker
 
 - name: create metallb rolebinding
   kubernetes.core.k8s:
@@ -35,8 +35,8 @@
         kind: Role
         name: pod-lister
       subjects:
-      - kind: ServiceAccount
-        name: speaker
+        - kind: ServiceAccount
+          name: speaker
 
 - name: create metallb rolebinding
   kubernetes.core.k8s:
@@ -54,5 +54,5 @@
         kind: Role
         name: controller
       subjects:
-      - kind: ServiceAccount
-        name: controller
+        - kind: ServiceAccount
+          name: controller

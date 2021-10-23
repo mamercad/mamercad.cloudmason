@@ -9,7 +9,7 @@
   ansible.builtin.unarchive:
     src: /tmp/blackbox_exporter-{{ blackbox_exporter.version }}.linux-amd64.tar.gz
     dest: /tmp/
-    remote_src: yes
+    remote_src: true
   become: true
 
 - name: create /opt/prometheus/blackbox_exporter

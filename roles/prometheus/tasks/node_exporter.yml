@@ -50,7 +50,7 @@
   ansible.builtin.unarchive:
     src: /tmp/node_exporter-{{ node_exporter[arch].version }}.linux-{{ arch }}.tar.gz
     dest: /tmp/
-    remote_src: yes
+    remote_src: true
   become: true
 
 - name: create /opt/prometheus/node_exporter

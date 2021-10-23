@@ -21,4 +21,3 @@
       ansible.builtin.include_role:
         name: prometheus
         tasks_from: node_exporter.yml
-

@@ -39,7 +39,7 @@
 - name: install docker-ce docker-ce-cli containerd.io
   ansible.builtin.apt:
     state: present
-    update_cache: yes
+    update_cache: true
     name:
       - docker-ce
       - docker-ce-cli

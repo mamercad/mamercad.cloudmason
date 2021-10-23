@@ -43,7 +43,7 @@
   ansible.builtin.unarchive:
     src: /tmp/prometheus.tgz
     dest: /opt/prometheus
-    remote_src: yes
+    remote_src: true
   become: true
 
 - name: create /opt/prometheus/storage

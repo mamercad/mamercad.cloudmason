@@ -7,9 +7,9 @@
 
   vars:
 
-      xxx: a
-      yyy: b
-      zzz: c
+    xxx: a
+    yyy: b
+    zzz: c
 
   tasks:
 
