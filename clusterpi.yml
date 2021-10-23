@@ -70,7 +70,7 @@
         version: v1.19.15%2Bk3s2
         binary: k3s-armhf
         sha256: d3250017ac051b9aa3e03a6dd80f2a2696502e4385eb14df9f0964ac8905eaa4
-        token: "{{ (lookup('community.general.lastpass', 'Homelab\Ansible/K3s', field='notes') | from_json)['token'] }}"
+        token: "{{ (lookup('community.general.lastpass', \"Homelab\\Ansible/K3s\", field='notes') | from_json)['token'] }}"
         options: "{{ k3s_options }} --disable servicelb --write-kubeconfig-mode 0644"
 
     - name: include tailscale role (main tasks)
