@@ -2,6 +2,7 @@
   ansible.builtin.apt:
     state: present
     name:
+      - curl
       - zsh
   become: true
 
