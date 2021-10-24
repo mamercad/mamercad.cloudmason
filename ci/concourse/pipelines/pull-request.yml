@@ -1,0 +1,102 @@
+---
+
+resource_types:
+
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: latest
+
+resources:
+
+  # - name: source
+  #   type: git
+  #   icon: github
+  #   source:
+  #     uri: https://github.com/mamercad/mamercad.cloudmason.git
+
+  - name: pull-request
+    type: pull-request
+    check_every: 24h
+    source:
+      repository: mamercad/mamercad.cloudmason
+      access_token: ((github-access-token))
+
+
+  - name: slack-notification
+    type: slack-notification
+    source:
+      url: ((slack-bot-token))
+
+jobs:
+
+  - name: test-pr
+    plan:
+
+      - get: pull-request
+        trigger: true
+        version: every
+
+      - put: pull-request
+        params:
+          path: pull-request
+          status: pending
+
+      - task: test-pr
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: alpine/git, tag: "latest"}
+          inputs:
+            - name: pull-request
+          run:
+            path: /bin/sh
+            args:
+              - -xce
+              - |
+                cd pull-request
+                git log -1 --pretty=format:"%an <%ae> opened '%s' %ar (%h)" | tee ../files/output
+                sed -i '1s/^/```/' ../files/output
+                sed -i '$s/$/```\n/' ../files/output
+                cat .git/resource/url | tee -a ../files/output
+          outputs:
+            - name: files
+
+        on_failure:
+          do:
+            - put: pull-request
+              params:
+                path: pull-request
+                status: failure
+                comment: "Concourse build [$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME/$BUILD_NAME]($ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME) failed :skull:"
+                delete_previous_comments: true
+            - put: slack-notification
+              params:
+                channel: '#concourse'
+                text_file: ./files/output
+                text: |
+                  Concourse build <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME/$BUILD_NAME> failed :skull:
+                  $TEXT_FILE_CONTENT
+
+        on_success:
+          do:
+            - put: pull-request
+              params:
+                path: pull-request
+                status: success
+                comment: "Concourse build [$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME/$BUILD_NAME]($ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME) passed :tada:"
+                delete_previous_comments: true
+            - put: slack-notification
+              params:
+                channel: '#concourse'
+                text_file: ./files/output
+                text: |
+                  Concourse build <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME/$BUILD_NAME> passed :tada:
+                  $TEXT_FILE_CONTENT
