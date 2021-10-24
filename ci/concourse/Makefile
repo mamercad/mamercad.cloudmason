@@ -25,6 +25,15 @@ fly-set-pipelines:
 	fly -t cloudmason set-pipeline \
 		--pipeline octodns --config pipelines/octodns.yml \
 		--non-interactive
+	fly -t cloudmason set-pipeline \
+		--pipeline test --config pipelines/test.yml \
+		--non-interactive
+	fly -t cloudmason set-pipeline \
+		--pipeline pre-commit --config pipelines/pre-commit.yml \
+		--non-interactive
+	fly -t cloudmason set-pipeline \
+		--pipeline pull-request --config pipelines/pull-request.yml \
+		--non-interactive
 
 fly-test-pipelines:
 	fly -t cloudmason validate-pipeline \
