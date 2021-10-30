@@ -1,0 +1,21 @@
+- name: install containerd
+  ansible.builtin.apt:
+    deb: "{{ raspian.containerd.deb }}"
+  become: true
+
+- name: install docker-ce-cli
+  ansible.builtin.apt:
+    deb: "{{ raspian.docker_cli.deb }}"
+  become: true
+
+- name: install docker-ce
+  ansible.builtin.apt:
+    deb: "{{ raspian.docker.deb }}"
+  become: true
+
+- name: start and enable docker
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+  become: true

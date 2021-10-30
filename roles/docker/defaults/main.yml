@@ -1,0 +1,8 @@
+# https://download.docker.com/linux/debian/dists/buster/pool/test/armhf/
+raspian:
+  containerd:
+    deb: https://download.docker.com/linux/debian/dists/buster/pool/test/armhf/containerd.io_1.4.9-1_armhf.deb
+  docker:
+    deb: https://download.docker.com/linux/debian/dists/buster/pool/test/armhf/docker-ce_20.10.10~3-0~debian-buster_armhf.deb
+  docker_cli:
+    deb: https://download.docker.com/linux/debian/dists/buster/pool/test/armhf/docker-ce-cli_20.10.9~3-0~debian-buster_armhf.deb
