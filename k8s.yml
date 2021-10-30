@@ -5,10 +5,22 @@
   gather_facts: false
   become: false
   tasks:
-    - name: include k8s role (main tasks)
+
+    - name: include k8s role (dashboard tasks)
       ansible.builtin.include_role:
         name: k8s
         tasks_from: dashboard.yml
+      vars:
+        context: "{{ k8s.context }}"
+      loop:
+        - context: lenovo
+      loop_control:
+        loop_var: k8s
+
+    - name: include k8s role (admin-user tasks)
+      ansible.builtin.include_role:
+        name: k8s
+        tasks_from: admin-user.yml
       vars:
         context: "{{ k8s.context }}"
       loop:
