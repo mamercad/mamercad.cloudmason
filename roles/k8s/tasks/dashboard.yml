@@ -37,7 +37,8 @@
           - port: 443
             targetPort: 8443
         selector:
-        k8s-app: kubernetes-dashboard
+          k8s-app: kubernetes-dashboard
+        type: LoadBalancer
 
 - name: create secret
   kubernetes.core.k8s:
