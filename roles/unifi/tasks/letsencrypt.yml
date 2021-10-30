@@ -25,7 +25,7 @@
     - name: get some crypto
       ansible.builtin.shell:
         cmd: |
-          echo /root/.acme.sh/acme.sh \
+          /root/.acme.sh/acme.sh \
             --issue \
             --dns dns_cf \
             --ocsp-must-staple \
