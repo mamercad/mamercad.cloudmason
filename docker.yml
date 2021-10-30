@@ -5,7 +5,15 @@
   gather_facts: true
   become: false
   tasks:
+
     - name: include docker role (main tasks)
       ansible.builtin.include_role:
         name: docker
         tasks_from: main.yml
+      when: ansible_architecture != "armv7l"
+
+    - name: include docker role (raspian tasks)
+      ansible.builtin.include_role:
+        name: docker
+        tasks_from: raspian.yml
+      when: ansible_architecture == "armv7l"
