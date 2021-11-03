@@ -1,0 +1,13 @@
+---
+- name: test2
+  hosts: "{{ ansible_limit | default('localhost', true) }}"
+  connection: "{{ 'local' if ansible_limit | default('localhost', true) == 'localhost' else 'ssh' }}"
+  gather_facts: true
+  become: false
+
+  tasks:
+
+    - name: debug
+      ansible.builtin.debug:
+        msg: |
+          {{ foo }}
