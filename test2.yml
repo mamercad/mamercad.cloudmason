@@ -7,6 +7,11 @@
 
   tasks:
 
+    - name: show ansible_product_name
+      ansible.builtin.debug:
+        msg: |
+          {{ ansible_product_name }}
+
     - name: show _foo
       ansible.builtin.debug:
         msg: |
