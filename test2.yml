@@ -11,6 +11,8 @@
       ansible.builtin.debug:
         msg: |
           {{ ansible_product_name }}
+          {{ ansible_facts["ansible_product_name"] }}
+          {{ hostvars[inventory_hostname]["ansible_facts"]["ansible_product_name"] }}
 
     - name: show _foo
       ansible.builtin.debug:
