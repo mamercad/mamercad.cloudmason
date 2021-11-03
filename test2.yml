@@ -7,16 +7,21 @@
 
   tasks:
 
-    - name: debug
-      ansible.builtin.debug:
-        var: ansible_facts
+    # - name: debug
+    #   ansible.builtin.debug:
+    #     var: ansible_facts
 
     - name: debug
       ansible.builtin.debug:
         msg: |
           {{ ansible_facts.keys() | sort }}
 
+    # - name: debug
+    #   ansible.builtin.debug:
+    #     msg: |
+    #       {{ ansible_facts.keys() | sort | length }}
+
     - name: debug
       ansible.builtin.debug:
         msg: |
-          {{ ansible_facts.keys() | sort | length }}
+          {{ hostvars[inventory_hostname]["ansible_facts"].keys() | sort }}
