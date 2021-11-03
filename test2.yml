@@ -10,4 +10,4 @@
     - name: debug
       ansible.builtin.debug:
         msg: |
-          {{ foo }}
+          {{ ansible_facts.foo }}
