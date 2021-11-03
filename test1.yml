@@ -21,3 +21,8 @@
       ansible.builtin.set_fact:
         ansible_product_name: fiz
         cacheable: true
+
+    - name: show ansible_product_name
+      ansible.builtin.debug:
+        msg: |
+          {{ ansible_product_name }}
