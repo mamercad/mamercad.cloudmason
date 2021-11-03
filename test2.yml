@@ -10,11 +10,13 @@
     - name: show _foo
       ansible.builtin.debug:
         msg: |
+          {{ _foo }}
           ansible_facts["_foo"]: {{ ansible_facts["_foo"] }}
           hostvars[inventory_hostname]["ansible_facts"]["_foo"]: {{ hostvars[inventory_hostname]["ansible_facts"]["_foo"] }}
 
     - name: show _bar
       ansible.builtin.debug:
         msg: |
+          {{ _bar }}
           ansible_facts["_bar"]: {{ ansible_facts["_bar"] }}
           hostvars[inventory_hostname]["ansible_facts"]["_bar"]: {{ hostvars[inventory_hostname]["ansible_facts"]["_bar"] }}
