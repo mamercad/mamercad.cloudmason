@@ -20,4 +20,4 @@
     - name: override ansible_product_name
       ansible.builtin.set_fact:
         ansible_product_name: fiz
-        # cacheable: false
+        cacheable: true
