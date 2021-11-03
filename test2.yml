@@ -10,4 +10,5 @@
     - name: debug
       ansible.builtin.debug:
         msg: |
-          {{ ansible_facts }}
+          {{ ansible_facts.keys() | sort }}
+          {{ ansible_facts.keys() | sort | length }}
