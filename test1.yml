@@ -11,3 +11,7 @@
       ansible.builtin.set_fact:
         foo: bar
         cacheable: true
+
+    - name: set a fact
+      ansible.builtin.set_fact:
+        bar: foo
