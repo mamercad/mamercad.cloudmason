@@ -7,11 +7,12 @@
 
   tasks:
 
-    - name: set a fact
+    - name: set a fact _foo=bar (cacheable)
       ansible.builtin.set_fact:
-        foo: bar
+        _foo: bar
         cacheable: true
 
-    - name: set a fact
+    - name: set a fact _bar=foo (not cacheable)
       ansible.builtin.set_fact:
-        bar: foo
+        _bar: foo
+        cacheable: false
