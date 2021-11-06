@@ -7,7 +7,23 @@ resource_types:
     source:
       repository: arbourd/concourse-slack-alert-resource
 
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
 resources:
+
+  - name: pull-request
+    type: pull-request
+    check_every: 24h
+    source:
+      repository: mamercad/mamercad.cloudmason
+      access_token: ((github-access-token))
+      paths:
+        - inventory/awx.yml
+        - roles/awx
+        - awx.yml
 
   - name: source
     type: git
@@ -16,14 +32,71 @@ resources:
       uri: https://github.com/mamercad/mamercad.cloudmason.git
       branch: main
       paths:
+        - inventory/awx.yml
         - roles/awx
+        - awx.yml
 
-  - name: notify
+  - name: slack-alert
     type: slack-alert
     source:
       url: ((site.SLACK_WEBHOOK))
 
 jobs:
+
+  - name: test-pr
+    plan:
+
+      - get: pull-request
+        trigger: true
+        version: every
+
+      - put: pull-request
+        params:
+          path: pull-request
+          status: pending
+
+      - task: test-pr
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: alpine/git, tag: "latest"}
+          inputs:
+            - name: pull-request
+          run:
+            path: /bin/sh
+            args:
+              - -xce
+              - |
+                cd pull-request
+                pre-commit run --verbose
+          outputs:
+            - name: files
+
+  - name: pre-commit
+    plan:
+
+      - get: source
+        trigger: true
+        version: every
+
+      - task: pre-commit
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: alpine/git, tag: "latest"}
+          inputs:
+            - name: source
+          run:
+            path: /bin/sh
+            args:
+              - -xce
+              - |
+                cd source
+                pre-commit run --verbose
+          outputs:
+            - name: files
 
   - name: deploy
     public: true
@@ -31,6 +104,7 @@ jobs:
 
       - get: source
         trigger: true
+        passed: ["pre-commit"]
 
       - task: ansible
         params:
@@ -80,18 +154,18 @@ jobs:
                 ansible-playbook -i inventory/concourse.yml awx.yml -v
 
         on_success:
-          put: notify
+          put: slack-alert
           params:
             alert_type: success
         on_failure:
-          put: notify
+          put: slack-alert
           params:
             alert_type: failed
         on_abort:
-          put: notify
+          put: slack-alert
           params:
             alert_type: aborted
         on_error:
-          put: notify
+          put: slack-alert
           params:
             alert_type: errored
