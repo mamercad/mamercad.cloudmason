@@ -1,0 +1,5 @@
+- name: install znc
+  ansible.builtin.apt:
+    state: present
+    name: znc
+  become: true

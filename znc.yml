@@ -1,0 +1,11 @@
+---
+- name: znc
+  hosts: thinkpad
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: include znc role (main tasks)
+      ansible.builtin.include_role:
+        name: znc
+        tasks_from: main.yml
