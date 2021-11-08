@@ -9,10 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = """
   author: Mark Mercado (@mamercad)
-  name: slack
+  name: summary
   type: notification
   requirements:
-    - Allow in configuration C(callbacks_enabled = slack) in C([default]).
+    - Allow in configuration C(callbacks_enabled = summary) in C([default]).
     - The C(requests) Python library.
   short_description: Sends play events to a Slack channel.
   description:
@@ -24,7 +24,7 @@ DOCUMENTATION = """
       env:
         - name: SLACK_BOT_TOKEN
       ini:
-        - section: callback_slack
+        - section: callback_summary
           key: slack_bot_token
     slack_channel:
       required: true
@@ -32,7 +32,7 @@ DOCUMENTATION = """
       env:
         - name: SLACK_CHANNEL
       ini:
-        - section: callback_slack
+        - section: callback_summary
           key: slack_channel
     slack_ansible_events:
       required: false
@@ -41,14 +41,14 @@ DOCUMENTATION = """
       env:
         - name: SLACK_ANSIBLE_EVENTS
       ini:
-        - section: callback_slack
+        - section: callback_summary
           key: slack_ansible_events
     slack_threading:
       required: false
       description: Use Slack threads (or not).
       default: false
       ini:
-        - section: callback_slack
+        - section: callback_summary
           key: slack_threading
 """
 
@@ -201,10 +201,12 @@ class PlayStats(object):
     def stats(self):
         return self._stats
 
-    def set(self, host, task, status, result):
+    def set(self, host, role, task, status, result):
         if not host in self._stats:
             self._stats[host] = []
-        self._stats[host].append({"task": task, "status": status, "result": result})
+        self._stats[host].append(
+            {"role": role, "task": task, "status": status, "result": result}
+        )
 
     def last(self, host):
         if host in self._stats:
@@ -212,10 +214,18 @@ class PlayStats(object):
         return None
 
 
+class NodeInfo(object):
+    def __init__(self, host):
+        try:
+            raise Exception(f"Exception on {host}")
+        except Exception:
+            pass
+
+
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "notification"
-    CALLBACK_NAME = "slack"
+    CALLBACK_NAME = "summary"
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
@@ -227,6 +237,7 @@ class CallbackModule(CallbackBase):
         )
 
         self.print = self._display
+        self.verbosity = self._display.verbosity
 
         self.slack_bot_token = self.get_option("slack_bot_token")
         self.slack_channel = self.get_option("slack_channel")
@@ -255,10 +266,12 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_start(self, playbook, *args, **kwargs):
         self.playbook_basedir = playbook._basedir
+        self.working_directory = os.path.basename(os.getcwd())
         self.playbook_name = os.path.basename(playbook._file_name)
         self.plays = playbook.get_plays()
 
         self.print.v(f"playbook_basedir: {self.playbook_basedir}")
+        self.print.v(f"working_directory: {self.working_directory}")
         self.print.v(f"playbook_name: {self.playbook_name}")
         self.print.v(f"plays: {str(self.plays)}")
 
@@ -270,14 +283,16 @@ class CallbackModule(CallbackBase):
                 f"plays: {self.plays}\n"
             )
 
-        self.slack.add(SlackHeader(text=f"{self.playbook_name}").block)
-
+        self.slack.add(SlackHeader(text=f"{self.working_directory} / {self.playbook_name}").block)
 
     def v2_playbook_on_play_start(self, play, *args, **kwargs):
         self.play_name = play.get_name()
         self.play_roles = play.get_roles()
         self.play_tasks = play.get_tasks()
         self.play_uuid = play._uuid
+        self.vm = play.get_variable_manager()
+        self.extra_vars = self.vm.extra_vars
+        self.play_vars = self.vm.get_vars(play)
 
         self.print.v(f"play_name: {self.play_name}")
         self.print.v(f"play_roles: {str(self.play_roles)}")
@@ -292,7 +307,6 @@ class CallbackModule(CallbackBase):
                 f"play_tasks: {self.play_tasks}\n"
                 f"play_uuid: {self.play_uuid}\n"
             )
-
 
     def v2_playbook_on_task_start(self, task, *args, **kwargs):
         self.role_name = task._role
@@ -324,7 +338,9 @@ class CallbackModule(CallbackBase):
         self.print.v(f"is_skipped: {self.is_skipped}")
         self.print.v(f"is_unreachable: {self.is_unreachable}")
 
-        self.play_stats.set(self.host, self.task_name, self.status, self.result)
+        self.play_stats.set(
+            self.host, self.role_name, self.task_name, self.status, self.result
+        )
 
         if f"v2_runner_on_{status}" in self.slack_ansible_events:
             message = (
@@ -355,36 +371,49 @@ class CallbackModule(CallbackBase):
             summary = stats.summarize(host)
             self.print.v(f"summarize {host}: {str(summary)}")
 
+            node_info = NodeInfo(host)
+
             if summary.get("failures") or summary.get("unreachable"):
                 self.overall_stats.set(host, "failed")
-                self.slack.add(SlackSection(text=f":large_red_square: *{host}* failed").block)
+                self.slack.add(
+                    SlackSection(text=f":large_red_square:  *{host}*  failed").block
+                )
                 if self.play_stats.last(host):
-                    self.slack.add(SlackSection(text=f"```{json.dumps(self.play_stats.last(host), indent=4)}```").block)
+                    self.slack.add(
+                        SlackSection(
+                            text=f"```{json.dumps(self.play_stats.last(host), indent=4)}```"
+                        ).block
+                    )
             else:
                 self.overall_stats.set(host, "passed")
-                self.slack.add(SlackSection(text=f":large_green_square: *{host}* passed").block)
+                self.slack.add(
+                    SlackSection(text=f":large_green_square:  *{host}*  passed").block
+                )
 
             if f"v2_playbook_on_stats" in self.slack_ansible_events:
                 message = f"*v2_playbook_on_stats*\n" f"{host}: {str(summary)}\n"
-
 
         all = self.overall_stats.all
         passed = self.overall_stats.passed
         failed = self.overall_stats.failed
         pct = self.overall_stats.pct
 
-        self.slack.add(SlackContext(
-          text=(
-            f"> Summary {len(all)} hosts"
-            " • "
-            f"{len(passed)*':large_green_square: '}"
-            f"{len(passed)} passed"
-            " • "
-            f"{len(failed)*':large_red_square: '}"
-            f"{len(failed)} failed"
-            " • "
-            f"{pct:.1f}% success\n"
-          )).block
+        self.slack.add(
+            SlackContext(
+                text=(
+                    f"> Summary"
+                    " • "
+                    f"{len(all)} hosts"
+                    " • "
+                    f"{len(passed)*':large_green_square: '}"
+                    f"{len(passed)} passed"
+                    " • "
+                    f"{len(failed)*':large_red_square: '}"
+                    f"{len(failed)} failed"
+                    " • "
+                    f"{pct:.1f}% success\n"
+                )
+            ).block
         )
 
         self.slack.send()
