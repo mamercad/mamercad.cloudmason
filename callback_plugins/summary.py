@@ -309,7 +309,7 @@ class CallbackModule(CallbackBase):
             )
 
     def v2_playbook_on_task_start(self, task, *args, **kwargs):
-        self.role_name = task._role
+        self.role_name = str(task._role)
         self.task_name = task.get_name()
 
         self.print.v(f"role_name: {self.role_name}")
