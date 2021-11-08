@@ -1,3 +1,8 @@
 - name: debug
   ansible.builtin.debug:
-    msg: in the testing role
+    msg: debug in the testing role
+
+- name: fail
+  ansible.builtin.fail:
+    msg: fail in the testing role
+  when: 3 | random == 1
