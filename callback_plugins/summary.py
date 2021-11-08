@@ -128,22 +128,28 @@ class SlackClient(object):
             "Authorization": f"Bearer {self._token}",
             "Content-type": "application/json; charset=utf-8",
         }
+
         if self._threading:
             if self._slack_ts is not None:
                 payload.update({"thread_ts": self._slack_ts})
+
         try:
             slack = requests.post(
                 "https://slack.com/api/chat.postMessage", headers=headers, json=payload
             )
         except Exception:
             raise
+
         if slack.status_code != requests.codes.ok:
             raise Exception(f"Slack response code not ok [{slack.status_code}]")
+
         response_json = slack.json()
         response_text = slack.text
         response_ok = response_json.get("ok", False)
+
         if not response_ok:
             raise Exception(f"Slack response not ok [{response_ok}] [{response_text}]")
+
         response_ts = response_json.get("ts", None)
         if response_ts:
             self._slack_ts = response_ts
@@ -212,6 +218,16 @@ class PlayStats(object):
         if host in self._stats:
             return self._stats[host][-1]
         return None
+
+    @property
+    def total_tasks(self, host):
+        if host in self._stats:
+            pass
+
+    @property
+    def passed_tasks(self, host):
+        if host in self._stats:
+            pass
 
 
 class NodeInfo(object):
@@ -283,7 +299,9 @@ class CallbackModule(CallbackBase):
                 f"plays: {self.plays}\n"
             )
 
-        self.slack.add(SlackHeader(text=f"{self.working_directory} / {self.playbook_name}").block)
+        self.slack.add(
+            SlackHeader(text=f"{self.working_directory} / {self.playbook_name}").block
+        )
 
     def v2_playbook_on_play_start(self, play, *args, **kwargs):
         self.play_name = play.get_name()
@@ -402,18 +420,20 @@ class CallbackModule(CallbackBase):
             SlackContext(
                 text=(
                     f"> Summary"
-                    " • "
+                    "  •  "
                     f"{len(all)} hosts"
-                    " • "
+                    "  •  "
                     f"{len(passed)*':large_green_square: '}"
                     f"{len(passed)} passed"
-                    " • "
+                    "  •  "
                     f"{len(failed)*':large_red_square: '}"
                     f"{len(failed)} failed"
-                    " • "
+                    "  •  "
                     f"{pct:.1f}% success\n"
                 )
             ).block
         )
 
         self.slack.send()
+
+        self.print.v(str(self.play_stats.stats))
