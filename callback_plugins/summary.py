@@ -419,7 +419,7 @@ class CallbackModule(CallbackBase):
         self.slack.add(
             SlackContext(
                 text=(
-                    f"> Summary"
+                    f"Summary"
                     "  •  "
                     f"{len(all)} hosts"
                     "  •  "
