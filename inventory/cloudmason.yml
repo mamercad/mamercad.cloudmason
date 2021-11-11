@@ -262,13 +262,28 @@ all:
         personal: mamercad@gmail.com
       shell: /usr/bin/zsh
     mail:
-      forwarders:
-        - host: mx1.forwardemail.net.
-          weight: 10
-        - host: mx2.forwardemail.net.
-          weight: 20
-      email: forward-email=mamercad@gmail.com
-      spf: v=spf1 a mx include:spf.forwardemail.net include:_spf.google.com -all
+      cloudmason_org:
+        forwarders:
+          - host: mx01.mail.icloud.com.
+            weight: 10
+          - host: mx02.mail.icloud.com.
+            weight: 20
+        txt: apple-domain=HkIuRA8FQ3S9jqP5
+        spf: v=spf1 redirect=icloud.com
+        dkim:
+          host: sig1._domainkey
+          value: sig1.dkim.cloudmason.org.at.icloudmailadmin.com.
+      letsbuildthe_cloud:
+        forwarders:
+          - host: mx01.mail.icloud.com.
+            weight: 10
+          - host: mx02.mail.icloud.com.
+            weight: 20
+        txt: apple-domain=U1v3mEgKU1rZSMVn
+        spf: v=spf1 redirect=icloud.com
+        dkim:
+          host: sig1._domainkey
+          value: sig1.dkim.letsbuildthe.cloud.at.icloudmailadmin.com.
     network:
       domain: cloudmason.org
       gateway: 192.168.1.1

@@ -5,16 +5,19 @@
     ttl: 3600
   - type: MX
     values:
-      - exchange: {{ mail.forwarders.0.host }}
-        preference: {{ mail.forwarders.0.weight }}
-      - exchange: {{ mail.forwarders.1.host }}
-        preference: {{ mail.forwarders.1.weight }}
+      - exchange: {{ mail.cloudmason_org.forwarders.0.host }}
+        preference: {{ mail.cloudmason_org.forwarders.0.weight }}
+      - exchange: {{ mail.cloudmason_org.forwarders.1.host }}
+        preference: {{ mail.cloudmason_org.forwarders.1.weight }}
     ttl: 3600
   - type: TXT
     values:
-      - forward-email={{ mail.email }}
-      - {{ mail.spf }}
+      - {{ mail.cloudmason_org.txt }}
+      - "{{ mail.cloudmason_org.spf }}"
     ttl: 3600
+{{ mail.cloudmason_org.dkim.host }}:
+  type: CNAME
+  value: {{ mail.cloudmason_org.dkim.value }}
 att:
   type: A
   value: {{ hostvars.gateway.eth2 }}
