@@ -32,3 +32,27 @@ all:
     ubuntu:
       hosts:
         prodesk:
+  vars:
+    mail:
+      cloudmason_org:
+        forwarders:
+          - host: mx01.mail.icloud.com.
+            weight: 10
+          - host: mx02.mail.icloud.com.
+            weight: 20
+        txt: apple-domain=HkIuRA8FQ3S9jqP5
+        spf: v=spf1 redirect=icloud.com
+        dkim:
+          host: sig1._domainkey
+          value: sig1.dkim.cloudmason.org.at.icloudmailadmin.com.
+      letsbuildthe_cloud:
+        forwarders:
+          - host: mx01.mail.icloud.com.
+            weight: 10
+          - host: mx02.mail.icloud.com.
+            weight: 20
+        txt: apple-domain=U1v3mEgKU1rZSMVn
+        spf: v=spf1 redirect=icloud.com
+        dkim:
+          host: sig1._domainkey
+          value: sig1.dkim.letsbuildthe.cloud.at.icloudmailadmin.com.
