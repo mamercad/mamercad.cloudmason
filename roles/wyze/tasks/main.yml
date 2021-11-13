@@ -1,0 +1,9 @@
+- name: create wyze namespace
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: wyze
