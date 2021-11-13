@@ -212,6 +212,10 @@
             rule: Host(`qnapweb.cloudmason.org`)
             service: qnapweb
             tls: {}
+          wyze:
+            rule: Host(`wyze.cloudmason.org`)
+            service: wyze
+            tls: {}
         middlewares:
           admin-user:
             basicAuth:
@@ -301,6 +305,11 @@
             loadBalancer:
               servers:
                 - url: http://qnap.cloudmason.org:10000/
+          wyze:
+            loadBalancer:
+              servers:
+                - url: http://wyze-rtsp.wyze.thinkpad.cloudmason.org:8888/
+            middlewares: ['internal-only']
       tls:
         options:
           default:
