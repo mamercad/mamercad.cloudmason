@@ -165,7 +165,6 @@ all:
       hosts:
         net1:
         net2:
-        thinkpad:
     traefik:
       hosts:
         net1:
