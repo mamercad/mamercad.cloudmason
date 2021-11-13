@@ -1,0 +1,15 @@
+---
+- name: wyze
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+
+  tasks:
+
+    - name: include wyze role (main tasks)
+      ansible.builtin.include_role:
+        name: wyze
+        tasks_from: main.yml
+      vars:
+        context: thinkpad
