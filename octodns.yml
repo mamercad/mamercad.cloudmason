@@ -25,7 +25,7 @@
         name: octodns
         tasks_from: main.yml
       vars:
-        doit: false
+        doit: true
       tags: always
 
 - name: powerdns
