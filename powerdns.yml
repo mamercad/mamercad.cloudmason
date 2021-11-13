@@ -10,7 +10,7 @@
         name: powerdns
         tasks_from: raspian.yml
       when: ansible_architecture == "armv7l"
-    - name: include powerdns role (ubuntu tasks)
-      ansible.builtin.include_role:
-        name: powerdns
-        tasks_from: ubuntu.yml
+    # - name: include powerdns role (ubuntu tasks)
+    #   ansible.builtin.include_role:
+    #     name: powerdns
+    #     tasks_from: ubuntu.yml
