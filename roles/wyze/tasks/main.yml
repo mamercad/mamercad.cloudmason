@@ -7,3 +7,86 @@
       kind: Namespace
       metadata:
         name: wyze
+
+- name: create wyze email secret
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: v1
+      data:
+        WYZE_EMAIL: "{{ secret.WYZE_EMAIL | b64encode }}"
+        WYZE_PASSWORD: "{{ secret.WYZE_PASSWORD | b64encode }}"
+      kind: Secret
+      metadata:
+        name: wyze-creds
+        namespace: wyze
+      type: Opaque
+
+- name: create wyze deployment
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        labels:
+          app: wyze
+        name: wyze
+        namespace: wyze
+      spec:
+        selector:
+          matchLabels:
+            app: wyze
+        template:
+          metadata:
+            labels:
+              app: wyze
+          spec:
+            containers:
+              - args: []
+                env:
+                  - name: WYZE_EMAIL
+                    valueFrom:
+                      secretKeyRef:
+                        name: wyze-creds
+                        key: WYZE_EMAIL
+                  - name: WYZE_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: wyze-creds
+                        key: WYZE_PASSWORD
+                image: mrlt8/wyze-bridge:latest
+                name: wyze-bridge
+                ports:
+                  - containerPort: 8888
+                    name: wyze-rtsp
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                      - all
+                  readOnlyRootFilesystem: false
+            nodeSelector:
+              kubernetes.io/os: linux
+
+- name: create wyze service
+  kubernetes.core.k8s:
+    state: present
+    context: "{{ context }}"
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: wyze-rtsp
+        namespace: wyze
+      spec:
+        type: LoadBalancer
+        ports:
+          - name: wyze-rtsp
+            port: 8888
+            protocol: TCP
+            targetPort: 8888
+        selector:
+          app: wyze
