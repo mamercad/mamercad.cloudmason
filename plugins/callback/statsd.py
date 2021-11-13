@@ -116,7 +116,7 @@ class StatsD:
         self.task = None
 
     def ship_it(self, parent, metric):
-        """ Sends the metric to StatsD """
+        """Sends the metric to StatsD"""
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.host, int(self.port)))
@@ -134,7 +134,7 @@ class StatsD:
             sock.close()
 
     def v2_playbook_on_start(self, parent, playbook, plays):
-        """ Constructs the StatsD metric for sending """
+        """Constructs the StatsD metric for sending"""
         self.playdir = base64.b64encode(playbook["_basedir"].encode("utf-8")).decode(
             "utf-8"
         )
@@ -153,7 +153,7 @@ class StatsD:
         self.ship_it(parent, metric)
 
     def v2_playbook_on_task_start(self, parent, task, task_name):
-        """ Constructs the StatsD metric for sending """
+        """Constructs the StatsD metric for sending"""
         # self.task = base64.b64encode(task_name.encode("utf-8")).decode("utf-8")
         self.task = task_name
         metric = "ansible.v2_playbook_on_task_start.{0}.{1}.{2}:1|c".format(
@@ -166,7 +166,7 @@ class StatsD:
         self.ship_it(parent, metric)
 
     def v2_runner_on_ok(self, parent, result):
-        """ Constructs the StatsD metric for sending """
+        """Constructs the StatsD metric for sending"""
         metric = "ansible.v2_runner_on_ok.{0}.{1}.{2}.{3}.{4}.{5}:1|c".format(
             self.playdir,
             self.playbook,
@@ -180,7 +180,7 @@ class StatsD:
         self.ship_it(parent, metric)
 
     def v2_runner_on_failed(self, parent, result):
-        """ Constructs the StatsD metric for sending """
+        """Constructs the StatsD metric for sending"""
         metric = "ansible.v2_runner_on_failed.{0}.{1}.{2}.{3}.{4}.{5}:1|c".format(
             self.playdir,
             self.playbook,
@@ -194,7 +194,7 @@ class StatsD:
         self.ship_it(parent, metric)
 
     def v2_runner_on_skipped(self, parent, result):
-        """ Constructs the StatsD metric for sending """
+        """Constructs the StatsD metric for sending"""
         metric = "ansible.v2_runner_on_skipped.{0}.{1}.{2}.{3}.{4}.{5}:1|c".format(
             self.playdir,
             self.playbook,
@@ -208,7 +208,7 @@ class StatsD:
         self.ship_it(parent, metric)
 
     def v2_runner_on_unreachable(self, parent, result):
-        """ Constructs the StatsD metric for sending """
+        """Constructs the StatsD metric for sending"""
         metric = "ansible.v2_runner_on_unreachable.{0}.{1}.{2}.{3}.{4}.{5}:1|c".format(
             self.playdir,
             self.playbook,
@@ -222,7 +222,7 @@ class StatsD:
         self.ship_it(parent, metric)
 
     def v2_playbook_on_stats(self, parent, stats):
-        """ Constructs the StatsD metric for sending """
+        """Constructs the StatsD metric for sending"""
         for k1 in stats.keys():
             if len(stats[k1]):
                 for k2 in stats[k1].keys():

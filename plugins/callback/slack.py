@@ -150,6 +150,7 @@ class SlackMessages(object):
         # not sure what to use as text here
         self.slack.send(blocks=flatten_blocks)
 
+
 class SlackMessage(object):
     def __init__(self, print, slack, text, context, divider=False, *args, **kwargs):
         self.print = print
@@ -170,10 +171,15 @@ class SlackMessage(object):
         if context:
             self.blocks.append(self._slack_block_context())
 
-
     def _alphabet(self, string):
         words = string.split(" ")
-        return "".join([f":alphabet-white-{letter.lower()}:" for word in words for letter in list(word)])
+        return "".join(
+            [
+                f":alphabet-white-{letter.lower()}:"
+                for word in words
+                for letter in list(word)
+            ]
+        )
 
     def _slack_text(self):
         pieces = []
@@ -193,7 +199,7 @@ class SlackMessage(object):
         if "post" in self.text:
             pieces.append(f"⮕ {self.text['post']}")
 
-        return(" ".join(pieces))
+        return " ".join(pieces)
 
     def _slack_divider(self):
         return {
@@ -268,7 +274,9 @@ class CallbackModule(CallbackBase):
             threading=self.slack_threading,
         )
 
-        self.slack_messages = SlackMessages(print=self._display.display, slack=self.slack)
+        self.slack_messages = SlackMessages(
+            print=self._display.display, slack=self.slack
+        )
 
         if self.slack_bot_token is None:
             self._display.warning(
@@ -286,11 +294,9 @@ class CallbackModule(CallbackBase):
             )
             self.disabled = True
 
-
     def _get_ts(self):
         now = datetime.datetime.now()
         return f"{now.hour:02d}:{now.minute:02d}"
-
 
     def v2_playbook_on_start(self, playbook, **kwargs):
         if self.verbosity >= 3:
@@ -502,7 +508,10 @@ class CallbackModule(CallbackBase):
             }
 
             message = SlackMessage(
-                print=self._display.display, slack=self.slack, text=text, context=context
+                print=self._display.display,
+                slack=self.slack,
+                text=text,
+                context=context,
             )
 
             if self.slack_cadence == "realtime":
