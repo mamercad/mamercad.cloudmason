@@ -40,7 +40,7 @@ all:
             weight: 10
           - host: mx02.mail.icloud.com.
             weight: 10
-        txt: apple-domain=HkIuRA8FQ3S9jqP5
+        txt: apple-domain=EME9FAFWpCCwqNgQ
         spf: v=spf1 redirect=icloud.com
         dkim:
           host: sig1._domainkey
