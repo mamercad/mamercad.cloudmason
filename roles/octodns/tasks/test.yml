@@ -1,15 +1,15 @@
-- name: dig (internal resolver)
-  ansible.builtin.assert:
-    that:
-      - item in (lookup('community.general.dig', 'cloudmason.org', '@' ~ item) | split(','))
-  loop: "{{ nameservers.internal }}"
+# - name: dig (internal resolver)
+#   ansible.builtin.assert:
+#     that:
+#       - item in (lookup('community.general.dig', 'cloudmason.org', '@' ~ item) | split(','))
+#   loop: "{{ nameservers.internal }}"
 
-- name: dig (external resolver)
-  ansible.builtin.assert:
-    that:
-      - hostvars.gateway.eth0 in (lookup('community.general.dig', 'cloudmason.org', '@' ~ item) | split(','))
-      - hostvars.gateway.eth2 in (lookup('community.general.dig', 'letsbuildthe.cloud', '@' ~ item) | split(','))
-  loop: "{{ nameservers.external }}"
+# - name: dig (external resolver)
+#   ansible.builtin.assert:
+#     that:
+#       - hostvars.gateway.eth0 in (lookup('community.general.dig', 'cloudmason.org', '@' ~ item) | split(','))
+#       - hostvars.gateway.eth2 in (lookup('community.general.dig', 'letsbuildthe.cloud', '@' ~ item) | split(','))
+#   loop: "{{ nameservers.external }}"
 
 - name: dig (internal resolution)
   ansible.builtin.assert:
