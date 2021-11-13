@@ -73,6 +73,7 @@ DOCUMENTATION = """
           key: ansible_events
 """
 
+
 class SyslogClient(object):
     def __init__(
         self,
@@ -124,7 +125,12 @@ class CallbackModule(CallbackBase):
         self.syslog_facility = self.get_option("syslog_facility")
         self.syslog_priority = self.get_option("syslog_priority")
 
-        self.syslog = SyslogClient(host=self.syslog_host, port=self.syslog_port, facility=self.syslog_facility, priority=self.syslog_priority)
+        self.syslog = SyslogClient(
+            host=self.syslog_host,
+            port=self.syslog_port,
+            facility=self.syslog_facility,
+            priority=self.syslog_priority,
+        )
 
         self.ansible_events = self.get_option("ansible_events").split(",")
 

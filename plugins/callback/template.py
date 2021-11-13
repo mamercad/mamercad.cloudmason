@@ -3,6 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = """
@@ -42,7 +43,6 @@ class CallbackModule(CallbackBase):
         self.print = self._display.display
         self.verbosity = self._display.verbosity
 
-
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(
             task_keys=task_keys, var_options=var_options, direct=direct
@@ -52,22 +52,19 @@ class CallbackModule(CallbackBase):
         # host and task need to be specified in case 'magic variables' (host vars, group vars, etc)
         # need to be loaded as well
         return self._play.get_variable_manager().get_vars(
-            play=self._play,
-            host=host,
-            task=task
+            play=self._play, host=host, task=task
         )
 
     def v2_playbook_on_start(self, playbook, **kwargs):
         self.playbook = playbook
         self.playbook_file_name = playbook._file_name
 
-
     def v2_playbook_on_play_start(self, play):
         self.play = play
         self.vm = play.get_variable_manager()
         self.extra_vars = self.vm.extra_vars
         self.play_vars = self.vm.get_vars(self.play)
-        self.hostvars = self.vm.get_vars()['hostvars']
+        self.hostvars = self.vm.get_vars()["hostvars"]
 
         # name = play.get_name().strip()
         # if not name:
