@@ -28,6 +28,19 @@
         doit: false
       tags: always
 
+- name: powerdns
+  hosts: powerdns
+  connection: ssh
+  gather_facts: false
+  become: false
+  tasks:
+    - name: restart recursor
+      ansible.builtin.systemd:
+        name: pdns-recursor
+        state: restarted
+      tags: always
+      become: true
+
 - name: test
   hosts: localhost
   connection: local
