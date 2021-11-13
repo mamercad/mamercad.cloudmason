@@ -1,3 +1,4 @@
 organizations:
-  - name: Cloudmason
+  - state: present
+    name: Cloudmason
     description: Cloudmason

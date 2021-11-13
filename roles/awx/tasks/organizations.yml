@@ -1,6 +1,4 @@
 - name: create organizations
   awx.awx.tower_organization:
-    state: present
-    name: "{{ item.name }}"
-    description: "{{ item.description }}"
+  args: "{{ item }}"
   loop: "{{ organizations | default([], true) }}"
