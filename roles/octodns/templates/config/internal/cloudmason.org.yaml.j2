@@ -4,11 +4,26 @@
     values:
       - 192.168.1.10
       - 192.168.1.11
-  - ttl: 3600
-    type: MX
+  # - ttl: 3600
+  #   type: MX
+  #   values:
+  #     - exchange: smtp.cloudmason.org.
+  #       preference: 10
+  - type: MX
     values:
-      - exchange: smtp.cloudmason.org.
-        preference: 10
+      - exchange: {{ mail.cloudmason_org.forwarders.0.host }}
+        preference: {{ mail.cloudmason_org.forwarders.0.weight }}
+      - exchange: {{ mail.cloudmason_org.forwarders.1.host }}
+        preference: {{ mail.cloudmason_org.forwarders.1.weight }}
+    ttl: 3600
+  - type: TXT
+    values:
+      - {{ mail.cloudmason_org.txt }}
+      - "{{ mail.cloudmason_org.spf }}"
+    ttl: 3600
+{{ mail.cloudmason_org.dkim.host }}:
+  type: CNAME
+  value: {{ mail.cloudmason_org.dkim.value }}
 C02D6D7BMD6M:
   type: A
   value: 192.168.1.109
