@@ -36,6 +36,7 @@
   become: true
 
 - name: deploy traefik.yaml
+  tags: config
   ansible.builtin.copy:
     dest: "{{ traefik_home }}/traefik.yaml"
     owner: "{{ traefik_user }}"
@@ -220,7 +221,20 @@
           internal-only:
             ipWhiteList:
               sourceRange:
+                - "127.0.0.1"
                 - "192.168.1.0/24"
+                - "100.88.226.83"   # honeycrisp
+                - "100.122.123.10"  # boomer
+                - "100.93.209.27"   # clusterpi0
+                - "100.87.109.78"   # clusterpi1
+                - "100.117.181.104" # clusterpi2
+                - "100.71.247.18"   # fuji
+                - "100.125.224.21"  # gala
+                - "100.107.179.32"  # lenovo
+                - "100.78.176.32"   # net1
+                - "100.78.6.96"     # net2
+                - "100.81.5.61"     # prodesk
+                - "100.88.47.75"    # thinkpad
           zabbix:
             addPrefix:
               prefix: /zabbix
