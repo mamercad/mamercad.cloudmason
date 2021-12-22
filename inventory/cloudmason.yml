@@ -28,19 +28,15 @@ all:
       ansible_host: 192.168.1.137
       ansible_user: mamercad
     clusterpi0:
-      ansible_host: 192.168.1.62
       ansible_user: pi
       ansible_python_interpreter: /usr/bin/python3
     clusterpi1:
-      ansible_host: 192.168.1.81
       ansible_user: pi
       ansible_python_interpreter: /usr/bin/python3
     clusterpi2:
-      ansible_host: 192.168.1.64
       ansible_user: pi
       ansible_python_interpreter: /usr/bin/python3
     clusterpi3:
-      ansible_host: 192.168.1.68
       ansible_user: pi
       ansible_python_interpreter: /usr/bin/python3
     displaypi0:
@@ -61,7 +57,7 @@ all:
       ansible_network_os: vyos.vyos.vyos
       ansible_user: mamercad
     net1:
-      ansible_host: 192.168.1.10
+      # ansible_host: 192.168.1.10
       ansible_python_interpreter: /usr/bin/python3
       healthchecks_io: !vault |
         $ANSIBLE_VAULT;1.1;AES256
@@ -73,7 +69,7 @@ all:
         34323132393937373537353866313766353861633566333130336364323739393533653835646132
         376262333030323666653934386439613831
     net2:
-      ansible_host: 192.168.1.11
+      # ansible_host: 192.168.1.11
       ansible_python_interpreter: /usr/bin/python3
       healthchecks_io: !vault |
         $ANSIBLE_VAULT;1.1;AES256
@@ -85,7 +81,6 @@ all:
         30653639396530393865303365613462313862356135633433663939393563633361353036313363
         353361643666373762653038656437383566
     lenovo:
-      ansible_host: 192.168.1.98
       ansible_python_interpreter: /usr/bin/python3
       healthchecks_io: !vault |
         $ANSIBLE_VAULT;1.1;AES256
@@ -96,8 +91,8 @@ all:
         37336230646466653337376337333637663734343431616639653464646337363363653337376337
         64643030616134353336323761306663633564376262396361306166346630346339353063346533
         656561616436616637316138326232653835
+      ansible_host: 192.168.1.98
     prodesk:
-      ansible_host: 192.168.1.127
       ansible_python_interpreter: /usr/bin/python3
       healthchecks_io: !vault |
         $ANSIBLE_VAULT;1.1;AES256
@@ -108,8 +103,8 @@ all:
         66316366623837353963303861623934663239663638343565663339313634386437623435653462
         37646562346137303434373936333038323338313561323837356662393263656337663431366230
         343734613837623262303263633331386635
+      ansible_host: 192.168.1.127
     thinkpad:
-      ansible_host: 192.168.1.67
       ansible_python_interpreter: /usr/bin/python3
       healthchecks_io: !vault |
         $ANSIBLE_VAULT;1.1;AES256
@@ -120,8 +115,8 @@ all:
         39313862653436383861336562343835366637623135333638386631356363663465316162303262
         35643330336363643062633839646631653535653335653536373162663061636561613439323161
         653964326634313535613339363438356566
+      ansible_host: 192.168.1.67
     gala:
-      ansible_host: 192.168.1.73
       ansible_python_interpreter: /usr/bin/python3
       healthchecks_io: !vault |
         $ANSIBLE_VAULT;1.1;AES256
@@ -133,7 +128,6 @@ all:
         34616238303461613237383466613037396264653630633564306536356139313936333263306231
         343461356436393762313562383865366361
     jonagold:
-      ansible_host: 192.168.1.110
       ansible_python_interpreter: /usr/bin/python3
       healthchecks_io: !vault |
         $ANSIBLE_VAULT;1.1;AES256
@@ -262,16 +256,26 @@ all:
       shell: /usr/bin/zsh
     mail:
       cloudmason_org:
+        # Cloudflare
         forwarders:
-          - host: mx01.mail.icloud.com.
-            weight: 10
-          - host: mx02.mail.icloud.com.
-            weight: 10
-        txt: apple-domain=EME9FAFWpCCwqNgQ
-        spf: v=spf1 redirect=icloud.com
-        dkim:
-          host: sig1._domainkey
-          value: sig1.dkim.cloudmason.org.at.icloudmailadmin.com.
+          - host: isaac.mx.cloudflare.net.
+            weight: 15
+          - host: linda.mx.cloudflare.net.
+            weight: 70
+          - host: amir.mx.cloudflare.net.
+            weight: 45
+        spf: v=spf1 include:_spf.mx.cloudflare.net ~all
+        # # Apple
+        # forwarders:
+        #   - host: mx01.mail.icloud.com.
+        #     weight: 10
+        #   - host: mx02.mail.icloud.com.
+        #     weight: 10
+        # txt: apple-domain=EME9FAFWpCCwqNgQ
+        # spf: v=spf1 redirect=icloud.com
+        # dkim:
+        #   host: sig1._domainkey
+        #   value: sig1.dkim.cloudmason.org.at.icloudmailadmin.com.
       letsbuildthe_cloud:
         forwarders:
           - host: mx01.mail.icloud.com.
