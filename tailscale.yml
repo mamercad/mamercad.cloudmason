@@ -1,6 +1,6 @@
 ---
 - name: tailscale
-  hosts: ubuntu
+  hosts: ubuntu,raspbian
   connection: ssh
   gather_facts: true
   become: false
