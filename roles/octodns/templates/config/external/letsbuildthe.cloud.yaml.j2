@@ -9,15 +9,13 @@
         preference: {{ mail.letsbuildthe_cloud.forwarders.0.weight }}
       - exchange: {{ mail.letsbuildthe_cloud.forwarders.1.host }}
         preference: {{ mail.letsbuildthe_cloud.forwarders.1.weight }}
+      - exchange: {{ mail.letsbuildthe_cloud.forwarders.2.host }}
+        preference: {{ mail.letsbuildthe_cloud.forwarders.2.weight }}
     ttl: 3600
   - type: TXT
     values:
-      - {{ mail.letsbuildthe_cloud.txt }}
       - "{{ mail.letsbuildthe_cloud.spf }}"
     ttl: 3600
-{{ mail.letsbuildthe_cloud.dkim.host }}:
-  type: CNAME
-  value: {{ mail.letsbuildthe_cloud.dkim.value }}
 att:
   type: A
   value: {{ hostvars.gateway.eth2 }}

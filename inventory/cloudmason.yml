@@ -277,16 +277,26 @@ all:
         #   host: sig1._domainkey
         #   value: sig1.dkim.cloudmason.org.at.icloudmailadmin.com.
       letsbuildthe_cloud:
+        # Cloudflare
         forwarders:
-          - host: mx01.mail.icloud.com.
-            weight: 10
-          - host: mx02.mail.icloud.com.
-            weight: 10
-        txt: apple-domain=U1v3mEgKU1rZSMVn
-        spf: v=spf1 redirect=icloud.com
-        dkim:
-          host: sig1._domainkey
-          value: sig1.dkim.letsbuildthe.cloud.at.icloudmailadmin.com.
+          - host: isaac.mx.cloudflare.net.
+            weight: 73
+          - host: linda.mx.cloudflare.net.
+            weight: 87
+          - host: amir.mx.cloudflare.net.
+            weight: 100
+        spf: v=spf1 include:_spf.mx.cloudflare.net ~all
+        # # Apple
+        # forwarders:
+        #   - host: mx01.mail.icloud.com.
+        #     weight: 10
+        #   - host: mx02.mail.icloud.com.
+        #     weight: 10
+        # txt: apple-domain=U1v3mEgKU1rZSMVn
+        # spf: v=spf1 redirect=icloud.com
+        # dkim:
+        #   host: sig1._domainkey
+        #   value: sig1.dkim.letsbuildthe.cloud.at.icloudmailadmin.com.
     network:
       domain: cloudmason.org
       gateway: 192.168.1.1
